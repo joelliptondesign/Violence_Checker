@@ -53,6 +53,10 @@ Within `ViolenceFinding`, `contact_occurred` means person-directed physical cont
 
 `src/comparison.py` builds `ComparisonResult` from an incident, a regex result, and a semantic extraction result. It makes no provider calls and does not use model-generated comparison prose. Observations are deterministic presentation logic derived from existing outputs.
 
+The comparison result explicitly separates classification divergence from semantic enrichment. Classification alignment records whether regex and semantic extraction are both positive, both negative, regex-positive/semantic-negative, regex-negative/semantic-positive, or unavailable because semantic extraction failed. Semantic enrichment records material distinctions represented by validated semantic output but not by the lexical regex boolean, including historical context, threats, attempts, completed violence, accidental contact, no person-directed contact, negation, corrections, conflicting statements, injury mentions, actor or target information, supporting evidence, and confidence or uncertainty notes.
+
+`material_difference_detected` is true when classification diverges or semantic enrichment exists. A true no-material-difference state is limited to aligned classifications with no material semantic distinction. Comparison remains deterministic and does not make an additional provider request.
+
 ## Salesforce Preview
 
 `src/salesforce_preview.py` creates a deterministic illustrative dictionary from a successful validated semantic result. The field names are deliberately illustrative and contain no real Salesforce object names, credentials, identifiers, connection logic, or API calls.
@@ -69,7 +73,7 @@ Failed semantic results do not produce a preview.
 - explicit `Run Analysis` control
 - side-by-side regex and semantic output
 - semantic validation status
-- comparison observations
+- comparison status, classification divergence, and semantic enrichment observations
 - illustrative Salesforce preview
 
 Semantic extraction is not run on page load, fixture selection, or manual typing. One semantic request occurs per `Run Analysis` action.

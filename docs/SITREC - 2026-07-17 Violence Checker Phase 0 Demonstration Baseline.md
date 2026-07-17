@@ -8,7 +8,7 @@ System identity: local Phase 0 semantic violence detection pre-PoC.
 
 Implementation layer: Python and Streamlit application for a local stakeholder demonstration using synthetic hospital incident narratives only.
 
-The repository demonstrates an illustrative lexical regex baseline, OpenAI Responses API semantic extraction, Pydantic validation, deterministic comparison observations, and an illustrative Salesforce write-back preview. It is local demonstration software and is not production software.
+The repository demonstrates an illustrative lexical regex baseline, OpenAI Responses API semantic extraction, Pydantic validation, deterministic comparison status and observations, and an illustrative Salesforce write-back preview. It is local demonstration software and is not production software.
 
 This SITREC is a current-state rehydration artifact for 2026-07-17. It does not supersede repository files, tests, source code, local configuration, or deterministic validation output.
 
@@ -31,7 +31,7 @@ Repo truth for 2026-07-17:
 - Successful semantic output must validate as a real `ViolenceFinding`.
 - Failed semantic output does not silently become a default finding.
 - Regex output is deterministic and lexical-only in `src/regex_baseline.py`.
-- Comparison observations are deterministic in `src/comparison.py`.
+- Comparison status, classification divergence observations, and semantic enrichment observations are deterministic in `src/comparison.py`.
 - Salesforce preview generation is deterministic and illustrative in `src/salesforce_preview.py`.
 - Salesforce preview is generated only from successful validated semantic output.
 - Stale results are invalidated when the active narrative changes.
@@ -54,6 +54,7 @@ Repo truth for 2026-07-17:
 - No provider request occurs on module import, initial Streamlit load, fixture selection, or manual typing.
 - Regex behavior remains illustrative, lexical, deterministic, and not Rochester Regional logic.
 - Comparison and preview layers make no provider requests.
+- Comparison distinguishes classification divergence from semantic enrichment instead of collapsing semantic context into a no-difference state.
 - Salesforce preview requires validated semantic success.
 - Failed semantic extraction results do not produce Salesforce previews.
 - `.env` remains untracked and ignored.
@@ -65,15 +66,15 @@ Repo truth for 2026-07-17:
 
 Fixture path:
 
-`src/fixtures.py` approved fixture record -> `Incident` object -> original narrative display -> explicit `Run Analysis` -> regex baseline -> semantic extractor -> Pydantic validation -> typed semantic result -> deterministic comparison -> illustrative Salesforce preview when semantic validation succeeds -> Streamlit rendering.
+`src/fixtures.py` approved fixture record -> `Incident` object -> original narrative display -> explicit `Run Analysis` -> regex baseline -> semantic extractor -> Pydantic validation -> typed semantic result -> deterministic comparison status with classification divergence and semantic enrichment observations -> illustrative Salesforce preview when semantic validation succeeds -> Streamlit rendering.
 
 Manual input path:
 
-manual text area -> whitespace-only rejection -> session-local illustrative incident identifier -> `Incident` object -> original narrative display -> explicit `Run Analysis` -> regex baseline -> semantic extractor -> Pydantic validation -> typed semantic result -> deterministic comparison -> illustrative Salesforce preview when semantic validation succeeds -> Streamlit rendering.
+manual text area -> whitespace-only rejection -> session-local illustrative incident identifier -> `Incident` object -> original narrative display -> explicit `Run Analysis` -> regex baseline -> semantic extractor -> Pydantic validation -> typed semantic result -> deterministic comparison status with classification divergence and semantic enrichment observations -> illustrative Salesforce preview when semantic validation succeeds -> Streamlit rendering.
 
 Failure path:
 
-semantic configuration failure, OpenAI request failure, structured response failure, or Pydantic validation failure -> typed `SemanticExtractionResult` -> no default finding -> deterministic comparison observation for failure -> no Salesforce preview -> bounded Streamlit error display.
+semantic configuration failure, OpenAI request failure, structured response failure, or Pydantic validation failure -> typed `SemanticExtractionResult` -> no default finding -> semantic comparison unavailable status and deterministic failure observation -> no Salesforce preview -> bounded Streamlit error display.
 
 ## E. AUTHORITY MODEL
 
@@ -105,7 +106,7 @@ semantic configuration failure, OpenAI request failure, structured response fail
 - `Intentionality`: bounded values `intentional`, `accidental`, and `unclear`.
 - `SemanticExtractionResult`: typed result with `success`, `configuration_failure`, `openai_request_failure`, `structured_response_failure`, and `pydantic_validation_failure`.
 - Regex result: dictionary containing `detected`, `matched_terms`, and `matched_patterns`.
-- `ComparisonResult`: typed comparison container with incident, regex result, semantic result, semantic validation status, and deterministic observations.
+- `ComparisonResult`: typed comparison container with incident, regex result, semantic result, semantic validation status, classification alignment, material difference flag, display status, deterministic classification divergence observations, deterministic semantic enrichment observations, and aggregate observations.
 - Salesforce preview dictionary: illustrative fields derived from a successful validated `ViolenceFinding`.
 - Fixture records: dictionaries containing an `Incident` and qualitative metadata. Metadata is display context only and is not semantic extraction input.
 
@@ -139,7 +140,10 @@ semantic configuration failure, OpenAI request failure, structured response fail
 - Semantic outputs are validated through Pydantic before use.
 - Typed semantic failure categories are displayed without stack traces.
 - Regex and semantic outputs are displayed side by side after analysis.
-- Comparison observations are deterministic and require no provider call.
+- Comparison status and observations are deterministic and require no provider call.
+- Comparison highlights classification divergence when regex and semantic violence presence disagree or semantic extraction fails.
+- Comparison highlights semantic enrichment when validated semantic extraction adds material context not represented by the lexical regex boolean.
+- A no-material-difference comparison is reserved for aligned classifications with no material semantic enrichment.
 - Salesforce preview is deterministic, illustrative, and only generated from validated semantic success.
 - Stale analysis results are hidden when active input changes.
 - Automated tests validate core behavior.
@@ -185,6 +189,7 @@ semantic configuration failure, OpenAI request failure, structured response fail
 - Fixture selection alone does not display analysis output.
 - Manual typing alone does not display analysis output.
 - One analysis action invokes one semantic extractor call in test-covered app logic.
+- Comparison tests cover classification divergence, semantic enrichment, and a deliberately minimal aligned no-difference result.
 - Fixture narratives remain exact in the fixture tests.
 - Salesforce preview rejects non-success semantic results.
 
@@ -227,7 +232,7 @@ semantic configuration failure, OpenAI request failure, structured response fail
 <Calls OpenAI Responses API structured parsing, validates output through `ViolenceFinding`, and returns typed success or failure.>
 
 `src/comparison.py`
-<Builds deterministic comparison observations from existing regex and semantic results without provider calls.>
+<Builds deterministic comparison status, classification divergence observations, and semantic enrichment observations from existing regex and semantic results without provider calls.>
 
 `src/salesforce_preview.py`
 <Builds deterministic illustrative preview dictionaries only from successful validated semantic results.>

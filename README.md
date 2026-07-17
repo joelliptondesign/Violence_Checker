@@ -57,7 +57,7 @@ Complete the local demonstration flow:
 3. For manual input, enter a non-empty narrative. The text is analyzed as typed and is not persisted.
 4. Review the original narrative displayed by the app.
 5. Press `Run Analysis`.
-6. View the illustrative regex baseline, validated semantic extraction result, deterministic comparison observations, and illustrative Salesforce write-back preview.
+6. View the illustrative regex baseline, validated semantic extraction result, deterministic comparison status, separated classification divergence and semantic enrichment observations, and illustrative Salesforce write-back preview.
 
 Semantic extraction occurs only after pressing `Run Analysis`. One semantic request occurs per analysis action.
 
@@ -102,9 +102,9 @@ Regex limitations are intentional and visible. The baseline does not resolve neg
 
 ## Comparison Layer
 
-`src/comparison.py` builds deterministic comparison observations from the existing regex result and semantic extraction result. It does not make a second model call and does not use model-generated prose for comparison.
+`src/comparison.py` builds deterministic comparison status and observations from the existing regex result and semantic extraction result. It does not make a second model call and does not use model-generated prose for comparison.
 
-The comparison can highlight conditions such as lexical matches in historical, corrected, or negated language; semantic distinctions between threats, attempts, and completed violence; accidental contact; conflicting information; and semantic extraction failure categories.
+The comparison distinguishes classification divergence from semantic enrichment. It can highlight regex-positive/semantic-negative results, regex-negative/semantic-positive results, semantic comparison failure, and semantic context that the lexical baseline does not encode, including historical language, threats, attempts, completed violence, accidental contact, no contact, negation, corrections, conflicting information, injury mentions, actor or target information, evidence excerpts, and confidence or uncertainty notes.
 
 ## Semantic Extraction
 

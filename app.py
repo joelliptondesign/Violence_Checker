@@ -13,6 +13,15 @@ from src.models import Incident
 from src.semantic_extractor import SemanticExtractionStatus
 
 
+ALIGNMENT_LABELS = {
+    "aligned_positive": "Classification aligned: regex and semantic extraction both indicate violence-related content.",
+    "aligned_negative": "Classification aligned: neither output indicates violence-related content.",
+    "regex_positive_semantic_negative": "Classification divergence: regex positive, semantic negative.",
+    "regex_negative_semantic_positive": "Classification divergence: regex negative, semantic positive.",
+    "semantic_failure": "Semantic comparison unavailable.",
+}
+
+
 def _fixture_label(item: dict) -> str:
     incident = item["incident"]
     scenario = item["metadata"]["scenario_type"]
@@ -102,8 +111,35 @@ def _display_results(result) -> None:
     st.write(result.comparison.semantic_validation_status)
 
     st.header("Comparison")
-    for observation in result.comparison.observations:
-        st.write(f"- {observation}")
+    if result.comparison.display_status == "Material Difference Detected":
+        st.warning(result.comparison.display_status)
+    elif result.comparison.display_status == "Semantic Comparison Unavailable":
+        st.error(result.comparison.display_status)
+    elif result.comparison.display_status == "Classification Aligned, Semantic Context Added":
+        st.info(result.comparison.display_status)
+    else:
+        st.success(result.comparison.display_status)
+
+    st.write(
+        ALIGNMENT_LABELS.get(
+            result.comparison.classification_alignment,
+            result.comparison.classification_alignment,
+        )
+    )
+
+    if result.comparison.divergence_observations:
+        st.markdown("**Classification divergence**")
+        for observation in result.comparison.divergence_observations:
+            st.write(f"- {observation}")
+
+    if result.comparison.semantic_enrichment_observations:
+        st.markdown("**Semantic enrichment**")
+        for observation in result.comparison.semantic_enrichment_observations:
+            st.write(f"- {observation}")
+
+    if not result.comparison.material_difference_detected:
+        for observation in result.comparison.observations:
+            st.write(f"- {observation}")
 
     st.header("Salesforce Preview")
     st.caption("Deterministic preview only. No Salesforce integration is performed.")
