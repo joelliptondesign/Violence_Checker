@@ -1,12 +1,16 @@
 """Deterministic stakeholder-facing labels for internal pipeline contracts."""
 
+from typing import Optional
+
 from src.contracts import (
     PolicyDecision,
     PolicyOutcome,
     PolicyReasonCode,
     ValidationFailureStage,
     ValidationResult,
+    ValidatedSemanticFacts,
 )
+from src.models import ViolenceEventType
 
 
 POLICY_OUTCOME_LABELS = {
@@ -101,6 +105,43 @@ def policy_explanation(decision: PolicyDecision) -> str:
 
 def policy_reason_explanations(decision: PolicyDecision) -> list[str]:
     return [POLICY_REASON_EXPLANATIONS[reason] for reason in decision.reason_codes]
+
+
+EVENT_TYPE_LABELS = {
+    ViolenceEventType.NONE: "no violence event",
+    ViolenceEventType.VERBAL_THREAT: "a verbal threat",
+    ViolenceEventType.ATTEMPTED_PHYSICAL_VIOLENCE: "attempted physical violence",
+    ViolenceEventType.COMPLETED_PHYSICAL_VIOLENCE: "completed physical violence",
+    ViolenceEventType.UNCLEAR: "an unclear event",
+}
+
+
+def semantic_summary(
+    validated_facts: Optional[ValidatedSemanticFacts],
+    decision: PolicyDecision,
+) -> str:
+    """Summarize validated facts and policy outcome without inference."""
+    if decision.outcome == PolicyOutcome.WRITE_FAILED or validated_facts is None:
+        return "Semantic analysis was unable to produce validated facts."
+
+    facts = validated_facts.facts
+    event_label = EVENT_TYPE_LABELS[facts.event_type]
+    actor = facts.actor or "The narrative's actor"
+    target_phrase = f" involving {facts.target}" if facts.target else ""
+
+    if decision.outcome == PolicyOutcome.WRITE_DETECTED:
+        summary = f"{actor} is described as responsible for {event_label}{target_phrase}."
+    elif decision.outcome == PolicyOutcome.WRITE_NOT_DETECTED:
+        summary = "The validated facts do not describe a current violence event or threat."
+    else:
+        summary = f"The validated facts describe {event_label}{target_phrase}, but the policy result remains uncertain."
+
+    details = []
+    if facts.contact_occurred:
+        details.append("Physical contact occurred.")
+    if facts.injury_mentioned:
+        details.append("An injury was documented.")
+    return " ".join([summary, *details])
 
 
 def validation_summary(validation: ValidationResult) -> str:

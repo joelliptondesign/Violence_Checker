@@ -129,15 +129,17 @@ Offline tests use fakes and do not require credentials or network access.
 
 ## Application Write Policy
 
-`src/policy.py` implements local policy `violence_checker_write_disposition` version `1.0.0`. After schema validation, domain validation, and compatibility construction, it deterministically produces `WRITE_DETECTED`, `WRITE_UNCERTAIN`, `WRITE_NOT_DETECTED`, or `WRITE_FAILED`. Failure takes precedence over uncertainty, uncertainty over detected, and detected over not detected. Provider-reported confidence alone does not affect the outcome.
+`src/policy.py` implements local policy `violence_checker_write_disposition` version `1.0.1`. After schema validation, domain validation, and compatibility construction, it deterministically produces `WRITE_DETECTED`, `WRITE_UNCERTAIN`, `WRITE_NOT_DETECTED`, or `WRITE_FAILED`. Failure takes precedence over uncertainty, uncertainty over detected, and detected over not detected. Provider-reported confidence alone does not affect the outcome.
+
+Material uncertainty is determined only from bounded structured facts: conflicting information, unclear event type, materially unclear intentionality, an inconsistent threat representation, or a negated affirmative finding. Free-form uncertainty notes remain visible evidence but cannot independently override decisive structured facts. Accordingly, the approved `CASE_001` completed-assault state is `WRITE_DETECTED` when violence, completed physical violence, contact, injury, current-event status, and intentionality are affirmative and no conflict, negation, or correction override is present.
 
 The policy controls only representation inside this demonstration. It does not make clinical, legal, safety, hospital workflow, human-review, or real Salesforce decisions.
 
 ## Presentation Layer
 
-`src/presentation.py` deterministically translates internal policy outcomes, reason codes, and validation stages into stakeholder-readable labels and explanations. The Streamlit interface presents `Validation` and `AI Assessment` before implementation detail. Internal policy identifiers, policy version, enum values, reason codes, validation stages, semantic fields, compatibility status, and regex artifacts remain unchanged and are available in a collapsed `Technical Details` section.
+`src/presentation.py` deterministically translates internal policy outcomes, reason codes, validation stages, and validated semantic facts into stakeholder-readable labels, explanations, and a concise summary. The primary Streamlit result is a two-column comparison: `Regex Baseline` on the left and `Semantic Analysis` on the right. The semantic column contains a collapsed `Technical Details` expander with validation, semantic facts, compatibility status, policy metadata, internal outcome, reason codes, and internal explanation.
 
-Presentation mappings do not evaluate policy, reinterpret semantic facts, alter validation, change comparison or preview behavior, or make an additional provider request. The deterministic execution contracts remain authoritative; presentation labels are display-only.
+Presentation mappings do not evaluate policy, reinterpret semantic facts, alter validation, change comparison or preview behavior, or make an additional provider request. Summary text reuses only validated bounded fields and makes no inference request. The deterministic execution contracts remain authoritative; presentation labels are display-only.
 
 ## Salesforce Preview
 

@@ -1,7 +1,11 @@
 import sys
 from unittest.mock import patch
 
+from src.app_logic import run_analysis as build_analysis_result
+from src.contracts import SemanticFacts
 from src.fixtures import SYNTHETIC_INCIDENTS
+from src.models import Intentionality, ViolenceEventType
+from src.semantic_extractor import SemanticExtractionResult, SemanticExtractionStatus
 
 SOURCE_INSTRUCTION = "Select a fixture or enter a manual narrative, then press Run Analysis."
 REMOVED_DISCLAIMER = (
@@ -129,3 +133,72 @@ def test_newly_rejected_manual_input_shows_bounded_feedback_without_analysis():
     assert "analysis_result" not in app_test.session_state
     assert "analysis_signature" not in app_test.session_state
     assert_no_analysis_output(app_test)
+
+
+def test_successful_result_restores_two_column_primary_comparison_and_details():
+    fixture = SYNTHETIC_INCIDENTS[0]
+    result = build_analysis_result(
+        fixture["incident"],
+        extractor=lambda _incident: SemanticExtractionResult(
+            status=SemanticExtractionStatus.SUCCESS,
+            semantic_candidate=SemanticFacts(
+                violence_present=True,
+                event_type=ViolenceEventType.COMPLETED_PHYSICAL_VIOLENCE,
+                actor="pt",
+                target="rn",
+                contact_occurred=True,
+                injury_mentioned=True,
+                current_event=True,
+                intentionality=Intentionality.INTENTIONAL,
+                negated=False,
+                correction_present=False,
+                conflicting_information=False,
+                evidence_text=["he hit her on left side of face with closed fist"],
+                confidence=0.9,
+                uncertainty_notes=["Actor and target abbreviations are preserved."],
+            ),
+        ),
+    )
+
+    with patch("src.app_logic.run_analysis", return_value=result) as analyzer:
+        app_test = fresh_app_test()
+        app_test.radio[0].set_value("Synthetic fixture").run()
+        app_test.selectbox[0].set_value(fixture).run()
+        app_test.button[0].click().run(timeout=10)
+
+    rendered = all_rendered_text(app_test)
+    assert "Regex Baseline" in header_values(app_test)
+    assert "Semantic Analysis" in header_values(app_test)
+    assert "Semantic Extraction" not in header_values(app_test)
+    assert "pt is described as responsible for completed physical violence involving rn." in rendered
+    assert "Physical contact occurred. An injury was documented." in rendered
+    assert "Illustrative lexical baseline based only on matching terms and patterns." in rendered
+    assert [item.label for item in app_test.expander] == ["Technical Details"]
+    for label in (
+        "Result category:",
+        "Validation stage:",
+        "Schema validation status:",
+        "Domain validation status:",
+        "Violence present:",
+        "Event type:",
+        "Actor:",
+        "Target:",
+        "Contact occurred:",
+        "Injury mentioned:",
+        "Current event:",
+        "Intentionality:",
+        "Negation:",
+        "Correction:",
+        "Conflicting information:",
+        "Confidence:",
+        "Evidence excerpts",
+        "Uncertainty notes",
+        "Compatibility construction:",
+        "Policy identifier:",
+        "Policy version:",
+        "Internal outcome:",
+        "Reason codes:",
+        "Internal explanation:",
+    ):
+        assert label in rendered
+    assert analyzer.call_count == 1

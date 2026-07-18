@@ -33,8 +33,8 @@ For each case:
 2. Choose the case.
 3. Confirm the narrative appears.
 4. Press `Run Analysis`.
-5. Review the stakeholder-facing `Validation` summary, `AI Assessment`, concise explanation and reasons, comparison observations, and policy-gated Salesforce preview.
-6. Expand `Technical Details` only when engineering inspection of regex artifacts, semantic facts, validation stages, compatibility status, policy metadata, internal outcome, or reason codes is useful.
+5. Compare `Regex Baseline` on the left with `Semantic Analysis` on the right, including the deterministic summary, explanation, and reasons.
+6. Expand `Technical Details` inside the semantic column only when engineering inspection of semantic facts, validation stages, compatibility status, policy metadata, internal outcome, or reason codes is useful.
 
 ## Talking Points
 
@@ -42,9 +42,11 @@ For each case:
 - Regex can flag terms without understanding historical context, corrections, or negation.
 - Semantic extraction returns structured output validated by Pydantic.
 - Comparison observations are deterministic and do not make another model call.
-- Policy `violence_checker_write_disposition` version `1.0.0` deterministically represents admissible results as `WRITE_DETECTED`, `WRITE_UNCERTAIN`, `WRITE_NOT_DETECTED`, or `WRITE_FAILED`.
+- Policy `violence_checker_write_disposition` version `1.0.1` deterministically represents admissible results as `WRITE_DETECTED`, `WRITE_UNCERTAIN`, `WRITE_NOT_DETECTED`, or `WRITE_FAILED`.
+- Structured facts determine material uncertainty. Free-form uncertainty notes remain visible but cannot independently change a decisive disposition.
+- `CASE_001` is the completed-assault demonstration and is expected to display `Violence Detected` when its affirmative structured facts validate without conflict, negation, or correction override.
 - The primary assessment labels are deterministic display mappings: `Violence Detected`, `Uncertain`, `No Violence Detected`, and `Unable to Determine`.
-- Stakeholder explanations and reasons are deterministic mappings from `PolicyDecision`; they are not model-generated.
+- Stakeholder summaries, explanations, and reasons are deterministic mappings from validated facts and `PolicyDecision`; they are not model-generated and make no additional provider request.
 - Internal enums and policy metadata remain available under `Technical Details` and remain authoritative for engineering inspection.
 - The policy is an application write disposition only; it is not a clinical, legal, safety, hospital workflow, or real Salesforce decision.
 - One semantic request occurs per `Run Analysis` click.

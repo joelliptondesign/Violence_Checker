@@ -68,8 +68,8 @@ def test_policy_disposition_is_represented_without_independent_preview_logic():
 
     preview = build_salesforce_preview("CASE_008", finding, policy)
 
-    assert policy.outcome == PolicyOutcome.WRITE_UNCERTAIN
-    assert preview["Illustrative_Write_Disposition__c"] == "WRITE_UNCERTAIN"
+    assert policy.outcome == PolicyOutcome.WRITE_DETECTED
+    assert preview["Illustrative_Write_Disposition__c"] == "WRITE_DETECTED"
 
 
 def test_failed_policy_is_rejected():
@@ -89,7 +89,7 @@ def test_non_policy_object_is_rejected():
 def test_preview_copies_authoritative_policy_without_redeciding():
     authoritative = PolicyDecision(
         policy_id="violence_checker_write_disposition",
-        policy_version="1.0.0",
+        policy_version="1.0.1",
         outcome=PolicyOutcome.WRITE_DETECTED,
         reason_codes=[PolicyReasonCode.AFFIRMATIVE_VIOLENCE_OR_THREAT],
         explanation="Validated facts affirmatively represent violence or a threat.",

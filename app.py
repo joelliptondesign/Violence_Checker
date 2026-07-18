@@ -16,6 +16,7 @@ from src.presentation import (
     policy_explanation,
     policy_outcome_label,
     policy_reason_explanations,
+    semantic_summary,
     validation_summary,
 )
 from src.semantic_extractor import SemanticExtractionStatus
@@ -162,7 +163,6 @@ def _display_policy(decision, *, include_technical_details: bool = True) -> None
 
 def _display_technical_details(result) -> None:
     with st.expander("Technical Details", expanded=False):
-        _display_regex_details(result.regex_result)
         _display_semantic_details(result.semantic_result, result.validation_result)
         if result.compatibility_result is None:
             st.write("Compatibility construction: not available")
@@ -175,7 +175,32 @@ def _display_technical_details(result) -> None:
 
 def _display_results(result) -> None:
     _display_validation(result.validation_result)
-    _display_policy(result.policy_decision, include_technical_details=False)
+
+    regex_column, semantic_column = st.columns(2)
+    with regex_column:
+        st.header("Regex Baseline")
+        st.subheader("Detected" if result.regex_result["detected"] else "Not Detected")
+        st.write("Matched terms")
+        st.write(result.regex_result["matched_terms"] or [])
+        st.write("Matched patterns")
+        st.code("\n".join(result.regex_result["matched_patterns"]) or "No patterns matched")
+        st.caption("Illustrative lexical baseline based only on matching terms and patterns.")
+
+    with semantic_column:
+        st.header("Semantic Analysis")
+        st.subheader(policy_outcome_label(result.policy_decision))
+        st.write(
+            semantic_summary(
+                result.validation_result.validated_facts,
+                result.policy_decision,
+            )
+        )
+        st.write(policy_explanation(result.policy_decision))
+        st.markdown("**Why this result**")
+        for explanation in policy_reason_explanations(result.policy_decision):
+            st.write(f"- {explanation}")
+        st.caption("Deterministic policy applied to validated structured semantic facts.")
+        _display_technical_details(result)
 
     st.header("Comparison")
     if result.comparison.display_status == "Material Difference Detected":
@@ -215,7 +240,6 @@ def _display_results(result) -> None:
     else:
         st.json(result.salesforce_preview)
 
-    _display_technical_details(result)
 
 
 def main() -> None:

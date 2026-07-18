@@ -39,10 +39,11 @@ Current repository state for 2026-07-18:
 - `src/domain_validation.py` evaluates repository-grounded violence-domain consistency only after schema success.
 - `src/semantic_validation.py` exposes `ValidatedSemanticFacts` only after both stages pass and preserves schema-versus-domain failure provenance.
 - `src/compatibility_finding.py` accepts only `ValidatedSemanticFacts` and deterministically constructs the existing `ViolenceFinding` representation for comparison and preview compatibility.
-- `src/policy.py` implements application write policy `violence_checker_write_disposition` version `1.0.0` with bounded `WRITE_DETECTED`, `WRITE_UNCERTAIN`, `WRITE_NOT_DETECTED`, and `WRITE_FAILED` outcomes.
+- `src/policy.py` implements application write policy `violence_checker_write_disposition` version `1.0.1` with bounded `WRITE_DETECTED`, `WRITE_UNCERTAIN`, `WRITE_NOT_DETECTED`, and `WRITE_FAILED` outcomes.
+- Structured facts determine uncertainty materiality. Free-form uncertainty notes remain visible but do not independently override decisive governing facts; `CASE_001` completed assault is detected for its affirmative validated state.
 - `PolicyDecision` is the authoritative application write disposition and does not alter semantic facts, validation, compatibility findings, or comparison results.
 - `src/presentation.py` maps every bounded policy outcome, policy reason code, and validation stage to deterministic stakeholder-readable text without altering execution contracts.
-- Streamlit presents `Validation` and `AI Assessment` summaries before a collapsed `Technical Details` section containing internal engineering artifacts.
+- Streamlit presents a primary two-column `Regex Baseline` and `Semantic Analysis` comparison. The semantic column includes deterministic summary text and a collapsed `Technical Details` section containing internal engineering artifacts.
 - Semantic instructions in `src/semantic_prompt.py` request fact extraction and prohibit operational recommendations, hospital workflow decisions, Salesforce write decisions, and legal, clinical, or safety recommendations.
 - Regex output is deterministic and lexical-only in `src/regex_baseline.py` and remains unchanged for this correction.
 - Stakeholder-visible comparison behavior remains intact while consuming the deterministic compatibility finding.
@@ -221,7 +222,8 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 - Typed semantic failure categories are displayed without stack traces.
 - Regex and semantic outputs are displayed side by side after analysis.
 - Comparison status and observations are deterministic and require no provider call.
-- Deterministic policy `violence_checker_write_disposition` version `1.0.0` represents validated results as detected, uncertain, not detected, or failed.
+- Deterministic policy `violence_checker_write_disposition` version `1.0.1` represents validated results as detected, uncertain, not detected, or failed.
+- Deterministic semantic summaries are created locally from validated structured facts and policy decisions without a second provider request.
 - Salesforce preview is deterministic, illustrative, requires `PolicyDecision`, and is never generated for `WRITE_FAILED`.
 - Stale analysis results are hidden when active input changes.
 - Automated tests validate core behavior.
@@ -307,10 +309,10 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 <Identifies the project as a local Python and Streamlit pre-PoC, documents local setup, explicit Run Analysis flow, semantic extraction, comparison, and illustrative Salesforce preview.>
 
 `app.py`
-<Defines the Streamlit empty state, two-option narrative source selection, supporting instruction, original narrative display, explicit Run Analysis control, stakeholder-first validation and AI assessment rendering, collapsed technical details, and stale-result hiding.>
+<Defines the Streamlit empty state, two-option narrative source selection, supporting instruction, original narrative display, explicit Run Analysis control, two-column regex and semantic result presentation, deterministic stakeholder summary, semantic-column technical details, and stale-result hiding.>
 
 `src/presentation.py`
-<Maps every bounded policy outcome, policy reason code, and validation stage into deterministic stakeholder-readable labels and explanations without altering execution-layer contracts or behavior.>
+<Maps every bounded policy outcome, policy reason code, and validation stage into deterministic stakeholder-readable labels and creates concise summaries from validated facts without an additional provider request.>
 
 `src/app_logic.py`
 <Validates and normalizes explicit analysis input, preserves raw active signatures, maps typed failures to policy, evaluates admissible findings, gates preview generation by policy, and supports stale-result invalidation.>
@@ -352,7 +354,7 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 <Accepts only `ValidatedSemanticFacts` and maps its facts exactly into the transitional `ViolenceFinding` representation with typed defensive failure and no provider calls, semantic inference, defaults, policy, or workflow action.>
 
 `src/policy.py`
-<Implements provider-independent application write policy `violence_checker_write_disposition` version `1.0.0`, bounded outcomes and reasons, explicit precedence, and typed failure mapping without inference or operational action.>
+<Implements provider-independent application write policy `violence_checker_write_disposition` version `1.0.1`, structured-fact uncertainty materiality, bounded outcomes and reasons, explicit precedence, and typed failure mapping without inference or operational action.>
 
 `src/comparison.py`
 <Builds deterministic comparison status, classification divergence observations, and semantic enrichment observations from regex output and the compatibility finding without provider calls.>
@@ -379,7 +381,10 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 <Covers schema structure, bounded issues, provider and operational-field rejection, domain invariants, deterministic issue ordering, stage short-circuiting, admissibility, compatibility gating, and integration failure propagation.>
 
 `tests/test_policy.py`
-<Covers policy contract serialization, bounded outcomes and reasons, stable identity and version, all failure mappings, exhaustive admissible-state partitions, validation-rejected states, compatibility equality, terminal guards, negation, correction, conflict, uncertainty, detected and not-detected rules, precedence, confidence independence, preview gating, provider independence, and active-flow integration.>
+<Covers policy contract serialization, bounded outcomes and reasons, stable identity and version, all failure mappings, incidental-note materiality correction, exhaustive admissible-state partitions, validation-rejected states, compatibility equality, terminal guards, negation, correction, conflict, uncertainty, detected and not-detected rules, precedence, confidence independence, preview gating, provider independence, and active-flow integration.>
+
+`tests/test_fixture_policy_regression.py`
+<Covers all eight approved fixtures through deterministic semantic doubles, including detected `CASE_001`, validation, policy reasons, preview gating, raw narrative input, and zero live provider requests.>
 
 `telemetry/executor_heartbeat.jsonl`
 <Stores local executor operation telemetry as JSONL.>

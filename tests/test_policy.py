@@ -79,7 +79,7 @@ def test_policy_contract_constructs_and_serializes_stably():
 
     assert value.model_dump(mode="json") == {
         "policy_id": "violence_checker_write_disposition",
-        "policy_version": "1.0.0",
+        "policy_version": "1.0.1",
         "outcome": "WRITE_DETECTED",
         "reason_codes": ["affirmative_violence_or_threat"],
         "explanation": "Validated facts affirmatively represent violence or a threat.",
@@ -177,7 +177,6 @@ def test_failure_precedence_overrides_admissible_detected_inputs():
             "conflicting_information": True,
             "uncertainty_notes": ["Statements remain in conflict."],
         },
-        {"uncertainty_notes": ["The target remains unresolved."]},
     ],
 )
 def test_explicit_uncertainty_produces_write_uncertain(overrides):
@@ -215,7 +214,6 @@ def test_uncertainty_precedence_and_reason_order_are_deterministic():
         PolicyReasonCode.CONFLICTING_INFORMATION,
         PolicyReasonCode.UNCLEAR_EVENT_TYPE,
         PolicyReasonCode.UNCLEAR_MATERIAL_INTENTIONALITY,
-        PolicyReasonCode.MATERIAL_UNCERTAINTY_NOTES,
     ]
 
 
@@ -357,7 +355,6 @@ def test_invalid_policy_states_are_rejected_before_policy(overrides, expected_is
             },
             [
                 PolicyReasonCode.CONFLICTING_INFORMATION,
-                PolicyReasonCode.MATERIAL_UNCERTAINTY_NOTES,
                 PolicyReasonCode.NEGATED_AFFIRMATIVE_FINDING,
             ],
         ),
@@ -380,7 +377,7 @@ def test_admissible_negation_correction_and_conflict_states_reach_uncertainty(
     assert result.reason_codes == expected_reasons
 
 
-def test_all_admissible_policy_partitions_have_an_explicit_nonterminal_outcome():
+def policy_partition_inventory():
     booleans = (False, True)
     inventory = Counter()
 
@@ -436,15 +433,59 @@ def test_all_admissible_policy_partitions_have_an_explicit_nonterminal_outcome()
         inventory[result.outcome.value] += 1
         assert result.failure_provenance is None
 
-    assert inventory == Counter(
+    return inventory
+
+
+def test_all_admissible_policy_partitions_have_an_explicit_nonterminal_outcome():
+    first = policy_partition_inventory()
+    second = policy_partition_inventory()
+
+    assert first == second
+    assert first == Counter(
         {
             "domain_rejected": 2228,
             "domain_admitted": 1612,
-            "WRITE_UNCERTAIN": 1484,
-            "WRITE_DETECTED": 80,
-            "WRITE_NOT_DETECTED": 48,
+            "WRITE_UNCERTAIN": 1356,
+            "WRITE_DETECTED": 160,
+            "WRITE_NOT_DETECTED": 96,
         }
     )
+
+
+@pytest.mark.parametrize(
+    "notes",
+    [
+        [],
+        ["Actor and target abbreviations pt and rn are preserved."],
+        ["The secondary shorthand no loc is ambiguous."],
+        ["Arbitrary free-form extraction caveat."],
+    ],
+)
+def test_completed_assault_ignores_incidental_notes_as_policy_authority(notes):
+    result = decision(
+        event_type=ViolenceEventType.COMPLETED_PHYSICAL_VIOLENCE,
+        contact_occurred=True,
+        injury_mentioned=True,
+        uncertainty_notes=notes,
+    )
+
+    assert result.outcome == PolicyOutcome.WRITE_DETECTED
+    assert result.reason_codes == [PolicyReasonCode.AFFIRMATIVE_VIOLENCE_OR_THREAT]
+    assert result.policy_version == "1.0.1"
+
+
+def test_material_structured_uncertainty_overrides_incidental_notes():
+    result = decision(
+        event_type=ViolenceEventType.UNCLEAR,
+        intentionality=Intentionality.UNCLEAR,
+        uncertainty_notes=["Abbreviations are preserved."],
+    )
+
+    assert result.outcome == PolicyOutcome.WRITE_UNCERTAIN
+    assert result.reason_codes == [
+        PolicyReasonCode.UNCLEAR_EVENT_TYPE,
+        PolicyReasonCode.UNCLEAR_MATERIAL_INTENTIONALITY,
+    ]
 
 
 def test_policy_makes_no_provider_call(monkeypatch):

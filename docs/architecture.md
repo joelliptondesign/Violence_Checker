@@ -170,16 +170,18 @@ Responsibility classification:
 
 ### Policy Contract And Authority
 
-`src/policy.py` implements policy `violence_checker_write_disposition` version `1.0.0`. It accepts only `ValidatedSemanticFacts`, the exactly matching compatibility `ViolenceFinding`, or explicit typed pipeline failure provenance. It returns provider-independent `PolicyDecision` with a bounded `PolicyOutcome`, ordered bounded `PolicyReasonCode` values, policy identifier, version, deterministic explanation, and optional failure provenance.
+`src/policy.py` implements policy `violence_checker_write_disposition` version `1.0.1`. It accepts only `ValidatedSemanticFacts`, the exactly matching compatibility `ViolenceFinding`, or explicit typed pipeline failure provenance. It returns provider-independent `PolicyDecision` with a bounded `PolicyOutcome`, ordered bounded `PolicyReasonCode` values, policy identifier, version, deterministic explanation, and optional failure provenance.
 
 The four outcomes are:
 
 - `WRITE_FAILED`: an explicit input, provider, schema, domain, compatibility, or unsupported-input failure prevents an admissible representation.
-- `WRITE_UNCERTAIN`: admissible facts contain conflict, a verbal-threat event without an affirmative violence indication, unclear event type, materially unclear intentionality, explicit uncertainty notes, or a negated affirmative finding.
+- `WRITE_UNCERTAIN`: admissible structured facts contain conflict, a verbal-threat event without an affirmative violence indication, unclear event type, materially unclear intentionality, or a negated affirmative finding.
 - `WRITE_DETECTED`: admissible non-negated facts affirm violence or a verbal threat, attempted physical violence, or completed physical violence.
 - `WRITE_NOT_DETECTED`: admissible facts represent violence absent with event type `none` and no unresolved conflict; negated and corrected non-events receive additional bounded reasons.
 
 Precedence is fixed: `WRITE_FAILED`, then `WRITE_UNCERTAIN`, then `WRITE_DETECTED`, then `WRITE_NOT_DETECTED`. Failure reason codes preserve input-validation, provider-configuration, provider-request, provider-structured-response, provider-validation, schema-validation, domain-validation, and compatibility-construction provenance. Unsupported combinations fail explicitly and never default to not detected. Provider-reported confidence is not read by the policy evaluator.
+
+Free-form uncertainty notes are preserved in validated facts, comparison observations, technical presentation, and the illustrative preview, but their presence alone is not policy authority. The evaluator performs no text interpretation over notes. Materiality comes only from the bounded structured conditions above. A completed physical violence state with affirmative violence, contact, current-event status, intentionality, no negation, and no conflicting information therefore remains detected even when incidental terminology or abbreviation caveats are present.
 
 The `UNSUPPORTED_POLICY_INPUT` terminal guard is reserved for missing or incorrectly typed policy inputs, a mismatch between validated facts and the compatibility finding, programmer error, or future contract evolution not yet supported by this policy version. Exhaustive canonical enumeration confirms that no currently domain-admissible fact state reaches this guard.
 
@@ -208,14 +210,15 @@ Input, provider, schema, domain, or compatibility failure produces `WRITE_FAILED
 - original narrative display before analysis
 - explicit `Run Analysis` control
 - stakeholder-readable deterministic validation summary
-- stakeholder-readable `AI Assessment` classification, explanation, and reasons
+- primary two-column `Regex Baseline` and `Semantic Analysis` comparison
+- stakeholder-readable semantic classification, deterministic validated-fact summary, explanation, and reasons
 - comparison status, classification divergence, and semantic enrichment observations
 - illustrative Salesforce preview
-- collapsed `Technical Details` containing regex artifacts, semantic facts, validation stages, compatibility status, policy identifier and version, internal outcome, internal explanation, reason codes, and failure provenance when present
+- collapsed `Technical Details` inside the semantic column containing semantic facts, validation stages, compatibility status, policy identifier and version, internal outcome, internal explanation, reason codes, and failure provenance when present
 
 Semantic extraction is not run on page load, fixture selection, or manual typing. One semantic request occurs per `Run Analysis` action.
 
-`src/presentation.py` is a display-only translation boundary. It maps every bounded `PolicyOutcome`, `PolicyReasonCode`, and `ValidationFailureStage` to deterministic stakeholder text without changing the underlying objects. `app.py` renders these human-readable summaries before technical details. The deterministic execution layer remains authoritative: extraction, schema validation, domain validation, compatibility construction, policy evaluation, comparison, and Salesforce preview logic do not consume presentation labels and are unchanged by them.
+`src/presentation.py` is a display-only translation boundary. It maps every bounded `PolicyOutcome`, `PolicyReasonCode`, and `ValidationFailureStage` to deterministic stakeholder text and creates a concise summary only from `ValidatedSemanticFacts` and `PolicyDecision`. `app.py` renders these human-readable summaries before technical details. Summary generation makes no provider request. The deterministic execution layer remains authoritative: extraction, schema validation, domain validation, compatibility construction, policy evaluation, comparison, and Salesforce preview logic do not consume presentation labels and are unchanged by them.
 
 ## Session Behavior
 

@@ -17,7 +17,7 @@ from src.models import Intentionality, ViolenceEventType, ViolenceFinding
 
 
 POLICY_ID = "violence_checker_write_disposition"
-POLICY_VERSION = "1.0.0"
+POLICY_VERSION = "1.0.1"
 
 _FAILURE_REASONS = {
     PipelineFailureProvenance.INPUT_VALIDATION: PolicyReasonCode.INPUT_VALIDATION_FAILED,
@@ -104,8 +104,9 @@ def evaluate_policy(
     )
     if facts.intentionality == Intentionality.UNCLEAR and intentionality_is_material:
         uncertainty_reasons.append(PolicyReasonCode.UNCLEAR_MATERIAL_INTENTIONALITY)
-    if facts.uncertainty_notes:
-        uncertainty_reasons.append(PolicyReasonCode.MATERIAL_UNCERTAINTY_NOTES)
+    # Free-form extraction caveats remain evidence for inspection, but are not
+    # themselves a policy language. Material uncertainty is represented by the
+    # bounded structured conditions above.
     if facts.negated and facts.violence_present:
         uncertainty_reasons.append(PolicyReasonCode.NEGATED_AFFIRMATIVE_FINDING)
     if uncertainty_reasons:

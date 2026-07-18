@@ -47,6 +47,7 @@ tests/test_app_logic.py
 tests/test_comparison.py
 tests/test_config_and_app.py
 tests/test_contracts.py
+tests/test_fixture_policy_regression.py
 tests/test_fixtures.py
 tests/test_input_boundary.py
 tests/test_models.py

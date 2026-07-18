@@ -15,6 +15,7 @@ from src.presentation import (
     policy_explanation,
     policy_outcome_label,
     policy_reason_explanations,
+    semantic_summary,
     validation_summary,
 )
 from src.semantic_validation import validate_semantic_candidate, validation_not_run
@@ -96,3 +97,45 @@ def test_every_validation_stage_has_a_deterministic_summary():
 
 def test_validation_summary_mapping_covers_every_stage():
     assert set(VALIDATION_SUMMARIES) == set(ValidationFailureStage)
+
+
+def test_detected_semantic_summary_is_deterministic_and_human_readable():
+    validation = validate_semantic_candidate(
+        SemanticFacts(
+            **semantic_values(
+                violence_present=True,
+                event_type=ViolenceEventType.COMPLETED_PHYSICAL_VIOLENCE,
+                actor="pt",
+                target="rn",
+                contact_occurred=True,
+                injury_mentioned=True,
+                intentionality=Intentionality.INTENTIONAL,
+                evidence_text=["pt hit rn"],
+                uncertainty_notes=["Abbreviations are preserved."],
+            )
+        )
+    )
+    from src.compatibility_finding import construct_compatibility_finding
+    from src.policy import evaluate_policy
+
+    compatibility = construct_compatibility_finding(validation.validated_facts)
+    decision = evaluate_policy(
+        validated_facts=validation.validated_facts,
+        finding=compatibility.finding,
+    )
+
+    assert semantic_summary(validation.validated_facts, decision) == (
+        "pt is described as responsible for completed physical violence involving rn. "
+        "Physical contact occurred. An injury was documented."
+    )
+    assert "completed_physical_violence" not in semantic_summary(
+        validation.validated_facts, decision
+    )
+
+
+def test_failed_semantic_summary_is_safe_without_validated_facts():
+    decision = failed_policy_decision(PipelineFailureProvenance.PROVIDER_REQUEST)
+
+    assert semantic_summary(None, decision) == (
+        "Semantic analysis was unable to produce validated facts."
+    )

@@ -43,7 +43,7 @@ This graph records deterministic repository relationships discoverable from file
 | `src/models.py` | deterministic application component | `Incident`, `Intentionality`, `ViolenceEventType`, `ViolenceFinding` | 2 |
 | `src/narrative_normalizer.py` | deterministic | none | 1 |
 | `src/policy.py` | deterministic | none | 3 |
-| `src/presentation.py` | deterministic | none | 4 |
+| `src/presentation.py` | deterministic | none | 5 |
 | `src/provider_adapter.py` | deterministic | none | 1 |
 | `src/regex_baseline.py` | deterministic application component | none | 1 |
 | `src/salesforce_preview.py` | provider-facing | none | 2 |
@@ -55,11 +55,12 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_comparison.py` | deterministic test | none | 22 |
 | `tests/test_config_and_app.py` | deterministic test | none | 4 |
 | `tests/test_contracts.py` | deterministic test | none | 10 |
+| `tests/test_fixture_policy_regression.py` | deterministic test | none | 3 |
 | `tests/test_fixtures.py` | deterministic test | none | 3 |
 | `tests/test_input_boundary.py` | deterministic test | none | 12 |
 | `tests/test_models.py` | deterministic test | none | 19 |
-| `tests/test_policy.py` | deterministic test | none | 27 |
-| `tests/test_presentation.py` | deterministic test | none | 6 |
+| `tests/test_policy.py` | deterministic test | none | 30 |
+| `tests/test_presentation.py` | deterministic test | none | 8 |
 | `tests/test_regex_baseline.py` | deterministic test | none | 9 |
 | `tests/test_repo_governance.py` | deterministic test | none | 8 |
 | `tests/test_salesforce_preview.py` | deterministic test | none | 11 |
@@ -67,7 +68,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_semantic_extractor.py` | deterministic test | `ExplodingOpenAI`, `FakeClient`, `FakeResponses` | 19 |
 | `tests/test_semantic_prompt.py` | deterministic test | none | 5 |
 | `tests/test_semantic_validation.py` | deterministic test | none | 21 |
-| `tests/test_streamlit_empty_state.py` | deterministic test | none | 11 |
+| `tests/test_streamlit_empty_state.py` | deterministic test | none | 12 |
 | `tools/__init__.py` | deterministic | none | 0 |
 | `tools/repo_governance/__init__.py` | deterministic governance tooling | none | 0 |
 | `tools/repo_governance/__main__.py` | deterministic governance tooling | none | 0 |
@@ -92,7 +93,7 @@ This graph records deterministic repository relationships discoverable from file
 | `src/models.py` | `enum`, `pydantic`, `typing` |
 | `src/narrative_normalizer.py` | `re`, `src.contracts`, `src.models`, `unicodedata` |
 | `src/policy.py` | `src.contracts`, `src.models`, `typing` |
-| `src/presentation.py` | `src.contracts` |
+| `src/presentation.py` | `src.contracts`, `src.models`, `typing` |
 | `src/provider_adapter.py` | `src.contracts`, `typing` |
 | `src/regex_baseline.py` | `re`, `typing` |
 | `src/salesforce_preview.py` | `src.contracts`, `src.models`, `typing` |
@@ -104,11 +105,12 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_comparison.py` | `src.comparison`, `src.compatibility_finding`, `src.contracts`, `src.models`, `src.semantic_extractor`, `src.semantic_validation` |
 | `tests/test_config_and_app.py` | `importlib` |
 | `tests/test_contracts.py` | `src.app_logic`, `src.comparison`, `src.compatibility_finding`, `src.contract_adapters`, `src.contracts`, `src.models`, `src.policy`, `src.provider_adapter`, `src.salesforce_preview`, `src.semantic_extractor`, `src.semantic_validation` |
+| `tests/test_fixture_policy_regression.py` | `src.app_logic`, `src.contracts`, `src.fixtures`, `src.models`, `src.semantic_extractor`, `unittest.mock` |
 | `tests/test_fixtures.py` | `src.fixtures` |
 | `tests/test_input_boundary.py` | `pytest`, `src.app_logic`, `src.contracts`, `src.fixtures`, `src.input_validation`, `src.models`, `src.narrative_normalizer`, `src.semantic_extractor`, `unittest.mock` |
 | `tests/test_models.py` | `pydantic`, `pytest`, `src.models` |
 | `tests/test_policy.py` | `collections`, `itertools`, `pydantic`, `pytest`, `src.app_logic`, `src.compatibility_finding`, `src.contracts`, `src.models`, `src.policy`, `src.semantic_extractor`, `src.semantic_validation`, `unittest.mock` |
-| `tests/test_presentation.py` | `src.contracts`, `src.models`, `src.policy`, `src.presentation`, `src.semantic_validation` |
+| `tests/test_presentation.py` | `src.compatibility_finding`, `src.contracts`, `src.models`, `src.policy`, `src.presentation`, `src.semantic_validation` |
 | `tests/test_regex_baseline.py` | `src.fixtures`, `src.regex_baseline` |
 | `tests/test_repo_governance.py` | `__future__`, `importlib`, `json`, `pathlib`, `subprocess`, `sys`, `tools.repo_governance` |
 | `tests/test_salesforce_preview.py` | `pytest`, `src.contracts`, `src.models`, `src.policy`, `src.salesforce_preview`, `src.semantic_validation`, `unittest.mock` |
@@ -116,7 +118,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_semantic_extractor.py` | `importlib`, `pytest`, `src.config`, `src.contracts`, `src.fixtures`, `src.models`, `src.semantic_extractor`, `sys`, `types` |
 | `tests/test_semantic_prompt.py` | `pathlib`, `src.semantic_prompt` |
 | `tests/test_semantic_validation.py` | `pytest`, `src.app_logic`, `src.compatibility_finding`, `src.contracts`, `src.domain_validation`, `src.models`, `src.schema_validation`, `src.semantic_extractor`, `src.semantic_validation`, `types`, `unittest.mock` |
-| `tests/test_streamlit_empty_state.py` | `src.fixtures`, `streamlit.testing.v1`, `sys`, `unittest.mock` |
+| `tests/test_streamlit_empty_state.py` | `src.app_logic`, `src.contracts`, `src.fixtures`, `src.models`, `src.semantic_extractor`, `streamlit.testing.v1`, `sys`, `unittest.mock` |
 | `tools/__init__.py` | none |
 | `tools/repo_governance/__init__.py` | `.governance` |
 | `tools/repo_governance/__main__.py` | `.governance` |
@@ -171,6 +173,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_comparison.py` | `src/comparison.py` |
 | `tests/test_config_and_app.py` | unresolved |
 | `tests/test_contracts.py` | `src/contracts.py` |
+| `tests/test_fixture_policy_regression.py` | unresolved |
 | `tests/test_fixtures.py` | `src/fixtures.py` |
 | `tests/test_input_boundary.py` | unresolved |
 | `tests/test_models.py` | `src/models.py` |
