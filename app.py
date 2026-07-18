@@ -29,10 +29,14 @@ def _fixture_label(item: dict) -> str:
 
 
 def _selected_incident() -> Tuple[Optional[Incident], Optional[str]]:
+    st.header("Narrative source")
+    st.caption("Select a fixture or enter a manual narrative, then press Run Analysis.")
     mode = st.radio(
         "Narrative source",
-        ["Select a source", "Synthetic fixture", "Manual narrative"],
+        ["Synthetic fixture", "Manual narrative"],
         horizontal=True,
+        index=None,
+        label_visibility="collapsed",
     )
 
     if mode == "Synthetic fixture":
@@ -48,7 +52,7 @@ def _selected_incident() -> Tuple[Optional[Incident], Optional[str]]:
         incident = fixture["incident"]
         return incident, fixture["metadata"]["scenario_type"]
 
-    if mode == "Select a source":
+    if mode is None:
         return None, None
 
     manual_text = st.text_area(
@@ -154,10 +158,6 @@ def main() -> None:
     st.write(
         "Synthetic local pre-PoC for comparing an illustrative regex baseline with validated semantic extraction."
     )
-    st.info(
-        "Synthetic data only. The regex baseline is illustrative, lexical-only, and not Rochester Regional's actual implementation."
-    )
-    st.caption("Select a fixture or enter a manual narrative, then press Run Analysis.")
 
     incident, scenario_label = _selected_incident()
 
