@@ -109,3 +109,23 @@ def test_stale_result_clears_when_source_mode_changes():
     assert "analysis_result" not in app_test.session_state
     assert "analysis_signature" not in app_test.session_state
     assert_no_analysis_output(app_test)
+
+
+def test_newly_rejected_manual_input_shows_bounded_feedback_without_analysis():
+    app_test = fresh_app_test()
+
+    app_test.radio[0].set_value("Manual narrative").run()
+    app_test.text_area[0].set_value("\ufeff").run()
+    app_test.button[0].click().run()
+
+    assert "Incident narrative must contain substantive text." in all_rendered_text(app_test)
+    assert "AI Assessment" in header_values(app_test)
+    assert "Unable to Determine" in all_rendered_text(app_test)
+    assert "The incident input could not be validated." in all_rendered_text(app_test)
+    assert "Application Write Disposition" not in all_rendered_text(app_test)
+    assert [item.label for item in app_test.expander] == ["Technical Details"]
+    assert "Internal outcome: WRITE_FAILED" in all_rendered_text(app_test)
+    assert "Reason codes: ['input_validation_failed']" in all_rendered_text(app_test)
+    assert "analysis_result" not in app_test.session_state
+    assert "analysis_signature" not in app_test.session_state
+    assert_no_analysis_output(app_test)

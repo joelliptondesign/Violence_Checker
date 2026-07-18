@@ -57,7 +57,7 @@ Complete the local demonstration flow:
 3. For manual input, enter a non-empty narrative. The text is analyzed as typed and is not persisted.
 4. Review the original narrative displayed by the app.
 5. Press `Run Analysis`.
-6. View the illustrative regex baseline, validated semantic extraction result, deterministic comparison status, separated classification divergence and semantic enrichment observations, and illustrative Salesforce write-back preview.
+6. View the illustrative regex baseline, validated semantic extraction result, deterministic application write disposition, comparison status, separated classification divergence and semantic enrichment observations, and policy-gated illustrative Salesforce write-back preview.
 
 Semantic extraction occurs only after pressing `Run Analysis`. One semantic request occurs per analysis action.
 
@@ -116,7 +116,7 @@ The comparison distinguishes classification divergence from semantic enrichment.
 extract_violence_finding(incident: Incident) -> SemanticExtractionResult
 ```
 
-The extractor keeps OpenAI logic out of Streamlit. It submits the unmodified `Incident.narrative` to the OpenAI Responses API using one model call, requests structured output tied to `ViolenceFinding`, and validates the result through Pydantic before returning success.
+The extractor keeps OpenAI logic out of Streamlit. App orchestration supplies a separate incident containing the deterministically normalized narrative. The extractor makes one OpenAI Responses API call, parses `ProviderStructuredResponse`, and deterministically copies its fields into a provider-independent candidate. Dedicated schema validation constructs `SemanticFacts`; dedicated domain validation evaluates encoded field consistency; and only the resulting `ValidatedSemanticFacts` may enter the local compatibility constructor that maps facts into `ViolenceFinding` for current comparison and preview behavior.
 
 Malformed or missing structured output cannot propagate as an application result. Expected failure states are typed:
 
@@ -127,11 +127,23 @@ Malformed or missing structured output cannot propagate as an application result
 
 Offline tests use fakes and do not require credentials or network access.
 
+## Application Write Policy
+
+`src/policy.py` implements local policy `violence_checker_write_disposition` version `1.0.0`. After schema validation, domain validation, and compatibility construction, it deterministically produces `WRITE_DETECTED`, `WRITE_UNCERTAIN`, `WRITE_NOT_DETECTED`, or `WRITE_FAILED`. Failure takes precedence over uncertainty, uncertainty over detected, and detected over not detected. Provider-reported confidence alone does not affect the outcome.
+
+The policy controls only representation inside this demonstration. It does not make clinical, legal, safety, hospital workflow, human-review, or real Salesforce decisions.
+
+## Presentation Layer
+
+`src/presentation.py` deterministically translates internal policy outcomes, reason codes, and validation stages into stakeholder-readable labels and explanations. The Streamlit interface presents `Validation` and `AI Assessment` before implementation detail. Internal policy identifiers, policy version, enum values, reason codes, validation stages, semantic fields, compatibility status, and regex artifacts remain unchanged and are available in a collapsed `Technical Details` section.
+
+Presentation mappings do not evaluate policy, reinterpret semantic facts, alter validation, change comparison or preview behavior, or make an additional provider request. The deterministic execution contracts remain authoritative; presentation labels are display-only.
+
 ## Salesforce Preview
 
-`src/salesforce_preview.py` creates a deterministic illustrative dictionary from a successful validated semantic result. Field names are intentionally illustrative and contain no real Salesforce identifiers, credentials, connection logic, or API calls.
+`src/salesforce_preview.py` creates a deterministic illustrative dictionary from the locally constructed compatibility `ViolenceFinding` and required `PolicyDecision`. `WRITE_FAILED` cannot produce a preview; the other outcomes are copied into the illustrative write-disposition field. Field names are intentionally illustrative and contain no real Salesforce identifiers, credentials, connection logic, or API calls.
 
-Preview generation is declined for configuration failures, provider request failures, structured response failures, and Pydantic validation failures. Invalid or failed semantic output cannot produce a write-back payload.
+Preview generation is declined for configuration failures, provider request failures, structured response failures, provider parse failures, schema failures, domain failures, and compatibility failures. Invalid or inadmissible semantic output cannot produce a write-back payload.
 
 ## Repository Structure
 

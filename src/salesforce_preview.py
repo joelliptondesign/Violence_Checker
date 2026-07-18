@@ -1,19 +1,22 @@
 from typing import Dict, List
 
+from src.contracts import PolicyDecision, PolicyOutcome
 from src.models import ViolenceFinding
-from src.semantic_extractor import SemanticExtractionResult, SemanticExtractionStatus
 
 
 def build_salesforce_preview(
     incident_id: str,
-    semantic_result: SemanticExtractionResult,
+    finding: ViolenceFinding,
+    policy_decision: PolicyDecision,
+    *,
+    validation_status: str = "success",
 ) -> Dict[str, object]:
-    if semantic_result.status != SemanticExtractionStatus.SUCCESS:
-        raise ValueError("Salesforce preview requires a successful semantic result")
-
-    finding = semantic_result.finding
     if not isinstance(finding, ViolenceFinding):
         raise TypeError("Salesforce preview requires a validated ViolenceFinding")
+    if not isinstance(policy_decision, PolicyDecision):
+        raise TypeError("Salesforce preview requires a PolicyDecision")
+    if policy_decision.outcome == PolicyOutcome.WRITE_FAILED:
+        raise ValueError("WRITE_FAILED cannot produce a Salesforce preview")
 
     return {
         "Illustrative_Incident_Identifier__c": incident_id,
@@ -31,7 +34,8 @@ def build_salesforce_preview(
         "Illustrative_Confidence__c": finding.confidence,
         "Illustrative_Evidence__c": list(finding.evidence_text),
         "Illustrative_Uncertainty_Notes__c": list(finding.uncertainty_notes),
-        "Illustrative_Validation_Status__c": semantic_result.status.value,
+        "Illustrative_Validation_Status__c": validation_status,
+        "Illustrative_Write_Disposition__c": policy_decision.outcome.value,
     }
 
 
@@ -53,4 +57,5 @@ def preview_field_names() -> List[str]:
         "Illustrative_Evidence__c",
         "Illustrative_Uncertainty_Notes__c",
         "Illustrative_Validation_Status__c",
+        "Illustrative_Write_Disposition__c",
     ]

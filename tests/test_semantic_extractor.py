@@ -5,8 +5,9 @@ from types import SimpleNamespace
 import pytest
 
 from src.config import DEFAULT_OPENAI_MODEL, AppConfig, load_config
+from src.contracts import ProviderStructuredResponse, SemanticFacts
 from src.fixtures import SYNTHETIC_INCIDENTS
-from src.models import Incident, Intentionality, ViolenceEventType, ViolenceFinding
+from src.models import Incident, Intentionality, ViolenceEventType
 from src.semantic_extractor import (
     SemanticExtractionStatus,
     extract_violence_finding,
@@ -77,7 +78,7 @@ def test_invoking_extraction_without_openai_api_key_returns_config_failure(monke
     result = extract_violence_finding(case_008(), config=AppConfig())
 
     assert result.status == SemanticExtractionStatus.CONFIGURATION_FAILURE
-    assert result.finding is None
+    assert result.semantic_candidate is None
 
 
 def test_openai_model_default_is_available(monkeypatch):
@@ -102,11 +103,11 @@ def test_request_construction_uses_one_provider_request_and_original_narrative()
     assert request["model"] == "demo-model"
     assert request["input"] == "pt swung at rn missed. security called"
     assert request["input"] == incident.narrative
-    assert request["text_format"] is ViolenceFinding
+    assert request["text_format"] is ProviderStructuredResponse
     assert "metadata" not in request
 
 
-def test_valid_structured_output_returns_violence_finding_with_exact_evidence():
+def test_valid_structured_output_returns_provider_independent_candidate_with_exact_evidence():
     client = FakeClient(parsed=valid_payload())
 
     result = extract_violence_finding(
@@ -116,8 +117,9 @@ def test_valid_structured_output_returns_violence_finding_with_exact_evidence():
     )
 
     assert result.status == SemanticExtractionStatus.SUCCESS
-    assert isinstance(result.finding, ViolenceFinding)
-    assert result.finding.evidence_text == ["pt swung at rn missed"]
+    assert isinstance(result.semantic_candidate, dict)
+    assert not isinstance(result.semantic_candidate, ProviderStructuredResponse)
+    assert result.semantic_candidate["evidence_text"] == ["pt swung at rn missed"]
 
 
 def test_provider_exception_returns_request_failure():
@@ -130,7 +132,7 @@ def test_provider_exception_returns_request_failure():
     )
 
     assert result.status == SemanticExtractionStatus.REQUEST_FAILURE
-    assert result.finding is None
+    assert result.semantic_candidate is None
 
 
 def test_missing_parsed_output_returns_structured_response_failure():
@@ -143,7 +145,7 @@ def test_missing_parsed_output_returns_structured_response_failure():
     )
 
     assert result.status == SemanticExtractionStatus.STRUCTURED_RESPONSE_FAILURE
-    assert result.finding is None
+    assert result.semantic_candidate is None
 
 
 def test_malformed_parsed_output_returns_validation_failure():
@@ -156,7 +158,7 @@ def test_malformed_parsed_output_returns_validation_failure():
     )
 
     assert result.status == SemanticExtractionStatus.VALIDATION_FAILURE
-    assert result.finding is None
+    assert result.semantic_candidate is None
 
 
 def test_invalid_enum_returns_validation_failure():
@@ -169,7 +171,7 @@ def test_invalid_enum_returns_validation_failure():
     )
 
     assert result.status == SemanticExtractionStatus.VALIDATION_FAILURE
-    assert result.finding is None
+    assert result.semantic_candidate is None
 
 
 def test_invalid_confidence_returns_validation_failure():
@@ -182,12 +184,12 @@ def test_invalid_confidence_returns_validation_failure():
     )
 
     assert result.status == SemanticExtractionStatus.VALIDATION_FAILURE
-    assert result.finding is None
+    assert result.semantic_candidate is None
 
 
 def test_pydantic_parse_exception_returns_validation_failure():
     with pytest.raises(Exception) as captured:
-        ViolenceFinding.model_validate({"violence_present": True})
+        ProviderStructuredResponse.model_validate({"violence_present": True})
     assert captured.value is not None
     client = FakeClient(exception=captured.value)
 
@@ -198,7 +200,7 @@ def test_pydantic_parse_exception_returns_validation_failure():
     )
 
     assert result.status == SemanticExtractionStatus.VALIDATION_FAILURE
-    assert result.finding is None
+    assert result.semantic_candidate is None
 
 
 def test_no_default_finding_is_substituted_after_failure():
@@ -210,7 +212,7 @@ def test_no_default_finding_is_substituted_after_failure():
         client=client,
     )
 
-    assert result.finding is None
+    assert result.semantic_candidate is None
 
 
 def test_semantic_extractor_does_not_import_streamlit_or_regex_logic(monkeypatch):

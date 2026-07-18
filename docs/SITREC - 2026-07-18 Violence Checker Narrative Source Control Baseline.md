@@ -32,27 +32,54 @@ Current repository state for 2026-07-18:
 - Empty or whitespace-only manual input cannot run analysis.
 - Stale results are invalidated when the active source mode or active narrative changes.
 - Eight approved synthetic fixtures exist in `src/fixtures.py` and remain unchanged.
-- `Incident` and `ViolenceFinding` contracts exist in `src/models.py` and remain unchanged for this correction.
-- Semantic extraction uses `src/semantic_extractor.py` and remains unchanged for this correction.
-- Semantic instructions in `src/semantic_prompt.py` remain unchanged for this correction.
+- `Incident` and the transitional compatibility `ViolenceFinding` contract exist in `src/models.py`.
+- OpenAI structured output parses into `ProviderStructuredResponse`; `src/provider_adapter.py` deterministically copies its fields into a provider-independent semantic candidate.
+- Successful `SemanticExtractionResult` objects carry a semantic candidate and do not establish deterministic admissibility.
+- `src/schema_validation.py` performs strict structural validation and constructs `SemanticFacts` only on schema success.
+- `src/domain_validation.py` evaluates repository-grounded violence-domain consistency only after schema success.
+- `src/semantic_validation.py` exposes `ValidatedSemanticFacts` only after both stages pass and preserves schema-versus-domain failure provenance.
+- `src/compatibility_finding.py` accepts only `ValidatedSemanticFacts` and deterministically constructs the existing `ViolenceFinding` representation for comparison and preview compatibility.
+- `src/policy.py` implements application write policy `violence_checker_write_disposition` version `1.0.0` with bounded `WRITE_DETECTED`, `WRITE_UNCERTAIN`, `WRITE_NOT_DETECTED`, and `WRITE_FAILED` outcomes.
+- `PolicyDecision` is the authoritative application write disposition and does not alter semantic facts, validation, compatibility findings, or comparison results.
+- `src/presentation.py` maps every bounded policy outcome, policy reason code, and validation stage to deterministic stakeholder-readable text without altering execution contracts.
+- Streamlit presents `Validation` and `AI Assessment` summaries before a collapsed `Technical Details` section containing internal engineering artifacts.
+- Semantic instructions in `src/semantic_prompt.py` request fact extraction and prohibit operational recommendations, hospital workflow decisions, Salesforce write decisions, and legal, clinical, or safety recommendations.
 - Regex output is deterministic and lexical-only in `src/regex_baseline.py` and remains unchanged for this correction.
-- Comparison behavior in `src/comparison.py` remains unchanged for this correction.
-- Salesforce preview behavior in `src/salesforce_preview.py` remains unchanged for this correction.
+- Stakeholder-visible comparison behavior remains intact while consuming the deterministic compatibility finding.
+- Salesforce preview requires both the deterministic compatibility finding and `PolicyDecision`, rejects `WRITE_FAILED`, and includes the illustrative write disposition without real connectivity.
 - Local configuration is loaded from repository-root `.env` by `src/config.py`; `.env` remains ignored by Git.
 - Automated tests exist under `tests/`.
 - Executor operation telemetry exists at `telemetry/executor_heartbeat.jsonl`.
+- Local deterministic repository governance tooling exists at `tools/repo_governance/`.
+- Local governance usage and provenance are documented in `docs/local_governance.md`.
+- Generated repository governance artifacts exist at `docs/generated/repository_tree.txt` and `docs/generated/repository_knowledge_graph.md`.
+- Explicit internal pipeline boundary contracts exist at `src/contracts.py`.
+- Compatibility adapters from existing analysis outputs to contract objects exist at `src/contract_adapters.py`.
+- Deterministic incident-envelope validation exists at `src/input_validation.py` and returns typed failures before regex or semantic extraction.
+- Deterministic conservative narrative normalization exists at `src/narrative_normalizer.py`; normalized inference text and ordered provenance are retained without mutating raw narrative text.
 
 ## C. CORE INVARIANTS
 
-- The original incident narrative is not rewritten before analysis.
+- The original incident narrative remains unchanged as the authoritative raw evidence source and display value.
+- Only a separate deterministic normalized narrative copy is supplied to regex and semantic extraction.
+- Invalid incident input reaches neither regex nor semantic extraction.
 - Fixture metadata is not submitted to semantic extraction.
 - Semantic output cannot propagate as an application result without Pydantic validation.
+- Provider-specific response and SDK objects do not reach app logic, comparison, or Salesforce preview.
+- The provider extracts semantic facts and does not author the authoritative downstream `ViolenceFinding`, policy outcome, Salesforce write outcome, or workflow action.
+- Provider success alone is insufficient for propagation; schema and domain validation must both pass.
+- Schema failure prevents domain validation and exposes no admissible facts.
+- Domain failure exposes no admissible facts.
+- Every typed input, provider, schema, domain, or compatibility failure maps to `WRITE_FAILED` and produces no Salesforce preview.
+- Policy precedence is failure, uncertainty, detected, then not detected.
+- Provider-reported confidence alone does not determine policy outcome.
 - Semantic failures cannot silently become default `ViolenceFinding` objects.
+- Compatibility-construction failures cannot silently become default `ViolenceFinding` objects.
 - Exactly one OpenAI Responses API request is made per explicit analysis action.
 - No provider request occurs on module import, initial Streamlit load, source selection, fixture selection, or manual typing.
 - Regex behavior remains illustrative, lexical, deterministic, and not Rochester Regional logic.
 - Comparison and preview layers make no provider requests.
-- Salesforce preview requires validated semantic success.
+- Salesforce preview requires a non-failed `PolicyDecision` and successful deterministic compatibility construction.
 - Failed semantic extraction results do not produce Salesforce previews.
 - `.env` remains untracked and ignored.
 - Data in the approved fixture library is synthetic.
@@ -67,15 +94,31 @@ Streamlit startup -> title and purpose text -> `Narrative source` heading -> sup
 
 Fixture path:
 
-`Synthetic fixture` radio selection -> fixture selectbox -> approved fixture record from `src/fixtures.py` -> `Incident` object -> original narrative display -> explicit `Run Analysis` -> regex baseline -> semantic extractor -> Pydantic validation -> typed semantic result -> deterministic comparison status with classification divergence and semantic enrichment observations -> illustrative Salesforce preview when semantic validation succeeds -> Streamlit rendering.
+`Synthetic fixture` radio selection -> fixture selectbox -> approved fixture record from `src/fixtures.py` -> `Incident` object -> original narrative display -> explicit `Run Analysis` -> deterministic input validation -> deterministic normalization -> regex baseline using normalized narrative -> OpenAI structured parse to `ProviderStructuredResponse` using normalized narrative -> deterministic provider-independent candidate -> typed semantic result -> schema validation -> domain validation -> `ValidatedSemanticFacts` -> deterministic compatibility construction to `ViolenceFinding` -> deterministic policy evaluation -> deterministic comparison status with classification divergence and semantic enrichment observations -> policy-gated illustrative Salesforce preview -> stakeholder-readable validation and assessment mapping -> collapsed technical detail rendering.
 
 Manual input path:
 
-`Manual narrative` radio selection -> manual text area -> whitespace-only rejection -> session-local illustrative incident identifier -> `Incident` object -> original narrative display -> explicit `Run Analysis` -> regex baseline -> semantic extractor -> Pydantic validation -> typed semantic result -> deterministic comparison status with classification divergence and semantic enrichment observations -> illustrative Salesforce preview when semantic validation succeeds -> Streamlit rendering.
+`Manual narrative` radio selection -> manual text area -> whitespace-only rejection -> session-local illustrative incident identifier -> `Incident` object -> original narrative display -> explicit `Run Analysis` -> deterministic input validation -> deterministic normalization -> regex baseline using normalized narrative -> OpenAI structured parse to `ProviderStructuredResponse` using normalized narrative -> deterministic provider-independent candidate -> typed semantic result -> schema validation -> domain validation -> `ValidatedSemanticFacts` -> deterministic compatibility construction to `ViolenceFinding` -> deterministic policy evaluation -> deterministic comparison status with classification divergence and semantic enrichment observations -> policy-gated illustrative Salesforce preview -> stakeholder-readable validation and assessment mapping -> collapsed technical detail rendering.
 
 Failure path:
 
-semantic configuration failure, OpenAI request failure, structured response failure, or Pydantic validation failure -> typed `SemanticExtractionResult` -> no default finding -> semantic comparison unavailable status and deterministic failure observation -> no Salesforce preview -> bounded Streamlit error display.
+semantic configuration failure, OpenAI request failure, structured response failure, or provider parse validation failure -> typed `SemanticExtractionResult` with no candidate -> deterministic validation not run -> no compatibility construction -> provenance-specific `WRITE_FAILED` -> semantic comparison unavailable status and deterministic failure observation -> no Salesforce preview -> bounded Streamlit error and policy display.
+
+Schema failure path:
+
+provider-independent semantic candidate -> typed schema failure with bounded ordered issues -> domain validation not run -> no `ValidatedSemanticFacts` -> no compatibility finding -> schema-specific `WRITE_FAILED` and comparison-unavailable status -> no Salesforce preview -> bounded Streamlit error and policy display.
+
+Domain failure path:
+
+schema-valid `SemanticFacts` -> typed domain failure with bounded ordered issues -> no `ValidatedSemanticFacts` -> no compatibility finding -> domain-specific `WRITE_FAILED` and comparison-unavailable status -> no Salesforce preview -> bounded Streamlit error and policy display.
+
+Compatibility failure path:
+
+successful `ValidatedSemanticFacts` -> defensive compatibility construction failure -> typed compatibility failure -> compatibility-specific `WRITE_FAILED` -> no default finding -> semantic comparison unavailable status -> no Salesforce preview.
+
+Input failure path:
+
+invalid envelope, identifier, narrative type or content, disallowed Unicode content, or over-limit narrative -> typed `InputValidationResult` with bounded issue code, message, and input-specific `WRITE_FAILED` -> no regex call -> no semantic request -> no analysis result or Salesforce preview -> bounded Streamlit error and policy display.
 
 ## E. AUTHORITY MODEL
 
@@ -85,29 +128,60 @@ semantic configuration failure, OpenAI request failure, structured response fail
 | App presentation support logic | `src/app_logic.py` |
 | Approved fixture source text | `src/fixtures.py` |
 | Incident schema | `src/models.py` `Incident` |
-| Violence finding schema | `src/models.py` `ViolenceFinding` and validators |
+| Input validation contracts | `src/contracts.py` `InputValidationStatus`, `InputFailureCode`, `InputValidationIssue`, and `InputValidationResult` |
+| Input-boundary authority | `src/input_validation.py` |
+| Narrative-normalization authority | `src/narrative_normalizer.py` and `src/contracts.py` `NormalizedIncident` |
+| Provider parsing schema | `src/contracts.py` `ProviderStructuredResponse` |
+| Provider-independent candidate | `src/provider_adapter.py` |
+| Provider-independent facts | `src/contracts.py` `SemanticFacts` and `src/schema_validation.py` |
+| Schema-validation authority | `src/schema_validation.py` |
+| Domain-validation authority | `src/domain_validation.py` |
+| Combined validation authority | `src/semantic_validation.py` |
+| Admissibility carrier | `src/contracts.py` `ValidatedSemanticFacts` |
+| Compatibility finding schema | `src/models.py` `ViolenceFinding` and `src/compatibility_finding.py` |
+| Application write policy | `src/policy.py` and `src/contracts.py` policy contracts |
 | Semantic prompt | `src/semantic_prompt.py` |
 | Semantic extraction behavior | `src/semantic_extractor.py` |
 | Regex baseline | `src/regex_baseline.py` |
 | Comparison layer | `src/comparison.py` |
 | Salesforce preview layer | `src/salesforce_preview.py` |
+| Internal contract definitions | `src/contracts.py` |
+| Contract compatibility adapters | `src/contract_adapters.py` |
 | Environment configuration | `src/config.py`, `.env.example`, ignored local `.env` |
 | Automated regression behavior | `tests/` |
 | Architecture documentation | `docs/architecture.md` |
 | Demonstration runbook | `docs/demo_runbook.md` |
+| Local governance documentation | `docs/local_governance.md` |
+| Repository tree artifact | `docs/generated/repository_tree.txt` |
+| Repository knowledge graph artifact | `docs/generated/repository_knowledge_graph.md` |
 | SITREC | Current-state rehydration artifact only |
-| Deterministic validators | Test suite and imported reference SITREC validator functions |
+| Deterministic validators | Test suite and local `tools/repo_governance/` validation commands |
 
 ## F. DATA / CONTRACT MODEL
 
 - `Incident`: Pydantic model with non-empty `incident_id` and non-empty `narrative`. The narrative is preserved exactly.
-- `ViolenceFinding`: Pydantic model with `violence_present`, `event_type`, `actor`, `target`, `contact_occurred`, `injury_mentioned`, `current_event`, `intentionality`, `negated`, `correction_present`, `conflicting_information`, `evidence_text`, `confidence`, and `uncertainty_notes`.
+- `ViolenceFinding`: transitional downstream Pydantic representation with `violence_present`, `event_type`, `actor`, `target`, `contact_occurred`, `injury_mentioned`, `current_event`, `intentionality`, `negated`, `correction_present`, `conflicting_information`, `evidence_text`, `confidence`, and `uncertainty_notes`.
 - `ViolenceEventType`: bounded values `none`, `verbal_threat`, `attempted_physical_violence`, `completed_physical_violence`, and `unclear`.
 - `Intentionality`: bounded values `intentional`, `accidental`, and `unclear`.
-- `SemanticExtractionResult`: typed result with `success`, `configuration_failure`, `openai_request_failure`, `structured_response_failure`, and `pydantic_validation_failure`.
+- `SemanticExtractionResult`: typed provider result with `success`, `configuration_failure`, `openai_request_failure`, `structured_response_failure`, and `pydantic_validation_failure`; success carries a semantic candidate, not admissible facts.
+- `InputValidationResult`: typed input-boundary result containing success or failure status, a validated `Incident` only on success, and bounded field-level issues only on failure.
+- `InputFailureCode`: bounded values for envelope type, unsupported field, missing/type/empty identifier, missing/type/empty/whitespace/non-substantive narrative, null character, surrogate code point, and narrative size failures.
 - Regex result: dictionary containing `detected`, `matched_terms`, and `matched_patterns`.
 - `ComparisonResult`: typed comparison container with incident, regex result, semantic result, semantic validation status, classification alignment, material difference flag, display status, deterministic classification divergence observations, deterministic semantic enrichment observations, and aggregate observations.
-- Salesforce preview dictionary: illustrative fields derived from a successful validated `ViolenceFinding`.
+- Salesforce preview dictionary: illustrative fields derived from a compatibility `ViolenceFinding` and non-failed `PolicyDecision`, including `Illustrative_Write_Disposition__c`.
+- `NormalizedIncident`: typed contract preserving the exact original narrative plus a normalized inference narrative, changed flag, and ordered `NormalizationOperation` provenance.
+- `RegexResult`: typed adapter contract for the existing regex result dictionary.
+- `ProviderStructuredResponse`: provider-facing structured parse schema containing only authorized extracted fact fields.
+- `SemanticFacts`: provider-independent typed semantic fact contract produced by deterministic adaptation from `ProviderStructuredResponse`; provider-reported confidence is retained as an extraction attribute and is not deterministic truth.
+- `ValidationIssueCode` and `ValidationIssue`: bounded deterministic schema and domain issue representation.
+- `SchemaValidationResult`, `DomainValidationResult`, and `ValidationResult`: typed stage results with deterministic ordering and explicit not-run, schema-failure, domain-failure, or successful provenance.
+- `ValidatedSemanticFacts`: admissibility carrier exposed only after schema and domain validation pass.
+- `CompatibilityFindingResult`: typed deterministic success or defensive failure result for exact `ValidatedSemanticFacts` to `ViolenceFinding` mapping.
+- `PolicyOutcome`: bounded `WRITE_DETECTED`, `WRITE_UNCERTAIN`, `WRITE_NOT_DETECTED`, and `WRITE_FAILED` values.
+- `PolicyReasonCode`: bounded failure, uncertainty, detected, and not-detected reason values with deterministic ordering.
+- `PolicyDecision`: provider-independent application write disposition with stable policy identifier, version, outcome, ordered reasons, deterministic explanation, and optional typed failure provenance.
+- `SalesforcePayload`: typed adapter contract for the existing illustrative Salesforce preview dictionary.
+- `PipelineResult`: typed aggregate contract representing incident, normalized incident, regex result, semantic facts, validation result, operational finding, policy decision, Salesforce payload, presentation payload, and signature.
 - Fixture records: dictionaries containing an `Incident` and qualitative metadata. Metadata is display context only and is not semantic extraction input.
 - Narrative source UI state: unselected initial radio state, `Synthetic fixture`, or `Manual narrative`; the UI state is not a third source value.
 
@@ -122,6 +196,7 @@ semantic configuration failure, OpenAI request failure, structured response fail
 - No FoxCommand integration.
 - No workflow redesign.
 - No human review queue.
+- Policy outcomes are application representation only and do not determine hospital, clinical, legal, or safety action.
 - No batch processing.
 - No analytics dashboard.
 - No evaluation platform or formal benchmark infrastructure.
@@ -136,13 +211,18 @@ semantic configuration failure, OpenAI request failure, structured response fail
 - Fixture source selection supports the eight approved synthetic narratives.
 - Manual narrative entry is supported for local demonstration.
 - Empty or whitespace-only manual input is rejected before analysis.
+- Strict incident envelopes are validated deterministically before regex and semantic extraction.
+- Narratives must contain a non-whitespace character after one optional leading byte-order mark is disregarded, must exclude null characters and Unicode surrogates, and must not exceed 20,000 Python characters.
+- Valid narratives are normalized through a fixed formatting-only operation order before inference while raw narratives remain unchanged.
+- Invalid explicit analysis input returns bounded presentation-safe feedback without regex or provider calls.
 - Regex baseline can run locally without network access.
 - Semantic extraction can run through OpenAI Responses API when local credentials and network availability exist.
-- Semantic outputs are validated through Pydantic before use.
+- Provider candidates pass independent deterministic schema and domain validation before use.
 - Typed semantic failure categories are displayed without stack traces.
 - Regex and semantic outputs are displayed side by side after analysis.
 - Comparison status and observations are deterministic and require no provider call.
-- Salesforce preview is deterministic, illustrative, and only generated from validated semantic success.
+- Deterministic policy `violence_checker_write_disposition` version `1.0.0` represents validated results as detected, uncertain, not detected, or failed.
+- Salesforce preview is deterministic, illustrative, requires `PolicyDecision`, and is never generated for `WRITE_FAILED`.
 - Stale analysis results are hidden when active input changes.
 - Automated tests validate core behavior.
 
@@ -169,19 +249,35 @@ semantic configuration failure, OpenAI request failure, structured response fail
 - Streamlit displays the active narrative before analysis only after a fixture is selected or a non-empty manual narrative is entered.
 - User presses `Run Analysis`.
 - Streamlit calls app logic.
-- App logic calls the regex baseline locally.
-- App logic calls semantic extraction once.
+- App logic validates the incident candidate and terminates typed failures before analysis work.
+- App logic creates one deterministic normalized inference copy with ordered provenance.
+- App logic calls the regex baseline locally with normalized narrative text.
+- App logic calls semantic extraction once with normalized narrative text.
 - Semantic extractor reads local configuration, constructs an OpenAI client when credentials are present, and calls `responses.parse`.
-- Pydantic validates the structured semantic result.
+- Pydantic parses the provider structured response and validates provider-independent semantic facts.
+- A deterministic constructor maps facts exactly into the transitional compatibility finding.
+- Deterministic policy evaluation applies failure, uncertainty, detected, then not-detected precedence without reading provider confidence; an admissible verbal-threat event without an affirmative violence indication is represented explicitly as uncertain.
 - App logic builds deterministic comparison observations.
-- App logic builds an illustrative Salesforce preview only after semantic success.
+- App logic builds an illustrative Salesforce preview only after compatibility construction and a non-failed policy decision.
 - Streamlit renders results or typed failure information.
+- Presentation maps internal outcomes to `Violence Detected`, `Uncertain`, `No Violence Detected`, or `Unable to Determine`, displays deterministic explanations and human-readable reasons first, and retains internal artifacts under `Technical Details`.
 
 ## K. GUARANTEES
 
 - Repository tests enforce the current deterministic behavior within their encoded scope.
 - `Incident` rejects empty `incident_id` and empty `narrative`.
-- `ViolenceFinding` enforces bounded event type, bounded intentionality, confidence range, list evidence, and encoded consistency rules.
+- Input validation returns deterministic typed failures for expected invalid envelopes and prevents those failures from reaching regex or semantic extraction.
+- The minimum-information rule is independent of violence terminology or semantic interpretation, and the local demonstration maximum is exactly 20,000 Python characters.
+- Raw accepted narrative text remains unchanged in the application result, active signature, and original narrative display.
+- Normalization is deterministic and formatting-only; approved fixture narratives are normalization no-ops.
+- Schema validation enforces candidate type, complete strict field shape, forbidden extras, bounded event type and intentionality, strict booleans and strings, collection shapes, and confidence range without domain judgments.
+- Domain validation enforces repository-grounded violence, event-type, contact, intentionality, negation, conflict, and evidence consistency without inference or repair.
+- Compatibility construction accepts only `ValidatedSemanticFacts` and adds no policy threshold.
+- Policy accepts only typed validated inputs or explicit typed failure provenance and makes no provider call or semantic inference.
+- Presentation mappings consume authoritative validation and policy contracts without changing their fields, values, precedence, or outcomes.
+- Stakeholder-facing explanations are deterministic local mappings and make no provider request.
+- Every typed input, provider, schema, domain, or compatibility failure produces `WRITE_FAILED` and no Salesforce preview.
+- Comparison cannot determine or override policy outcome.
 - Malformed semantic results return typed failure instead of default findings.
 - The app import path does not make a provider request.
 - Initial Streamlit state has no active incident or analysis output.
@@ -191,7 +287,7 @@ semantic configuration failure, OpenAI request failure, structured response fail
 - One analysis action invokes one semantic extractor call in test-covered app logic.
 - Stale-result invalidation clears stale stored results when source mode or active narrative changes.
 - Fixture narratives remain exact in the fixture tests.
-- Salesforce preview rejects non-success semantic results.
+- Salesforce preview rejects objects that are not validated compatibility `ViolenceFinding` and `PolicyDecision` instances and rejects `WRITE_FAILED`.
 
 ## L. NON-GUARANTEES
 
@@ -211,13 +307,25 @@ semantic configuration failure, OpenAI request failure, structured response fail
 <Identifies the project as a local Python and Streamlit pre-PoC, documents local setup, explicit Run Analysis flow, semantic extraction, comparison, and illustrative Salesforce preview.>
 
 `app.py`
-<Defines the Streamlit empty state, two-option narrative source selection, supporting instruction, original narrative display, explicit Run Analysis control, result rendering, and stale-result hiding.>
+<Defines the Streamlit empty state, two-option narrative source selection, supporting instruction, original narrative display, explicit Run Analysis control, stakeholder-first validation and AI assessment rendering, collapsed technical details, and stale-result hiding.>
+
+`src/presentation.py`
+<Maps every bounded policy outcome, policy reason code, and validation stage into deterministic stakeholder-readable labels and explanations without altering execution-layer contracts or behavior.>
 
 `src/app_logic.py`
-<Builds analysis results, validates manual narratives, preserves active signatures, gates preview generation, and supports stale-result invalidation.>
+<Validates and normalizes explicit analysis input, preserves raw active signatures, maps typed failures to policy, evaluates admissible findings, gates preview generation by policy, and supports stale-result invalidation.>
+
+`src/input_validation.py`
+<Owns strict deterministic incident-envelope validation, the 20,000-character local limit, conservative minimum-information rule, Unicode exclusions, and typed failure production before analysis work.>
+
+`src/narrative_normalizer.py`
+<Creates a deterministic normalized inference copy through bounded formatting-only operations while preserving exact raw narrative text and ordered provenance.>
 
 `tests/test_streamlit_empty_state.py`
-<Covers the two-option narrative source radio, removed placeholder option, supporting instruction, removed banner text, initial empty state, source-selection no-call behavior, selection-only no-analysis behavior, and stale-result clearing on source change.>
+<Covers the two-option narrative source radio, removed placeholder option, supporting instruction, removed banner text, initial empty state, source-selection no-call behavior, selection-only no-analysis behavior, stakeholder-facing failed-assessment rendering, and stale-result clearing on source change.>
+
+`tests/test_presentation.py`
+<Covers complete deterministic outcome, reason, explanation, and validation-stage mappings while confirming presentation does not mutate authoritative policy contracts.>
 
 `tests/test_app_logic.py`
 <Covers app import behavior, manual input validation, metadata exclusion, stale-result helpers, and one semantic extraction call per analysis action.>
@@ -226,16 +334,67 @@ semantic configuration failure, OpenAI request failure, structured response fail
 <Defines exactly eight approved synthetic fixture records with stable identifiers and qualitative metadata.>
 
 `src/semantic_extractor.py`
-<Calls OpenAI Responses API structured parsing, validates output through `ViolenceFinding`, and returns typed success or failure.>
+<Calls OpenAI Responses API structured parsing with `ProviderStructuredResponse`, adapts parsed output into a provider-independent semantic candidate, and returns typed provider success or bounded provider failure without deciding deterministic admissibility.>
+
+`src/provider_adapter.py`
+<Terminates the provider-facing schema through deterministic field copying to a provider-independent candidate mapping.>
+
+`src/schema_validation.py`
+<Owns structural candidate validation, strict `SemanticFacts` construction, bounded schema issues, and deterministic issue ordering without domain judgments.>
+
+`src/domain_validation.py`
+<Owns repository-grounded violence-domain consistency rules for schema-valid facts without inference, repair, defaults, provider calls, or policy outcomes.>
+
+`src/semantic_validation.py`
+<Runs schema before domain validation, short-circuits domain execution after schema failure, and exposes `ValidatedSemanticFacts` only after both stages pass.>
+
+`src/compatibility_finding.py`
+<Accepts only `ValidatedSemanticFacts` and maps its facts exactly into the transitional `ViolenceFinding` representation with typed defensive failure and no provider calls, semantic inference, defaults, policy, or workflow action.>
+
+`src/policy.py`
+<Implements provider-independent application write policy `violence_checker_write_disposition` version `1.0.0`, bounded outcomes and reasons, explicit precedence, and typed failure mapping without inference or operational action.>
 
 `src/comparison.py`
-<Builds deterministic comparison status, classification divergence observations, and semantic enrichment observations from existing regex and semantic results without provider calls.>
+<Builds deterministic comparison status, classification divergence observations, and semantic enrichment observations from regex output and the compatibility finding without provider calls.>
 
 `src/salesforce_preview.py`
-<Builds deterministic illustrative preview dictionaries only from successful validated semantic results.>
+<Requires compatibility `ViolenceFinding` and `PolicyDecision`, rejects `WRITE_FAILED`, copies the authoritative disposition, and performs no independent policy evaluation or external API call.>
+
+`src/contracts.py`
+<Defines explicit internal contracts for normalized incidents, regex results, provider boundary responses, semantic facts, validation results, bounded policy outcomes and reasons, policy decisions, Salesforce payloads, and aggregate pipeline results while reusing existing `Incident` and `ViolenceFinding` contracts.>
+
+`src/contract_adapters.py`
+<Provides compatibility adapters from existing `AnalysisResult`, regex dictionaries, semantic results, and Salesforce preview dictionaries into the explicit contract model without changing operational pipeline behavior.>
+
+`tests/test_contracts.py`
+<Covers contract construction, serialization, legacy dictionary compatibility, provider response boundary adaptation, validation adapter behavior, and aggregate pipeline adapter behavior.>
+
+`tests/test_input_boundary.py`
+<Covers strict input validation, bounded failure codes, size limits, call suppression, formatting-only normalization, provenance order, idempotence, raw preservation, fixture no-ops, normalized inference integration, and unchanged semantic failure and preview gating behavior.>
+
+`tests/test_semantic_authority_boundary.py`
+<Covers provider-to-facts isolation, bounded semantic fields, absence of operational fields, semantic result consistency, deterministic compatibility mapping, no provider call, rejection without defaults, and semantic-only prompt constraints.>
+
+`tests/test_semantic_validation.py`
+<Covers schema structure, bounded issues, provider and operational-field rejection, domain invariants, deterministic issue ordering, stage short-circuiting, admissibility, compatibility gating, and integration failure propagation.>
+
+`tests/test_policy.py`
+<Covers policy contract serialization, bounded outcomes and reasons, stable identity and version, all failure mappings, exhaustive admissible-state partitions, validation-rejected states, compatibility equality, terminal guards, negation, correction, conflict, uncertainty, detected and not-detected rules, precedence, confidence independence, preview gating, provider independence, and active-flow integration.>
 
 `telemetry/executor_heartbeat.jsonl`
 <Stores local executor operation telemetry as JSONL.>
+
+`tools/repo_governance/`
+<Contains local deterministic governance tooling for repository tree generation, repository knowledge graph generation, SITREC structural validation, and heartbeat JSONL validation without executing foxcommand-runtime tooling.>
+
+`docs/local_governance.md`
+<Documents copied governance tooling provenance, authorized local commands, generated artifact paths, limitations, and the prohibition on routine foxcommand-runtime execution for Violence Checker governance operations.>
+
+`docs/generated/repository_tree.txt`
+<Generated deterministic repository tree excluding local configuration, caches, transient environments, and Git internals.>
+
+`docs/generated/repository_knowledge_graph.md`
+<Generated deterministic repository knowledge graph derived from repository files, imports, tests, documentation, entry points, contracts, and unresolved relationships.>
 
 `docs/SITREC - 2026-07-17 Violence Checker Phase 0 Demonstration Baseline.md`
 <Preserved prior-date active SITREC provenance and was not modified by the 2026-07-18 correction.>
@@ -248,7 +407,7 @@ If the SITREC and repository conflict, the repository wins. The SITREC must be u
 
 1. Begin with repository inspection.
 2. Confirm Git status before changes.
-3. Read `README.md`, `docs/architecture.md`, `docs/demo_runbook.md`, `app.py`, `src/`, `tests/`, and `telemetry/executor_heartbeat.jsonl`.
+3. Read `README.md`, `docs/architecture.md`, `docs/demo_runbook.md`, `docs/local_governance.md`, `app.py`, `src/`, `tests/`, `tools/repo_governance/`, and `telemetry/executor_heartbeat.jsonl`.
 4. Run deterministic validation before relying on behavior.
 5. Preserve OPORD-completed boundaries and do not assume production readiness.
 6. Use the minimum context required.
@@ -276,6 +435,7 @@ Validation is deterministic support, not source of truth. Required validation fo
 - source-of-truth rule check
 - continuation safety check
 - target repository test suite
+- local governance validation with `python3 -m tools.repo_governance validate-all`
 - heartbeat JSONL validation
 - target and reference repository Git status checks
 

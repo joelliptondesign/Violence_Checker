@@ -6,7 +6,9 @@ from openai import OpenAI, OpenAIError
 from pydantic import ValidationError
 
 from src.config import AppConfig, load_config
-from src.models import Incident, ViolenceFinding
+from src.contracts import ProviderStructuredResponse
+from src.models import Incident
+from src.provider_adapter import semantic_candidate_from_provider_response
 from src.semantic_prompt import SEMANTIC_EXTRACTION_PROMPT
 
 
@@ -21,8 +23,14 @@ class SemanticExtractionStatus(str, Enum):
 @dataclass(frozen=True)
 class SemanticExtractionResult:
     status: SemanticExtractionStatus
-    finding: Optional[ViolenceFinding] = None
+    semantic_candidate: Optional[object] = None
     failure_message: Optional[str] = None
+
+    def __post_init__(self) -> None:
+        if self.status == SemanticExtractionStatus.SUCCESS and self.semantic_candidate is None:
+            raise ValueError("successful semantic extraction requires a semantic candidate")
+        if self.status != SemanticExtractionStatus.SUCCESS and self.semantic_candidate is not None:
+            raise ValueError("failed semantic extraction cannot contain a semantic candidate")
 
     @property
     def succeeded(self) -> bool:
@@ -49,7 +57,7 @@ def extract_violence_finding(
             model=resolved_config.openai_model,
             instructions=SEMANTIC_EXTRACTION_PROMPT,
             input=incident.narrative,
-            text_format=ViolenceFinding,
+            text_format=ProviderStructuredResponse,
         )
     except OpenAIError as exc:
         return SemanticExtractionResult(
@@ -75,7 +83,7 @@ def extract_violence_finding(
         )
 
     try:
-        finding = ViolenceFinding.model_validate(parsed)
+        semantic_candidate = semantic_candidate_from_provider_response(parsed)
     except ValidationError as exc:
         return SemanticExtractionResult(
             status=SemanticExtractionStatus.VALIDATION_FAILURE,
@@ -84,5 +92,5 @@ def extract_violence_finding(
 
     return SemanticExtractionResult(
         status=SemanticExtractionStatus.SUCCESS,
-        finding=finding,
+        semantic_candidate=semantic_candidate,
     )

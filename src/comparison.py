@@ -1,6 +1,8 @@
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Optional
 
+from src.compatibility_finding import CompatibilityFindingResult, CompatibilityFindingStatus
+from src.contracts import ValidationFailureStage, ValidationResult
 from src.models import Incident, Intentionality, ViolenceEventType
 from src.semantic_extractor import SemanticExtractionResult, SemanticExtractionStatus
 
@@ -10,6 +12,8 @@ class ComparisonResult:
     incident: Incident
     regex_result: Dict[str, object]
     semantic_result: SemanticExtractionResult
+    validation_result: ValidationResult
+    compatibility_result: Optional[CompatibilityFindingResult]
     semantic_validation_status: str
     classification_alignment: str
     material_difference_detected: bool
@@ -23,12 +27,25 @@ def build_comparison_result(
     incident: Incident,
     regex_result: Dict[str, object],
     semantic_result: SemanticExtractionResult,
+    validation_result: ValidationResult,
+    compatibility_result: Optional[CompatibilityFindingResult] = None,
 ) -> ComparisonResult:
-    classification_alignment = _classification_alignment(regex_result, semantic_result)
-    divergence_observations = _build_divergence_observations(classification_alignment)
+    classification_alignment = _classification_alignment(
+        regex_result,
+        semantic_result,
+        validation_result,
+        compatibility_result,
+    )
+    divergence_observations = _build_divergence_observations(
+        classification_alignment,
+        semantic_result,
+        validation_result,
+    )
     semantic_enrichment_observations = _build_semantic_enrichment_observations(
         regex_result,
         semantic_result,
+        validation_result,
+        compatibility_result,
     )
     material_difference_detected = bool(divergence_observations or semantic_enrichment_observations)
     observations = divergence_observations + semantic_enrichment_observations
@@ -45,7 +62,9 @@ def build_comparison_result(
         incident=incident,
         regex_result=regex_result,
         semantic_result=semantic_result,
-        semantic_validation_status=semantic_result.status.value,
+        validation_result=validation_result,
+        compatibility_result=compatibility_result,
+        semantic_validation_status=_semantic_validation_status(semantic_result, validation_result),
         classification_alignment=classification_alignment,
         material_difference_detected=material_difference_detected,
         divergence_observations=divergence_observations,
@@ -58,11 +77,18 @@ def build_comparison_result(
 def _classification_alignment(
     regex_result: Dict[str, object],
     semantic_result: SemanticExtractionResult,
+    validation_result: ValidationResult,
+    compatibility_result: Optional[CompatibilityFindingResult],
 ) -> str:
     if semantic_result.status != SemanticExtractionStatus.SUCCESS:
         return "semantic_failure"
 
-    finding = semantic_result.finding
+    if not validation_result.passed:
+        return "semantic_failure"
+
+    if compatibility_result is None or compatibility_result.status != CompatibilityFindingStatus.SUCCESS:
+        return "semantic_failure"
+    finding = compatibility_result.finding
     if finding is None:
         return "semantic_failure"
 
@@ -80,7 +106,11 @@ def _classification_alignment(
     return "regex_negative_semantic_positive"
 
 
-def _build_divergence_observations(classification_alignment: str) -> List[str]:
+def _build_divergence_observations(
+    classification_alignment: str,
+    semantic_result: SemanticExtractionResult,
+    validation_result: ValidationResult,
+) -> List[str]:
     if classification_alignment == "regex_positive_semantic_negative":
         return [
             "Regex detected violence-related language, but semantic extraction determined no violence."
@@ -92,6 +122,11 @@ def _build_divergence_observations(classification_alignment: str) -> List[str]:
         ]
 
     if classification_alignment == "semantic_failure":
+        if semantic_result.status == SemanticExtractionStatus.SUCCESS:
+            if validation_result.failure_stage == ValidationFailureStage.SCHEMA:
+                return ["Semantic schema validation failed and comparison is unavailable."]
+            if validation_result.failure_stage == ValidationFailureStage.DOMAIN:
+                return ["Semantic domain validation failed and comparison is unavailable."]
         return ["Semantic extraction failed and no validated semantic comparison is available."]
 
     return []
@@ -100,11 +135,19 @@ def _build_divergence_observations(classification_alignment: str) -> List[str]:
 def _build_semantic_enrichment_observations(
     regex_result: Dict[str, object],
     semantic_result: SemanticExtractionResult,
+    validation_result: ValidationResult,
+    compatibility_result: Optional[CompatibilityFindingResult],
 ) -> List[str]:
-    if semantic_result.status != SemanticExtractionStatus.SUCCESS or semantic_result.finding is None:
+    if (
+        semantic_result.status != SemanticExtractionStatus.SUCCESS
+        or not validation_result.passed
+        or compatibility_result is None
+        or compatibility_result.status != CompatibilityFindingStatus.SUCCESS
+        or compatibility_result.finding is None
+    ):
         return []
 
-    finding = semantic_result.finding
+    finding = compatibility_result.finding
     observations: List[str] = []
 
     _append_unique(
@@ -176,6 +219,19 @@ def _build_semantic_enrichment_observations(
     )
 
     return observations
+
+
+def _semantic_validation_status(
+    semantic_result: SemanticExtractionResult,
+    validation_result: ValidationResult,
+) -> str:
+    if semantic_result.status != SemanticExtractionStatus.SUCCESS:
+        return semantic_result.status.value
+    if validation_result.failure_stage == ValidationFailureStage.SCHEMA:
+        return "schema_validation_failure"
+    if validation_result.failure_stage == ValidationFailureStage.DOMAIN:
+        return "domain_validation_failure"
+    return "success"
 
 
 def _display_status(

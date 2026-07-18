@@ -1,8 +1,13 @@
 SEMANTIC_EXTRACTION_PROMPT = """
 Analyze only the supplied incident narrative.
 
-Return a structured ViolenceFinding object. Do not use any information outside
-the narrative. Do not infer facts that are not present.
+Return only structured semantic facts extracted from the narrative. Do not use
+any information outside the narrative. Do not infer facts that are not present.
+
+Do not make operational recommendations, hospital workflow decisions,
+Salesforce write decisions, or legal, clinical, or safety recommendations.
+Do not decide whether extracted data should be written or what action a person
+or system should take.
 
 Required analysis:
 - Preserve the distinction between current incident events and historical events.
@@ -14,12 +19,12 @@ Required analysis:
   current_event=false, even when the historical event involved violence.
 - Identify negation, including statements that violence did not happen.
 - Identify corrections and conflicting statements. When a later explicit and
-  credible correction contradicts an earlier claim, let the correction control
-  the final structured finding while still marking correction_present=true and
+  credible correction contradicts an earlier claim, represent the corrected
+  semantic facts while still marking correction_present=true and
   conflicting_information=true when both claims appear.
 - If a correction states that a person was not struck, kicked, contacted, or
-  targeted, do not preserve the earlier person-directed violence claim as the
-  final violence finding unless another part of the narrative independently
+  targeted, do not preserve the earlier person-directed violence claim in the
+  extracted facts unless another part of the narrative independently
   supports a person-directed attempt or contact.
 - Distinguish no violence, verbal threats, attempted physical violence,
   completed physical violence, and unclear events.

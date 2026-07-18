@@ -1,9 +1,12 @@
-from src.comparison import build_comparison_result
-from src.models import Incident, Intentionality, ViolenceEventType, ViolenceFinding
+from src.comparison import build_comparison_result as _build_comparison_result
+from src.compatibility_finding import construct_compatibility_finding
+from src.contracts import SemanticFacts
+from src.models import Incident, Intentionality, ViolenceEventType
 from src.semantic_extractor import SemanticExtractionResult, SemanticExtractionStatus
+from src.semantic_validation import validate_semantic_candidate, validation_not_run
 
 
-def finding(**overrides):
+def facts(**overrides):
     data = {
         "violence_present": True,
         "event_type": ViolenceEventType.ATTEMPTED_PHYSICAL_VIOLENCE,
@@ -21,14 +24,24 @@ def finding(**overrides):
         "uncertainty_notes": [],
     }
     data.update(overrides)
-    return ViolenceFinding(**data)
+    return SemanticFacts(**data)
 
 
 def semantic_success(**overrides):
     return SemanticExtractionResult(
         status=SemanticExtractionStatus.SUCCESS,
-        finding=finding(**overrides),
+        semantic_candidate=facts(**overrides),
     )
+
+
+def build_comparison_result(incident, regex, semantic_result):
+    validation = validation_not_run()
+    compatibility = None
+    if semantic_result.succeeded:
+        validation = validate_semantic_candidate(semantic_result.semantic_candidate)
+        if validation.validated_facts is not None:
+            compatibility = construct_compatibility_finding(validation.validated_facts)
+    return _build_comparison_result(incident, regex, semantic_result, validation, compatibility)
 
 
 def test_successful_outputs_produce_comparison_result():
@@ -129,7 +142,7 @@ def test_semantic_failure_represented_without_default_finding():
         SemanticExtractionResult(status=SemanticExtractionStatus.REQUEST_FAILURE, failure_message="RequestError"),
     )
 
-    assert result.semantic_result.finding is None
+    assert result.semantic_result.semantic_candidate is None
     assert result.classification_alignment == "semantic_failure"
     assert result.material_difference_detected is True
     assert result.display_status == "Semantic Comparison Unavailable"

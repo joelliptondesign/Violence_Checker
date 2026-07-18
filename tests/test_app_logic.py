@@ -11,14 +11,15 @@ from src.app_logic import (
     validate_manual_narrative,
 )
 from src.fixtures import SYNTHETIC_INCIDENTS
-from src.models import Intentionality, ViolenceEventType, ViolenceFinding
+from src.contracts import PolicyOutcome, SemanticFacts
+from src.models import Intentionality, ViolenceEventType
 from src.semantic_extractor import SemanticExtractionResult, SemanticExtractionStatus
 
 
 def valid_semantic_result():
     return SemanticExtractionResult(
         status=SemanticExtractionStatus.SUCCESS,
-        finding=ViolenceFinding(
+        semantic_candidate=SemanticFacts(
             violence_present=True,
             event_type=ViolenceEventType.ATTEMPTED_PHYSICAL_VIOLENCE,
             actor="pt",
@@ -97,4 +98,5 @@ def test_one_analysis_action_results_in_one_semantic_extraction_call():
     result = run_analysis(fixture["incident"], extractor=extractor)
 
     assert calls == ["CASE_008"]
+    assert result.policy_decision.outcome == PolicyOutcome.WRITE_DETECTED
     assert result.salesforce_preview is not None
