@@ -22,6 +22,8 @@ Authorized local functions:
 
 Evaluation classification is deterministic and repository-local. Compatibility construction failures require explicit compatibility failure provenance and remain distinct from compatibility differences. Evidence coverage uses exact substring containment and ordered exact-span segmentation without fuzzy or model-assisted matching. Reports separate runtime failures from comparison differences, semantic weakness indicators, and legacy classification artifacts.
 
+The canonical initial evidence is `evaluation/runs/initial-operational-evaluation-001.json`, `evaluation/baselines/initial-evaluation-baseline-001.json`, `evaluation/reports/initial-operational-comparison-001.json`, and `evaluation/reports/initial-operational-evaluation-001.md`. Closeout validation loads these immutable JSON artifacts through their strict repository contracts and validates the preserved Markdown report structurally; it does not rerun the provider or regenerate the historical report. Prior classification values remain readable, while newly generated comparisons use current corrected classifications.
+
 Generated artifact locations:
 
 - `docs/generated/repository_tree.txt`

@@ -122,6 +122,12 @@ Explicitly accept a complete run, compare a current run, and generate an enginee
 
 To replace a reference baseline, choose a new identifier and output path and add `--replaces evaluation/baselines/baseline-001.json` to `accept-baseline`. The first accepted baseline and its generated comparison and engineering report are committed as immutable operational evidence; their presence does not claim semantic improvement.
 
+The initial operational evidence is preserved as `INITIAL_OPERATIONAL_EVALUATION_001`, `INITIAL_EVALUATION_BASELINE_001`, and `INITIAL_OPERATIONAL_COMPARISON_001`. The complete live-provider execution made 48 requests in canonical corpus order, recorded no provider failures, and recorded 14 domain-validation rejections. Its application policy outcomes were 9 `WRITE_DETECTED`, 22 `WRITE_UNCERTAIN`, 3 `WRITE_NOT_DETECTED`, and 14 `WRITE_FAILED`; comparison against repository-authored ground truth produced 0 matches, 34 partial mismatches, and 14 failures. The accepted baseline self-comparison records all 48 cases as unchanged. These are observations from one preserved operational run, not a semantic-performance claim.
+
+The immutable run, baseline, comparison, and report retain the classification vocabulary produced at creation time so their hashes and provenance remain intact. Current comparator and reporting logic corrects compatibility-difference, exact-evidence-containment, event-type-disagreement, and uncertainty-note classifications for newly generated artifacts while continuing to load the prior evidence.
+
+The current semantic representation uses global fields such as `violence_present`, `contact_occurred`, `negated`, `correction_present`, and `conflicting_information` with bounded event types. A proposed refinement of semantic direction, scope, negation, and correction representation was halted because it would require replacing serialized semantic contracts and migrating the provider boundary, validation, compatibility, policy, presentation, Salesforce preview, all 48 ground-truth records, evaluation schemas, and legacy-artifact handling. No such redesign or pipeline migration was performed, and the existing operational artifacts remain readable and unchanged.
+
 ## Domain Models
 
 `src/models.py` defines:

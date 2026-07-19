@@ -38,6 +38,10 @@ Current repository state for 2026-07-18:
 - `src/evaluation/corpus.py` implements deterministic atomic loading, bounded validation, and coverage calculation without provider execution.
 - `src/evaluation/runner.py` implements explicit deterministic-test and live-provider execution through the complete governed application pipeline, and `src/evaluation/case_comparison.py` performs asserted-field comparison with stable difference paths and bounded evaluation findings. Compatibility failures require explicit construction-failure provenance; compatibility differences, exact evidence coverage, event-type disagreement, and uncertainty-note disagreement remain separate deterministic classifications.
 - Generated immutable run artifacts are observed evidence only and are protected from overwrite by default. The repository contains its first full live-provider corpus run, explicitly accepted baseline, deterministic self-comparison, and engineering report; these artifacts do not alter ground truth or claim semantic improvement.
+- The initial operational run executed all 48 cases in canonical order with 48 provider requests, zero provider failures, 14 domain-validation rejections, 34 partial mismatches, 14 failures, and zero exact matches. Policy outcomes were 9 `WRITE_DETECTED`, 22 `WRITE_UNCERTAIN`, 3 `WRITE_NOT_DETECTED`, and 14 `WRITE_FAILED`.
+- The initial accepted-baseline self-comparison records all 48 cases as unchanged. Its run, baseline, comparison, and report are immutable evidence from their creation-time repository state, not a semantic-performance claim.
+- Prior artifacts retain their creation-time classification vocabulary and remain readable and unchanged. Current comparator and reporting logic correctly separates compatibility failures from compatibility differences, uses exact evidence containment, and separates event-type disagreement from uncertainty-note disagreement for new artifacts.
+- Semantic direction, scope, negation, and correction refinement was halted because the current global semantic fields and bounded event types cannot express that refinement without semantic contract replacement and broad pipeline migration. No semantic redesign, corpus rewrite, or pipeline migration was performed.
 - `Incident` and the transitional compatibility `ViolenceFinding` contract exist in `src/models.py`.
 - OpenAI structured output parses into `ProviderStructuredResponse`; `src/provider_adapter.py` deterministically copies its fields into a provider-independent semantic candidate.
 - Successful `SemanticExtractionResult` objects carry a semantic candidate and do not establish deterministic admissibility.
@@ -218,6 +222,7 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 - No database persistence.
 - No protected health information handling capability.
 - No FoxCommand integration.
+- No production, real-data, Salesforce, or FoxCommand integration was added by the evaluation baseline work.
 - No workflow redesign.
 - No human review queue.
 - Policy outcomes are application representation only and do not determine hospital, clinical, legal, or safety action.
@@ -260,6 +265,7 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 - Case comparison evaluates asserted semantic, validation, compatibility, policy, and failure expectations; provider confidence is excluded unless a future contract explicitly asserts it.
 - Provider and infrastructure failures are non-comparable, while deterministic validation and pipeline failures remain explicit failures.
 - Generated run artifacts are canonically serialized under `evaluation/runs/` and refuse overwrite unless explicitly authorized.
+- One complete 48-case live-provider run, one explicitly accepted baseline, one deterministic self-comparison, and one engineering report are preserved as the repository's initial operational evaluation evidence.
 
 ## I. KNOWN LIMITATIONS
 
@@ -270,9 +276,9 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 - No production reliability controls are implemented.
 - No persistent audit record exists beyond local executor heartbeat telemetry.
 - No real hospital taxonomy integration exists.
-- No measured benchmark or accepted regression baseline exists.
-- The corpus has not been executed as a complete live-provider run and establishes no semantic performance measurement.
-- The runner does not implement accepted baselines, regression comparison, a regression executor, or an engineering report generator.
+- The preserved initial operational run is a single synthetic-corpus observation and establishes no general semantic-performance measurement.
+- Current global fields including `violence_present`, `contact_occurred`, `negated`, `correction_present`, and `conflicting_information` do not independently encode proposition direction or scope.
+- Refining semantic direction and scope requires replacement of serialized semantic contracts and migration across provider parsing, validation, compatibility, policy, presentation, preview, all 48 ground-truth records, evaluation schemas, and legacy-artifact loading; that redesign was not authorized or performed.
 - Local API availability and valid credentials are required for semantic analysis.
 - Provider or network failures produce typed failures.
 - Salesforce preview uses illustrative fields only.
@@ -508,6 +514,8 @@ Validation is deterministic support, not source of truth. Required validation fo
 - source-of-truth rule check
 - continuation safety check
 - target repository test suite
+- evaluation corpus validation and deterministic coverage
+- strict loading of the accepted baseline, operational run, and regression artifact, plus structural validation of the preserved engineering report
 - local governance validation with `python3 -m tools.repo_governance validate-all`
 - heartbeat JSONL validation
 - target and reference repository Git status checks

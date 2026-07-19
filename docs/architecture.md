@@ -256,6 +256,12 @@ An evaluation case keeps its synthetic narrative, metadata, and ground-truth exp
 
 `src/evaluation/reporting.py` renders the machine regression artifact into ten stable engineering sections covering provenance, corpus, coverage, outcomes, evaluation findings, validation, policy, representative cases, and evidence-supported opportunities. Finding counts are grouped as runtime failures, comparison differences, semantic weakness indicators, or legacy classification artifacts. It reads repository artifacts only and uses no provider or LLM. `src/evaluation/artifact_cli.py` exposes explicit `accept-baseline`, `compare-run`, and `generate-report` commands. Evaluation results cannot automatically modify the semantic pipeline.
 
+The preserved initial operational evidence comprises one 48-case `live_provider` run, its explicitly accepted immutable baseline, a deterministic self-comparison, and an engineering report. The run recorded 48 provider requests, zero provider failures, 14 domain-validation rejections, 34 partial mismatches, 14 failures, and zero exact matches. Policy outcomes were 9 detected, 22 uncertain, 3 not detected, and 14 failed. The self-comparison records 48 unchanged cases. These values describe the evidence artifact and do not establish semantic performance.
+
+Prior artifacts retain their creation-time classification vocabulary and bytes. Current evaluation logic distinguishes compatibility construction failures from ordinary compatibility differences, uses exact evidence containment, and separates event-type disagreement from uncertainty-note disagreement; legacy values remain loadable for provenance continuity.
+
+The semantic contract remains event-global: `violence_present`, `contact_occurred`, `negated`, `correction_present`, `conflicting_information`, and bounded event types do not encode independently scoped propositions or event direction. Refining that representation was halted at the bounded execution boundary because it requires semantic contract replacement and a broad migration across provider parsing, validation, compatibility, policy, presentation, Salesforce preview, corpus ground truth, evaluation schemas, and legacy-artifact loading. No semantic redesign was performed during evaluation closeout.
+
 ## Architecture Boundaries
 
 The system separates:
