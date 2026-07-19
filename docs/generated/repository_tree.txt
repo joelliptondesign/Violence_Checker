@@ -15,6 +15,16 @@ docs/generated/
 docs/generated/repository_knowledge_graph.md
 docs/generated/repository_tree.txt
 docs/local_governance.md
+evaluation/
+evaluation/README.md
+evaluation/baselines/
+evaluation/baselines/README.md
+evaluation/corpus/
+evaluation/corpus/README.md
+evaluation/reports/
+evaluation/reports/README.md
+evaluation/runs/
+evaluation/runs/README.md
 requirements.txt
 scripts/
 scripts/__init__.py
@@ -27,6 +37,10 @@ src/config.py
 src/contract_adapters.py
 src/contracts.py
 src/domain_validation.py
+src/evaluation/
+src/evaluation/__init__.py
+src/evaluation/contracts.py
+src/evaluation/serialization.py
 src/fixtures.py
 src/input_validation.py
 src/models.py
@@ -43,6 +57,9 @@ src/semantic_validation.py
 telemetry/
 telemetry/executor_heartbeat.jsonl
 tests/
+tests/evaluation/
+tests/evaluation/__init__.py
+tests/evaluation/test_contracts.py
 tests/test_app_logic.py
 tests/test_comparison.py
 tests/test_config_and_app.py

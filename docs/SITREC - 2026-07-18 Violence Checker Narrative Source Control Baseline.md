@@ -32,6 +32,9 @@ Current repository state for 2026-07-18:
 - Empty or whitespace-only manual input cannot run analysis.
 - Stale results are invalidated when the active source mode or active narrative changes.
 - Eight approved synthetic fixtures exist in `src/fixtures.py` and remain unchanged.
+- An independent evaluation foundation exists in `src/evaluation/`, with canonical artifact boundaries under `evaluation/` and offline contract tests under `tests/evaluation/`.
+- Evaluation ground truth is repository-authored and authoritative; observed output is evidence and cannot author expectations.
+- No production evaluation corpus, integrated runner, accepted baseline, regression execution, or engineering report generation is implemented.
 - `Incident` and the transitional compatibility `ViolenceFinding` contract exist in `src/models.py`.
 - OpenAI structured output parses into `ProviderStructuredResponse`; `src/provider_adapter.py` deterministically copies its fields into a provider-independent semantic candidate.
 - Successful `SemanticExtractionResult` objects carry a semantic candidate and do not establish deterministic admissibility.
@@ -65,6 +68,8 @@ Current repository state for 2026-07-18:
 - Only a separate deterministic normalized narrative copy is supplied to regex and semantic extraction.
 - Invalid incident input reaches neither regex nor semantic extraction.
 - Fixture metadata is not submitted to semantic extraction.
+- Evaluation case metadata, engineering notes, and expected outcomes remain structurally separate from narrative input and must never be submitted to semantic extraction.
+- Evaluation contracts make no provider calls, perform no semantic inference, and cannot automatically modify the semantic pipeline.
 - Semantic output cannot propagate as an application result without Pydantic validation.
 - Provider-specific response and SDK objects do not reach app logic, comparison, or Salesforce preview.
 - The provider extracts semantic facts and does not author the authoritative downstream `ViolenceFinding`, policy outcome, Salesforce write outcome, or workflow action.
@@ -153,6 +158,10 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 | Architecture documentation | `docs/architecture.md` |
 | Demonstration runbook | `docs/demo_runbook.md` |
 | Local governance documentation | `docs/local_governance.md` |
+| Evaluation contract authority | `src/evaluation/contracts.py` and `src/evaluation/serialization.py` |
+| Evaluation ground-truth authority | Future repository-authored artifacts under `evaluation/corpus/` |
+| Generated evaluation observations | Future derived artifacts under `evaluation/runs/`; evidence only, never ground truth |
+| Evaluation baseline and report locations | `evaluation/baselines/` and `evaluation/reports/` |
 | Repository tree artifact | `docs/generated/repository_tree.txt` |
 | Repository knowledge graph artifact | `docs/generated/repository_knowledge_graph.md` |
 | SITREC | Current-state rehydration artifact only |
@@ -185,6 +194,11 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 - `PipelineResult`: typed aggregate contract representing incident, normalized incident, regex result, semantic facts, validation result, operational finding, policy decision, Salesforce payload, presentation payload, and signature.
 - Fixture records: dictionaries containing an `Incident` and qualitative metadata. Metadata is display context only and is not semantic extraction input.
 - Narrative source UI state: unselected initial radio state, `Synthetic fixture`, or `Manual narrative`; the UI state is not a third source value.
+- `EvaluationCase` and `EvaluationCaseMetadata`: strict synthetic case identity, schema version, narrative, categories, documentation-quality tags, and optional engineering notes, with metadata and ground truth structurally separate from narrative input.
+- `ExpectedEvaluationOutcome` and `ObservedEvaluationResult`: independent expected and observed states that reject contradictory success and failure payloads and never infer expectations from observations.
+- `FieldDifference` and `CaseEvaluationResult`: ordered deterministic difference and failure-pattern representation with bounded match, partial mismatch, failure, and non-comparable status.
+- `BaselineComparison`: prior and current result identities, ordered observations, and bounded improved, degraded, unchanged, or incomparable classification vocabulary.
+- `EvaluationArtifactProvenance`: evaluation schema, corpus identity, repository commit, optional model and extraction configuration identity, timestamp, and explicit live or test mode.
 
 ## G. SYSTEM BOUNDARIES
 
@@ -200,7 +214,7 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 - Policy outcomes are application representation only and do not determine hospital, clinical, legal, or safety action.
 - No batch processing.
 - No analytics dashboard.
-- No evaluation platform or formal benchmark infrastructure.
+- Evaluation is limited to contracts, serialization, canonical directories, documentation, and offline tests; there is no completed corpus, runner, comparison executor, accepted baseline, or report generator.
 - No model retry infrastructure.
 - No guarantee of clinical, legal, operational, or safety correctness.
 - No Rochester Regional implementation claim for the regex baseline.
@@ -227,6 +241,9 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 - Salesforce preview is deterministic, illustrative, requires `PolicyDecision`, and is never generated for `WRITE_FAILED`.
 - Stale analysis results are hidden when active input changes.
 - Automated tests validate core behavior.
+- Strict evaluation contracts compose existing semantic, compatibility, validation, and policy types without changing them.
+- Evaluation artifacts have canonical, authority-separated corpus, generated-run, accepted-baseline, and generated-report locations.
+- Canonical evaluation serialization is deterministic and preserves explicit collection ordering.
 
 ## I. KNOWN LIMITATIONS
 
@@ -238,6 +255,8 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 - No persistent audit record exists beyond local executor heartbeat telemetry.
 - No real hospital taxonomy integration exists.
 - No formal benchmark or gold dataset exists.
+- No production evaluation corpus or ground-truth case set exists beyond minimal test-only contract examples.
+- No integrated evaluation runner, live batch evaluation, accepted baseline, regression executor, or engineering report generator exists.
 - Local API availability and valid credentials are required for semantic analysis.
 - Provider or network failures produce typed failures.
 - Salesforce preview uses illustrative fields only.
@@ -364,6 +383,18 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 
 `src/contracts.py`
 <Defines explicit internal contracts for normalized incidents, regex results, provider boundary responses, semantic facts, validation results, bounded policy outcomes and reasons, policy decisions, Salesforce payloads, and aggregate pipeline results while reusing existing `Incident` and `ViolenceFinding` contracts.>
+
+`src/evaluation/contracts.py`
+<Defines strict provider-independent evaluation case, expectation, observation, difference, case result, baseline comparison, and provenance contracts by composing authoritative repository semantic types.>
+
+`src/evaluation/serialization.py`
+<Defines canonical deterministic JSON serialization for typed evaluation artifacts.>
+
+`evaluation/`
+<Defines canonical authority-separated locations for future corpus ground truth, generated observed runs, accepted baselines, and generated engineering reports without populating substantive artifacts.>
+
+`tests/evaluation/test_contracts.py`
+<Covers evaluation construction, deterministic serialization, malformed and contradictory state rejection, ordered collections, provider-call suppression, and compatibility with authoritative semantic, compatibility, validation, and policy contracts.>
 
 `src/contract_adapters.py`
 <Provides compatibility adapters from existing `AnalysisResult`, regex dictionaries, semantic results, and Salesforce preview dictionaries into the explicit contract model without changing operational pipeline behavior.>

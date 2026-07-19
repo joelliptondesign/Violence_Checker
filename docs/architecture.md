@@ -4,7 +4,7 @@
 
 Violence Checker is a local Phase 0 Semantic Violence Detection Pre-PoC. It demonstrates how a synthetic incident narrative can move through lexical detection, semantic fact extraction, deterministic compatibility construction, comparison, and an illustrative write-back preview.
 
-The repository is not a production system. It does not implement real Salesforce connectivity, persistence, authentication, deployment, workflow routing, analytics, model evaluation infrastructure, CI/CD, containerization, FoxCommand integration, or background processing.
+The repository is not a production system. It does not implement real Salesforce connectivity, persistence, authentication, deployment, workflow routing, analytics, a completed evaluation corpus or runner, CI/CD, containerization, FoxCommand integration, or background processing.
 
 ## Incident Input Model
 
@@ -224,6 +224,22 @@ Semantic extraction is not run on page load, fixture selection, or manual typing
 
 `src/app_logic.py` contains testable presentation support logic. It validates and normalizes explicit analysis input, builds analysis results, validates manual narratives, assigns a session-local manual identifier, returns typed input failures before analysis work, and invalidates stale results when the active raw narrative changes.
 
+## Independent Evaluation Foundation
+
+Evaluation is a repository capability independent from the operational semantic pipeline. `src/evaluation/contracts.py` defines strict typed envelopes for synthetic cases, repository-authored expectations, observed results, field differences, case outcomes, baseline classifications, and artifact provenance. `src/evaluation/serialization.py` provides canonical JSON with sorted object keys while preserving explicitly ordered collections. These modules make no provider calls, import no OpenAI SDK, perform no semantic inference, and do not mutate application contracts.
+
+Authority is deliberately separated:
+
+- `evaluation/corpus/` is the future authoritative source for repository-authored synthetic cases and ground truth.
+- `evaluation/runs/` is the future generated store for observed output. Observed output is evidence, never ground truth.
+- `evaluation/baselines/` is reserved for explicitly accepted baselines.
+- `evaluation/reports/` is reserved for generated engineering reports.
+- `tests/evaluation/` verifies the contract boundary without network access.
+
+An evaluation case keeps its synthetic narrative, metadata, and ground-truth expectation in distinct fields. Metadata, engineering notes, and expected outcomes must never be submitted to semantic extraction. Expected success requires an independently authored semantic payload; expected failure cannot contain success payloads. Observed failure cannot fabricate admissible semantic facts. Case status vocabulary is bounded to match, partial mismatch, failure, and non-comparable; baseline vocabulary is bounded to improved, degraded, unchanged, and incomparable. This execution defines vocabulary and invariants only, not comparison or baseline algorithms.
+
+The framework is deterministic even though future live provider output will be probabilistic. Canonically stored observations enable later deterministic comparison against independently authored expectations. No production corpus, integrated runner, live or batch evaluation, accepted baseline, regression execution, or engineering report generation exists. OPORD 003 does not authorize automatic modification of the semantic pipeline from evaluation results.
+
 ## Architecture Boundaries
 
 The system separates:
@@ -239,6 +255,7 @@ The system separates:
 - deterministic compatibility construction in `compatibility_finding.py`
 - deterministic application write policy in `policy.py`
 - deterministic stakeholder-facing label and explanation mapping in `presentation.py`
+- independent deterministic evaluation contracts in `evaluation/contracts.py` and canonical serialization in `evaluation/serialization.py`
 - transitional compatibility enforcement in `models.py`
 - deterministic presentation and comparison logic in `app_logic.py`, `comparison.py`, and `salesforce_preview.py`
 

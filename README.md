@@ -4,7 +4,7 @@ Violence Checker is a local Python and Streamlit pre-PoC for exploring semantic 
 
 ## Current Status
 
-This repository is a local, non-production demonstration project. It contains a runnable Streamlit demonstration interface, canonical Pydantic data contracts, eight approved synthetic incident fixtures, a deterministic illustrative regex baseline, validated semantic extraction, a comparison layer, and an illustrative Salesforce write-back preview.
+This repository is a local, non-production demonstration project. It contains a runnable Streamlit demonstration interface, canonical Pydantic data contracts, eight approved synthetic incident fixtures, a deterministic illustrative regex baseline, validated semantic extraction, a comparison layer, an illustrative Salesforce write-back preview, and the contract foundation for an independent evaluation capability.
 
 Semantic extraction is implemented as an isolated Python module that calls the OpenAI Responses API and validates structured output with Pydantic. The Streamlit app lets a user run one analysis at a time and view regex, semantic, comparison, and preview outputs side by side. It performs no real Salesforce integration.
 
@@ -74,6 +74,14 @@ Run the optional live semantic extraction smoke test:
 ```
 
 The live smoke test uses `CASE_008`, makes at most one OpenAI request, and fails clearly if `OPENAI_API_KEY` is unavailable. It prints only extraction status and non-secret result data.
+
+## Evaluation Foundation
+
+`src/evaluation/` defines strict, provider-independent evaluation contracts and canonical JSON serialization. Evaluation is an independent repository capability: it describes expected and observed results without changing or executing the semantic pipeline.
+
+Repository-authored ground truth belongs under `evaluation/corpus/` and is authoritative. Generated observations belong under `evaluation/runs/` and are evidence, not ground truth. Accepted baselines and generated engineering reports have separate locations under `evaluation/baselines/` and `evaluation/reports/`. Evaluation metadata, engineering notes, and expected outcomes are structurally separate from the synthetic narrative and must never be submitted to semantic extraction.
+
+The framework contracts and stored artifact serialization are deterministic even though future live provider output will be probabilistic. Stored run artifacts will enable later deterministic comparison. OPORD 003 does not authorize automatic pipeline modification, and this foundation makes no provider calls or semantic inferences.
 
 ## Domain Models
 
@@ -153,8 +161,16 @@ Preview generation is declined for configuration failures, provider request fail
 .
 ├── app.py
 ├── README.md
+├── evaluation
+│   ├── corpus
+│   ├── runs
+│   ├── baselines
+│   └── reports
 ├── requirements.txt
 ├── src
+│   ├── evaluation
+│   │   ├── contracts.py
+│   │   └── serialization.py
 │   ├── config.py
 │   ├── app_logic.py
 │   ├── comparison.py
@@ -169,6 +185,8 @@ Preview generation is declined for configuration failures, provider request fail
 ├── telemetry
 │   └── executor_heartbeat.jsonl
 └── tests
+    ├── evaluation
+    │   └── test_contracts.py
     ├── test_config_and_app.py
     ├── test_app_logic.py
     ├── test_comparison.py
@@ -199,6 +217,9 @@ Preview generation is declined for configuration failures, provider request fail
 - Workflow routing
 - Human review queues
 - Analytics dashboards
-- Model evaluation infrastructure
+- Production evaluation corpus and authoritative case content
+- Integrated evaluation runner and live batch execution
+- Accepted evaluation baselines and regression execution
+- Generated engineering evaluation reports
 - CI/CD
 - Containerization
