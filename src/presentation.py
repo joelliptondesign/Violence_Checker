@@ -3,9 +3,15 @@
 from typing import Optional
 
 from src.contracts import (
+    Completion,
+    ConductKind,
+    Contact,
     PolicyDecision,
     PolicyOutcome,
     PolicyReasonCode,
+    SemanticIntentionality,
+    TemporalScope,
+    UncertaintyDimension,
     ValidationFailureStage,
     ValidationResult,
     ValidatedSemanticEnvelope,
@@ -14,56 +20,54 @@ from src.contracts import (
 
 POLICY_OUTCOME_LABELS = {
     PolicyOutcome.WRITE_DETECTED: "Violence Detected",
-    PolicyOutcome.WRITE_UNCERTAIN: "Uncertain",
+    PolicyOutcome.WRITE_UNCERTAIN: "Unable to Determine",
     PolicyOutcome.WRITE_NOT_DETECTED: "No Violence Detected",
-    PolicyOutcome.WRITE_FAILED: "Unable to Determine",
+    PolicyOutcome.WRITE_FAILED: "Analysis Failed",
 }
 
 POLICY_EXPLANATIONS = {
     PolicyOutcome.WRITE_DETECTED: (
-        "The validated narrative indicates violence or a threat."
+        "The narrative describes violence involving another person."
     ),
     PolicyOutcome.WRITE_UNCERTAIN: (
-        "The available information is insufficient for a confident violence classification."
+        "The narrative suggests possible violence, but an important detail is unclear."
     ),
     PolicyOutcome.WRITE_NOT_DETECTED: (
-        "The validated narrative does not indicate violence or a threat."
+        "The narrative does not describe current violence involving another person."
     ),
     PolicyOutcome.WRITE_FAILED: (
-        "A classification could not be produced because the analysis pipeline did not complete successfully."
+        "The analysis could not be completed. No classification was produced."
     ),
 }
 
 POLICY_REASON_EXPLANATIONS = {
-    PolicyReasonCode.INPUT_VALIDATION_FAILED: "The incident input could not be validated.",
+    PolicyReasonCode.INPUT_VALIDATION_FAILED: "The incident narrative is not valid for analysis.",
     PolicyReasonCode.PROVIDER_CONFIGURATION_FAILED: (
-        "Semantic analysis is unavailable because the provider is not configured."
+        "The analysis service is not configured."
     ),
-    PolicyReasonCode.PROVIDER_REQUEST_FAILED: "The semantic analysis request did not complete.",
+    PolicyReasonCode.PROVIDER_REQUEST_FAILED: "The analysis request did not complete.",
     PolicyReasonCode.PROVIDER_STRUCTURED_RESPONSE_FAILED: (
-        "The semantic analysis response was incomplete."
+        "The analysis service returned an incomplete result."
     ),
     PolicyReasonCode.PROVIDER_VALIDATION_FAILED: (
-        "The semantic analysis response could not be validated."
+        "The analysis service returned an unusable result."
     ),
     PolicyReasonCode.SCHEMA_VALIDATION_FAILED: (
-        "The extracted information did not match the required structure."
+        "The result was missing required information."
     ),
     PolicyReasonCode.DOMAIN_VALIDATION_FAILED: (
-        "The extracted information contained an invalid combination of facts."
+        "The result contained inconsistent information."
     ),
     PolicyReasonCode.UNSUPPORTED_POLICY_INPUT: (
-        "The validated result is not supported by this policy version."
+        "The result could not be classified by this version of the application."
     ),
     PolicyReasonCode.CONFLICTING_INFORMATION: "The narrative contains conflicting information.",
-    PolicyReasonCode.SCOPED_SEMANTIC_UNCERTAINTY: (
-        "An active current interpersonal proposition has explicit bounded uncertainty."
-    ),
+    PolicyReasonCode.SCOPED_SEMANTIC_UNCERTAINTY: "An important detail about the reported event is unclear.",
     PolicyReasonCode.AFFIRMED_CURRENT_INTERPERSONAL_VIOLENCE: (
-        "An active current interpersonal proposition affirms violence or a threat."
+        "The narrative describes current violence or a threat involving another person."
     ),
     PolicyReasonCode.NO_ACTIVE_CURRENT_INTERPERSONAL_VIOLENCE: (
-        "No active current interpersonal proposition affirms violence or a threat."
+        "The narrative does not describe current violence or a threat involving another person."
     ),
 }
 
@@ -97,16 +101,41 @@ def semantic_summary(
     validated: Optional[ValidatedSemanticEnvelope],
     decision: PolicyDecision,
 ) -> str:
-    """Summarize only typed policy and derived views without semantic inference."""
+    """Summarize validated facts in short operational language."""
     if decision.outcome == PolicyOutcome.WRITE_FAILED or validated is None:
-        return "Semantic analysis was unable to produce a validated proposition envelope."
+        return "The analysis could not produce a usable result."
     candidate = validated.policy_candidate
+    propositions = {item.proposition_id: item for item in validated.envelope.propositions}
     if decision.outcome == PolicyOutcome.WRITE_DETECTED:
-        count = len(candidate.active_current_interpersonal_violence)
-        return f"{count} active current interpersonal proposition(s) support the detected outcome."
-    elif decision.outcome == PolicyOutcome.WRITE_NOT_DETECTED:
-        return "No validated active current interpersonal proposition supports a detected outcome."
-    return "Validated active current interpersonal propositions contain bounded uncertainty."
+        item = propositions[candidate.active_current_interpersonal_violence[0]]
+        if item.conduct_kind == ConductKind.PHYSICAL_CONDUCT:
+            if item.completion == Completion.ATTEMPTED:
+                return "The narrative describes an attempted physical act directed at another person."
+            if item.contact == Contact.OCCURRED:
+                return "The narrative describes completed physical violence involving contact."
+        return "The narrative describes a threat directed at another person."
+    if decision.outcome == PolicyOutcome.WRITE_NOT_DETECTED:
+        if any(item.intentionality == SemanticIntentionality.ACCIDENTAL for item in propositions.values()):
+            return "The narrative describes accidental contact, not violence."
+        if any(item.temporal_scope == TemporalScope.HISTORICAL for item in propositions.values()):
+            return "The narrative describes a past event, not violence during the current incident."
+        return "The narrative does not describe current violence involving another person."
+    material = [
+        item for item in validated.envelope.uncertainties
+        if item.uncertainty_id in candidate.active_current_interpersonal_uncertainties
+    ]
+    if material:
+        dimension = material[0].dimension
+        detail = {
+            UncertaintyDimension.CONTACT: "whether physical contact occurred",
+            UncertaintyDimension.COMPLETION: "whether the act was completed",
+            UncertaintyDimension.ASSERTION_STATUS: "whether the reported act occurred",
+            UncertaintyDimension.TEMPORAL_SCOPE: "whether the event occurred during the current incident",
+            UncertaintyDimension.TARGET_IDENTITY: "whether another person was targeted",
+            UncertaintyDimension.DIRECTION: "whether another person was targeted",
+        }.get(dimension, "what occurred")
+        return f"The narrative suggests possible violence, but it is unclear {detail}."
+    return "The narrative suggests possible violence, but an important detail is unclear."
 
 
 def validation_summary(validation: ValidationResult) -> str:

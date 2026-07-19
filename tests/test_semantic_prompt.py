@@ -47,3 +47,11 @@ def test_prompt_requires_complete_support_and_excludes_extraction_metadata():
     assert "conflicts_with relationship specifically requires supports_conflict" in prompt
     assert "do not return an incident identifier, extraction metadata" in prompt
     assert "violence-checker.proposition-extraction@1.0.0" not in prompt
+
+
+def test_prompt_treats_explicit_striking_as_resolved_without_inventing_motive():
+    prompt = SEMANTIC_EXTRACTION_PROMPT.lower()
+    assert "hitting, punching, or" in prompt
+    assert "closed fist as intentional physical conduct" in prompt
+    assert "identifies the contact as accidental" in prompt
+    assert "does not separately state a motive" in prompt

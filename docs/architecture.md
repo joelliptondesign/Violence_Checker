@@ -27,7 +27,8 @@ Schema validation establishes exact contract shape, schema identity, bounded voc
 
 Policy `violence_checker_write_disposition` version `2.0.0` is a total deterministic function over a validated derived view:
 
-- active, current, interpersonal, affirmed, intentional physical violence or threats produce `WRITE_DETECTED`;
+- active, current, interpersonal, affirmed physical violence or threats produce `WRITE_DETECTED`;
+- intentionality uncertainty alone does not downgrade affirmed completed physical conduct with occurred contact; all uncertainty material to contact, completion, assertion, current scope, or interpersonal direction remains `WRITE_UNCERTAIN`;
 - relevant conflict, scoped material uncertainty, or unresolved potentially violent propositions produce `WRITE_UNCERTAIN`;
 - all other admissible states produce `WRITE_NOT_DETECTED`;
 - failures before admissibility produce `WRITE_FAILED` through typed failure provenance.
@@ -44,7 +45,7 @@ Narrative wording is user-authored free-form evidence. Deterministic input rules
 
 Import, startup, source selection, fixture selection, and manual typing issue zero provider requests. Invalid submission also issues zero. Each valid explicit **Run Analysis** action issues exactly one request. There is no automatic analysis, retry, critic, repair, fallback, batch, or unattended inference path.
 
-Repository verification covers all eight stakeholder fixtures, CASE_003 historical-disclosure behavior, and representative free-form manual narratives. Mobile inspection at 390, 360, and 320 CSS pixels confirmed responsive stacking without page-level overflow and primary semantic meaning before regex detail.
+Repository verification covers all eight stakeholder fixtures, CASE_003 historical-disclosure behavior, explicit completed strikes with unresolved intentionality, accidental contact, and representative free-form manual narratives. Desktop uses Regex Baseline on the left and Semantic Analysis on the right. Mobile inspection at 390, 360, and 320 CSS pixels confirms responsive semantic-first stacking without duplicate content or page-level overflow.
 
 ## Evaluation boundary
 

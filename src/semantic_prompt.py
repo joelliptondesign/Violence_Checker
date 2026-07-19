@@ -52,6 +52,11 @@ Required boundaries:
 - Distinguish interpersonal, self-directed, object-directed, accidental,
   threatening, attempted, completed, negated, and uncertain content through the
   proposition fields. Do not author a direction or document-level outcome.
+- Treat explicit striking language such as one person hitting, punching, or
+  striking another person with a closed fist as intentional physical conduct
+  unless the narrative identifies the contact as accidental or explicitly leaves
+  intent unresolved. Do not add intentionality uncertainty merely because the
+  narrative does not separately state a motive.
 - Copy every evidence excerpt exactly from the supplied normalized narrative.
   Every proposition, relationship, and uncertainty must have at least one
   evidence_support entry; never return an unsupported semantic subject. A

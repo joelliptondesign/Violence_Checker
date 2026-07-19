@@ -2,6 +2,8 @@ from itertools import product
 
 from src.contracts import (
     AssertionStatus,
+    Completion,
+    Contact,
     EntityKind,
     PipelineFailureProvenance,
     PolicyOutcome,
@@ -9,6 +11,7 @@ from src.contracts import (
     SemanticIntentionality,
     TargetKind,
     TemporalScope,
+    UncertaintyDimension,
 )
 from src.policy import evaluate_policy
 from src.semantic_validation import validate_semantic_candidate
@@ -23,6 +26,37 @@ def decision(value, narrative="Patient struck the nurse."):
 
 def test_affirmed_current_interpersonal_violence_is_detected():
     assert decision(envelope()).outcome == PolicyOutcome.WRITE_DETECTED
+
+
+def test_completed_closed_fist_strike_is_detected_despite_intentionality_uncertainty():
+    narrative = (
+        "pt was getting upset about not being able to leave. rn tried to redirect him back to room and he hit "
+        "her on left side of face with closed fist. security came up. rn has red area on cheek no loc"
+    )
+    value = envelope(
+        narrative=narrative,
+        intentionality=SemanticIntentionality.UNDETERMINED,
+        uncertainty_dimension=UncertaintyDimension.INTENTIONALITY,
+    )
+    result = decision(value, narrative=narrative)
+    assert result.outcome == PolicyOutcome.WRITE_DETECTED
+    assert result.reason_codes == [PolicyReasonCode.AFFIRMED_CURRENT_INTERPERSONAL_VIOLENCE]
+
+
+def test_material_uncertainty_remains_uncertain():
+    value = envelope(
+        completion=Completion.UNDETERMINED,
+        contact=Contact.UNDETERMINED,
+        uncertainty_dimension=UncertaintyDimension.CONTACT,
+    )
+    result = decision(value)
+    assert result.outcome == PolicyOutcome.WRITE_UNCERTAIN
+    assert result.reason_codes == [PolicyReasonCode.SCOPED_SEMANTIC_UNCERTAINTY]
+
+
+def test_attempted_physical_violence_remains_detected():
+    value = envelope(completion=Completion.ATTEMPTED, contact=Contact.DID_NOT_OCCUR)
+    assert decision(value).outcome == PolicyOutcome.WRITE_DETECTED
 
 
 def test_historical_object_self_accidental_and_negated_states_are_not_detected():

@@ -54,7 +54,7 @@ This graph records deterministic repository relationships discoverable from file
 | `src/input_validation.py` | deterministic | none | 4 |
 | `src/models.py` | deterministic application component | `Incident` | 1 |
 | `src/narrative_normalizer.py` | deterministic | none | 1 |
-| `src/policy.py` | deterministic | none | 4 |
+| `src/policy.py` | deterministic | none | 5 |
 | `src/presentation.py` | deterministic | none | 5 |
 | `src/provider_adapter.py` | deterministic | none | 7 |
 | `src/regex_baseline.py` | deterministic application component | none | 1 |
@@ -80,14 +80,14 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_fixtures.py` | deterministic test | none | 3 |
 | `tests/test_input_boundary.py` | deterministic test | none | 6 |
 | `tests/test_models.py` | deterministic test | none | 3 |
-| `tests/test_policy.py` | deterministic test | none | 6 |
-| `tests/test_presentation.py` | deterministic test | none | 4 |
+| `tests/test_policy.py` | deterministic test | none | 9 |
+| `tests/test_presentation.py` | deterministic test | none | 6 |
 | `tests/test_regex_baseline.py` | deterministic test | none | 9 |
 | `tests/test_repo_governance.py` | deterministic test | none | 12 |
 | `tests/test_salesforce_preview.py` | deterministic test | none | 4 |
 | `tests/test_semantic_authority_boundary.py` | deterministic test | none | 7 |
 | `tests/test_semantic_extractor.py` | deterministic test | `FakeClient`, `FakeResponses`, `RaisingResponses` | 12 |
-| `tests/test_semantic_prompt.py` | deterministic test | none | 5 |
+| `tests/test_semantic_prompt.py` | deterministic test | none | 6 |
 | `tests/test_semantic_validation.py` | deterministic test | none | 10 |
 | `tests/test_streamlit_empty_state.py` | deterministic test | none | 13 |
 | `tests/test_successor_downstream_authority.py` | deterministic test | none | 5 |

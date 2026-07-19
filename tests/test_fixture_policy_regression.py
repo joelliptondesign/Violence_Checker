@@ -79,6 +79,6 @@ def test_case_003_historical_disclosure_has_direct_successor_authority():
     assert result.validation_result.domain_validation.passed
     assert result.policy_decision.outcome == PolicyOutcome.WRITE_NOT_DETECTED
     assert result.policy_decision.reason_codes == [PolicyReasonCode.NO_ACTIVE_CURRENT_INTERPERSONAL_VIOLENCE]
-    assert semantic_summary(validated, result.policy_decision) == "No validated active current interpersonal proposition supports a detected outcome."
+    assert semantic_summary(validated, result.policy_decision) == "The narrative describes a past event, not violence during the current incident."
     assert result.salesforce_preview is not None
     assert result.salesforce_preview["Illustrative_Write_Disposition__c"] == "WRITE_NOT_DETECTED"

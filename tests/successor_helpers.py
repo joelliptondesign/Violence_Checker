@@ -20,8 +20,10 @@ from src.contracts import (
     SEMANTIC_SCHEMA_IDENTITY,
     SEMANTIC_SCHEMA_VERSION,
     SemanticIntentionality,
+    SemanticUncertainty,
     TargetKind,
     TemporalScope,
+    UncertaintyDimension,
     ViolenceProposition,
     ViolenceSemanticEnvelope,
 )
@@ -40,6 +42,7 @@ def envelope(
     assertion_status=AssertionStatus.AFFIRMED,
     target_kind=TargetKind.ENTITY,
     target_entity_kind=EntityKind.PERSON,
+    uncertainty_dimension=None,
 ):
     entities = [EntityReference(entity_id="ENT-0001", entity_kind=EntityKind.PERSON, label="patient")]
     target_ref = None
@@ -54,6 +57,8 @@ def envelope(
             provider_entities.append(
                 ProviderEntityCandidate(local_ref=provider_target_ref, entity_kind=target_entity_kind, label="nurse")
             )
+        if uncertainty_dimension is not None:
+            raise ValueError("provider helper uncertainty is not supported")
         return ProviderStructuredResponse(
             entities=provider_entities,
             propositions=[
@@ -81,6 +86,35 @@ def envelope(
                 )
             ],
         )
+    uncertainties = []
+    supports = [
+        EvidenceSupport(
+            support_id="SUP-0001",
+            evidence_ref="EVID-0001",
+            subject_kind=EvidenceSubjectKind.PROPOSITION,
+            subject_ref="PROP-0001",
+            role=(EvidenceSupportRole.SUPPORTS_NEGATION if assertion_status == AssertionStatus.NEGATED else EvidenceSupportRole.SUPPORTS_ASSERTION),
+        )
+    ]
+    if uncertainty_dimension is not None:
+        uncertainty_dimension = UncertaintyDimension(uncertainty_dimension)
+        uncertainties.append(
+            SemanticUncertainty(
+                uncertainty_id="UNC-0001",
+                proposition_ref="PROP-0001",
+                dimension=uncertainty_dimension,
+                note="The narrative leaves this detail unresolved.",
+            )
+        )
+        supports.append(
+            EvidenceSupport(
+                support_id="SUP-0002",
+                evidence_ref="EVID-0001",
+                subject_kind=EvidenceSubjectKind.UNCERTAINTY,
+                subject_ref="UNC-0001",
+                role=EvidenceSupportRole.SUPPORTS_UNCERTAINTY,
+            )
+        )
     return ViolenceSemanticEnvelope(
         schema_identity=SEMANTIC_SCHEMA_IDENTITY,
         schema_version=SEMANTIC_SCHEMA_VERSION,
@@ -100,16 +134,8 @@ def envelope(
             )
         ],
         relationships=[],
-        uncertainties=[],
+        uncertainties=uncertainties,
         evidence_excerpts=[EvidenceExcerpt(evidence_id="EVID-0001", text=narrative)],
-        evidence_supports=[
-            EvidenceSupport(
-                support_id="SUP-0001",
-                evidence_ref="EVID-0001",
-                subject_kind=EvidenceSubjectKind.PROPOSITION,
-                subject_ref="PROP-0001",
-                role=(EvidenceSupportRole.SUPPORTS_NEGATION if assertion_status == AssertionStatus.NEGATED else EvidenceSupportRole.SUPPORTS_ASSERTION),
-            )
-        ],
+        evidence_supports=supports,
         extraction_metadata=ExtractionMetadata(extraction_contract_identity="violence-checker.proposition-extraction@1.0.0"),
     )

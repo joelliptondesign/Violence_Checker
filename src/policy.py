@@ -3,6 +3,10 @@
 from typing import Optional
 
 from src.contracts import (
+    AssertionStatus,
+    Completion,
+    ConductKind,
+    Contact,
     POLICY_CANDIDATE_SCHEMA_IDENTITY,
     POLICY_CANDIDATE_SCHEMA_VERSION,
     PipelineFailureProvenance,
@@ -10,6 +14,7 @@ from src.contracts import (
     PolicyDecision,
     PolicyOutcome,
     PolicyReasonCode,
+    UncertaintyDimension,
     ValidatedSemanticEnvelope,
 )
 
@@ -64,6 +69,31 @@ def _supported_candidate(candidate: PolicyCandidateView, incident_id: str) -> bo
     )
 
 
+def _has_material_current_interpersonal_uncertainty(validated: ValidatedSemanticEnvelope) -> bool:
+    """Return whether scoped uncertainty can still change the violence disposition."""
+    candidate = validated.policy_candidate
+    uncertainty_ids = set(candidate.active_current_interpersonal_uncertainties)
+    if not uncertainty_ids:
+        return False
+    propositions = {item.proposition_id: item for item in validated.envelope.propositions}
+    detected_ids = set(candidate.active_current_interpersonal_violence)
+    for uncertainty in validated.envelope.uncertainties:
+        if uncertainty.uncertainty_id not in uncertainty_ids:
+            continue
+        proposition = propositions[uncertainty.proposition_ref]
+        explicit_completed_contact = (
+            uncertainty.dimension == UncertaintyDimension.INTENTIONALITY
+            and proposition.proposition_id in detected_ids
+            and proposition.assertion_status == AssertionStatus.AFFIRMED
+            and proposition.conduct_kind == ConductKind.PHYSICAL_CONDUCT
+            and proposition.completion == Completion.COMPLETED
+            and proposition.contact == Contact.OCCURRED
+        )
+        if not explicit_completed_contact:
+            return True
+    return False
+
+
 def evaluate_policy(
     *,
     validated: Optional[ValidatedSemanticEnvelope] = None,
@@ -83,7 +113,7 @@ def evaluate_policy(
         reasons.append(PolicyReasonCode.CONFLICTING_INFORMATION)
     if (
         candidate.active_current_interpersonal_uncertain
-        or candidate.active_current_interpersonal_uncertainties
+        or _has_material_current_interpersonal_uncertainty(validated)
         or candidate.active_potential_interpersonal_uncertain
     ):
         reasons.append(PolicyReasonCode.SCOPED_SEMANTIC_UNCERTAINTY)

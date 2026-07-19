@@ -28,7 +28,9 @@ The provider returns semantic candidate content with temporary local references 
 
 The current stakeholder workflow has been verified across all eight synthetic fixtures. CASE_003 completes as a historical disclosure with no active current interpersonal violence. Representative free-form manual narratives, including supported violence, non-violence, and bounded ambiguity, traverse the same one-request pipeline; narrative wording remains user-authored and unrestricted except for deterministic input-boundary limits. Invalid input and non-analysis interactions make zero provider requests.
 
-At 390, 360, and 320 CSS pixels, the Streamlit interface has no page-level horizontal overflow, preserves technical-detail access, and stacks the primary semantic result before the regex baseline. Deployment preparation supports Streamlit secrets, environment variables, and ignored local `.env` configuration, but hosted deployment and hosted acceptance remain manual follow-on work.
+The deterministic policy distinguishes uncertainty that could change whether current interpersonal violence occurred from uncertainty that cannot negate an already explicit act. An affirmed, completed physical strike with contact is detected even if intentionality alone remains undetermined. Accidental contact, historical-only conduct, conflicting accounts, and materially unresolved conduct retain their separate outcomes.
+
+At desktop widths, the Streamlit interface places Regex Baseline on the left and Semantic Analysis on the right. At 390, 360, and 320 CSS pixels, it has no page-level horizontal overflow, preserves technical-detail access, and stacks Semantic Analysis before Regex Baseline without duplicating either result. Deployment preparation supports Streamlit secrets, environment variables, and ignored local `.env` configuration.
 
 ## Demonstration-use boundary
 

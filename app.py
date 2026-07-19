@@ -166,8 +166,31 @@ def _display_technical_details(result) -> None:
 def _display_results(result) -> None:
     _display_validation(result.validation_result)
 
-    semantic_column, regex_column = st.columns(2)
+    st.html(
+        """
+        <style>
+        @media (max-width: 640px) {
+          div[data-testid="stHorizontalBlock"]:has(.result-order-marker)
+            > div[data-testid="stColumn"]:has(.semantic-result-marker) { order: 1; }
+          div[data-testid="stHorizontalBlock"]:has(.result-order-marker)
+            > div[data-testid="stColumn"]:has(.regex-result-marker) { order: 2; }
+        }
+        </style>
+        """
+    )
+    regex_column, semantic_column = st.columns(2)
+    with regex_column:
+        st.html('<span class="result-order-marker regex-result-marker" hidden></span>')
+        st.header("Regex Baseline")
+        st.subheader("Detected" if result.regex_result["detected"] else "Not Detected")
+        st.write("Matched terms")
+        st.write(result.regex_result["matched_terms"] or [])
+        st.write("Matched patterns")
+        st.code("\n".join(result.regex_result["matched_patterns"]) or "No patterns matched")
+        st.caption("Illustrative lexical baseline based only on matching terms and patterns.")
+
     with semantic_column:
+        st.html('<span class="result-order-marker semantic-result-marker" hidden></span>')
         st.header("Semantic Analysis")
         st.subheader(policy_outcome_label(result.policy_decision))
         st.write(
@@ -180,17 +203,8 @@ def _display_results(result) -> None:
         st.markdown("**Why this result**")
         for explanation in policy_reason_explanations(result.policy_decision):
             st.write(f"- {explanation}")
-        st.caption("Deterministic policy applied to a validated proposition-oriented semantic envelope.")
+        st.caption("The result is based on the reported event details shown above.")
         _display_technical_details(result)
-
-    with regex_column:
-        st.header("Regex Baseline")
-        st.subheader("Detected" if result.regex_result["detected"] else "Not Detected")
-        st.write("Matched terms")
-        st.write(result.regex_result["matched_terms"] or [])
-        st.write("Matched patterns")
-        st.code("\n".join(result.regex_result["matched_patterns"]) or "No patterns matched")
-        st.caption("Illustrative lexical baseline based only on matching terms and patterns.")
 
     st.header("Comparison")
     if result.comparison.display_status == "Material Difference Detected":

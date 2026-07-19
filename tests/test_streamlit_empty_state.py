@@ -90,8 +90,8 @@ def test_missing_provider_configuration_renders_bounded_failure_without_secret_v
         app_test.button[0].click().run(timeout=10)
 
     rendered = all_rendered_text(app_test)
-    assert "Unable to Determine" in rendered
-    assert "Semantic analysis is unavailable because the provider is not configured." in rendered
+    assert "Analysis Failed" in rendered
+    assert "The analysis service is not configured." in rendered
     assert "Preview is available only after successful validated semantic extraction." in rendered
     assert "deployment-secret" not in rendered
     assert not any("Illustrative_" in str(item.value) for item in app_test.json)
@@ -142,8 +142,8 @@ def test_rejected_manual_input_shows_bounded_failure_without_analysis_result():
     app_test.button[0].click().run()
     rendered = all_rendered_text(app_test)
     assert "Incident narrative must contain substantive text." in rendered
-    assert "Unable to Determine" in rendered
-    assert "The incident input could not be validated." in rendered
+    assert "Analysis Failed" in rendered
+    assert "The incident narrative is not valid for analysis." in rendered
     assert "analysis_result" not in app_test.session_state
     assert_no_analysis_output(app_test)
 
@@ -174,7 +174,13 @@ def test_successful_run_renders_primary_result_before_baseline_details_and_previ
     assert "Propositions:" in rendered
     assert "Active propositions:" in rendered
     assert "Policy version: 2.0.0" in rendered
-    assert headers.index("Semantic Analysis") < headers.index("Regex Baseline")
+    assert headers.index("Regex Baseline") < headers.index("Semantic Analysis")
+    source = __import__("pathlib").Path("app.py").read_text(encoding="utf-8")
+    assert "@media (max-width: 640px)" in source
+    assert "semantic-result-marker) { order: 1; }" in source
+    assert "regex-result-marker) { order: 2; }" in source
+    assert source.count('st.header("Semantic Analysis")') == 1
+    assert source.count('st.header("Regex Baseline")') == 1
     assert len(app_test.get("column")) == 4
     assert any(
         "Illustrative_Write_Disposition__c" in str(item.value)
