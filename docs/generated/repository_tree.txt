@@ -40,8 +40,11 @@ src/contracts.py
 src/domain_validation.py
 src/evaluation/
 src/evaluation/__init__.py
+src/evaluation/case_comparison.py
 src/evaluation/contracts.py
 src/evaluation/corpus.py
+src/evaluation/run_contracts.py
+src/evaluation/runner.py
 src/evaluation/serialization.py
 src/fixtures.py
 src/input_validation.py
@@ -63,6 +66,7 @@ tests/evaluation/
 tests/evaluation/__init__.py
 tests/evaluation/test_contracts.py
 tests/evaluation/test_corpus.py
+tests/evaluation/test_runner.py
 tests/test_app_logic.py
 tests/test_comparison.py
 tests/test_config_and_app.py

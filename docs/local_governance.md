@@ -15,6 +15,7 @@ Authorized local functions:
 - Run local governance validation: `python3 -m tools.repo_governance validate-all`
 - Validate the authoritative synthetic evaluation corpus: `.venv/bin/python -m src.evaluation.corpus validate`
 - Inspect deterministic corpus coverage: `.venv/bin/python -m src.evaluation.corpus coverage`
+- Validate evaluation runner configuration without provider execution: `.venv/bin/python -m src.evaluation.runner validate --mode live_provider --run-id VALIDATE_ONLY --repository-commit "$(git rev-parse HEAD)" --output evaluation/runs/validate-only.json --case EVAL_001`
 
 Generated artifact locations:
 

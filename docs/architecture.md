@@ -4,7 +4,7 @@
 
 Violence Checker is a local Phase 0 Semantic Violence Detection Pre-PoC. It demonstrates how a synthetic incident narrative can move through lexical detection, semantic fact extraction, deterministic compatibility construction, comparison, and an illustrative write-back preview.
 
-The repository is not a production system. It does not implement real Salesforce connectivity, persistence, authentication, deployment, workflow routing, analytics, an evaluation runner or measured benchmark, CI/CD, containerization, FoxCommand integration, or background processing.
+The repository is not a production system. It does not implement real Salesforce connectivity, persistence, authentication, deployment, workflow routing, analytics, an accepted evaluation baseline or measured benchmark, CI/CD, containerization, FoxCommand integration, or background processing.
 
 ## Incident Input Model
 
@@ -132,6 +132,8 @@ Within the compatibility `ViolenceFinding`, `contact_occurred` means person-dire
 | `PolicyDecision` | `src/contracts.py` | `src/policy.py` | app orchestration, Salesforce preview, presentation, and pipeline adapter |
 | `SalesforcePayload` | `src/contracts.py` | adapter from illustrative preview dictionary | contract tests and later typed presentation migration |
 | `PipelineResult` | `src/contracts.py` | `pipeline_result_from_analysis` adapter | deterministic contract validation and later migration work |
+| `ObservedCaseResult` | `src/evaluation/run_contracts.py` | evaluation runner after the complete governed pipeline | deterministic case comparison and immutable run artifacts |
+| `EvaluationRunArtifact` | `src/evaluation/run_contracts.py` | `src/evaluation/runner.py` | canonical generated evidence under `evaluation/runs/` |
 
 Current provider-isolation and application flow:
 
@@ -231,7 +233,7 @@ Evaluation is a repository capability independent from the operational semantic 
 Authority is deliberately separated:
 
 - `evaluation/corpus/corpus.json` is the authoritative source for the 48 repository-authored synthetic cases and manually authored ground truth in corpus version `1.0.0`.
-- `evaluation/runs/` is the future generated store for observed output. Observed output is evidence, never ground truth.
+- `evaluation/runs/` is the generated store for observed output. Observed output is evidence, never ground truth.
 - `evaluation/baselines/` is reserved for explicitly accepted baselines.
 - `evaluation/reports/` is reserved for generated engineering reports.
 - `tests/evaluation/` verifies contracts, corpus integrity, coverage, fixture preservation, and provider-call suppression without network access.
@@ -240,7 +242,11 @@ An evaluation case keeps its synthetic narrative, metadata, and ground-truth exp
 
 `src/evaluation/corpus.py` reads only the canonical JSON corpus, rejects duplicate JSON keys, validates strict corpus and evaluation schema version `1.0.0`, rejects unknown fields and malformed or non-synthetic cases atomically, verifies identifier uniqueness and ordering, validates bounded category and tag coverage, confirms ground truth against existing validation, compatibility, and policy authorities, and rejects substantive files in generated artifact locations. Its deterministic coverage summary reports category, documentation tag, success/failure, current/historical, policy-outcome, and compound-case counts without executing semantic extraction or assigning a benchmark score.
 
-The framework and corpus are deterministic even though future live provider output will be probabilistic. No integrated runner, provider corpus execution, case comparison algorithm, live or batch evaluation, accepted baseline, regression execution, or engineering report generation exists. No semantic performance has been measured. OPORD 003 does not authorize automatic modification of the semantic pipeline from evaluation results.
+`src/evaluation/runner.py` supports two explicit modes. `deterministic_test` requires a caller-supplied semantic executor and cannot silently call a provider. `live_provider` is opt-in and uses the configured production extractor. Both modes invoke `run_analysis()` once per selected case and adapt its full result into `PipelineResult`, so input validation, normalization, regex, semantic extraction, schema and domain validation, compatibility construction, policy, operational comparison, preview gating, and aggregate adaptation remain the existing authorities. Only the case identifier and raw synthetic narrative cross into that path; metadata, engineering notes, and expected outcomes do not.
+
+`src/evaluation/case_comparison.py` compares only explicitly asserted expectations. It excludes provider confidence from semantic equality, preserves stable field paths and ordering, distinguishes validation or pipeline failure from semantic mismatch, and treats provider or infrastructure failure as non-comparable. Match, partial mismatch, failure, and non-comparable statuses are accompanied by bounded difference reasons and failure-pattern taxonomy for historical/current confusion, correction, conflict, threat, intentionality, negation, directionality, evidence, uncertainty, semantic-field, validation, policy, pipeline, compatibility, and provider failures.
+
+`src/evaluation/run_contracts.py` defines immutable configuration, observation, summary, and artifact envelopes. Canonical JSON artifacts are written under `evaluation/runs/` as observed evidence, never truth; an existing path is protected unless overwrite is explicit. The deterministic test suite executes the complete 48-case corpus without network access. No full live-provider corpus run, accepted baseline, baseline regression comparison, regression executor, final engineering report, or semantic performance claim exists. Evaluation results cannot automatically modify the semantic pipeline.
 
 ## Architecture Boundaries
 
@@ -257,7 +263,7 @@ The system separates:
 - deterministic compatibility construction in `compatibility_finding.py`
 - deterministic application write policy in `policy.py`
 - deterministic stakeholder-facing label and explanation mapping in `presentation.py`
-- independent deterministic evaluation contracts, corpus loading, validation, coverage, and canonical serialization in `evaluation/`
+- independent evaluation contracts, corpus loading, validation, coverage, complete-pipeline execution, deterministic comparison, and canonical run serialization in `evaluation/`
 - transitional compatibility enforcement in `models.py`
 - deterministic presentation and comparison logic in `app_logic.py`, `comparison.py`, and `salesforce_preview.py`
 

@@ -80,6 +80,16 @@ class DifferenceReasonCode(str, Enum):
     OBSERVATION_UNAVAILABLE = "observation_unavailable"
     PIPELINE_FAILURE = "pipeline_failure"
     VALIDATION_FAILURE = "validation_failure"
+    MISSING_OBSERVED_VALUE = "missing_observed_value"
+    UNEXPECTED_OBSERVED_VALUE = "unexpected_observed_value"
+    SCALAR_MISMATCH = "scalar_mismatch"
+    COLLECTION_MISMATCH = "collection_mismatch"
+    VALIDATION_STAGE_MISMATCH = "validation_stage_mismatch"
+    FAILURE_PROVENANCE_MISMATCH = "failure_provenance_mismatch"
+    POLICY_OUTCOME_MISMATCH = "policy_outcome_mismatch"
+    POLICY_REASON_MISMATCH = "policy_reason_mismatch"
+    SEMANTIC_SUCCESS_MISMATCH = "semantic_success_mismatch"
+    NON_COMPARABLE_PROVIDER_FAILURE = "non_comparable_provider_failure"
 
 
 class CaseEvaluationStatus(str, Enum):
@@ -95,6 +105,22 @@ class FailurePattern(str, Enum):
     COMPATIBILITY_FAILURE = "compatibility_failure"
     POLICY_FAILURE = "policy_failure"
     MISSING_OBSERVATION = "missing_observation"
+    HISTORICAL_CURRENT_CONFUSION = "historical_current_confusion"
+    CORRECTION_REVERSAL_FAILURE = "correction_reversal_failure"
+    CONFLICT_RESOLUTION_FAILURE = "conflict_resolution_failure"
+    THREAT_CLASSIFICATION_FAILURE = "threat_classification_failure"
+    ACCIDENTAL_INTENTIONAL_CONFUSION = "accidental_intentional_confusion"
+    NEGATION_FAILURE = "negation_failure"
+    OBJECT_DIRECTED_INTERPERSONAL_CONFUSION = "object_directed_interpersonal_confusion"
+    SELF_DIRECTED_INTERPERSONAL_CONFUSION = "self_directed_interpersonal_confusion"
+    UNSUPPORTED_EVIDENCE = "unsupported_evidence"
+    EVIDENCE_OMISSION = "evidence_omission"
+    EXCESSIVE_UNCERTAINTY = "excessive_uncertainty"
+    INSUFFICIENT_UNCERTAINTY = "insufficient_uncertainty"
+    SEMANTIC_FIELD_MISMATCH = "semantic_field_mismatch"
+    VALIDATION_REJECTION = "validation_rejection"
+    POLICY_MISMATCH = "policy_mismatch"
+    PIPELINE_FAILURE = "pipeline_failure"
 
 
 class NonComparableReason(str, Enum):
@@ -328,6 +354,7 @@ class FieldDifference(EvaluationContract):
     observed_value: JsonValue = None
     classification: DifferenceClassification
     reason_code: DifferenceReasonCode
+    explanation: Optional[StrictStr] = None
 
     @field_validator("field")
     @classmethod
@@ -340,6 +367,8 @@ class FieldDifference(EvaluationContract):
             raise ValueError("matching differences require values_equal reason")
         if self.classification != DifferenceClassification.MATCH and self.reason_code == DifferenceReasonCode.VALUES_EQUAL:
             raise ValueError("material differences cannot use values_equal reason")
+        if self.explanation is not None and not self.explanation.strip():
+            raise ValueError("difference explanation must be omitted or non-empty")
         return self
 
     @property

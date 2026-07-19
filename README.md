@@ -77,11 +77,15 @@ The live smoke test uses `CASE_008`, makes at most one OpenAI request, and fails
 
 ## Evaluation Foundation
 
-`src/evaluation/` defines strict, provider-independent evaluation contracts, canonical JSON serialization, and a deterministic corpus loader, validator, and coverage calculator. Evaluation is an independent repository capability: it describes expected and observed results without changing or executing the semantic pipeline.
+`src/evaluation/` defines strict, provider-independent evaluation contracts, canonical JSON serialization, a deterministic corpus loader and validator, and a non-interactive runner with deterministic case comparison. Evaluation remains independent from ground-truth authority while the runner reuses the complete governed application pipeline.
 
 The 48-case `violence-checker-synthetic-evaluation-corpus` version `1.0.0` and its manually authored deterministic ground truth live under `evaluation/corpus/` and are authoritative. Stable case identifiers use `EVAL_001` through `EVAL_048`; cases are ordered by identifier and use bounded primary-category and documentation-quality vocabularies. Generated observations belong under `evaluation/runs/` and are evidence, not ground truth. Accepted baselines and generated engineering reports have separate locations under `evaluation/baselines/` and `evaluation/reports/`. Evaluation metadata, engineering notes, and expected outcomes are structurally separate from the synthetic narrative and must never be submitted to semantic extraction.
 
-The corpus covers completed and attempted assault, threats, accidental contact, historical disclosures, negation, corrections, conflicts, object-directed aggression, self-directed violence, ambiguous encounters, incomplete reports, required documentation-quality conditions, and compound cases. Ground truth cannot be authored or repaired from provider, regex, app, or external-system output. The framework contracts and stored artifact serialization are deterministic even though future live provider output will be probabilistic. OPORD 003 does not authorize automatic pipeline modification, and corpus loading, validation, and coverage make no provider calls or semantic inferences.
+The corpus covers completed and attempted assault, threats, accidental contact, historical disclosures, negation, corrections, conflicts, object-directed aggression, self-directed violence, ambiguous encounters, incomplete reports, required documentation-quality conditions, and compound cases. Ground truth cannot be authored or repaired from provider, regex, app, or external-system output.
+
+The runner supports explicit `deterministic_test` and `live_provider` modes. Deterministic mode requires a caller-supplied semantic executor and is used by offline tests. Live mode is opt-in and reuses `run_analysis()` exactly once per case, including input validation, normalization, regex, semantic extraction, schema and domain validation, compatibility construction, policy, existing comparison, preview gating, and aggregate pipeline adaptation. Only case identifier and raw narrative enter the governed path; corpus metadata and expectations do not.
+
+Generated JSON artifacts under `evaluation/runs/` contain ordered observed evidence, case comparisons, bounded failure patterns, and deterministic summaries. Provider and infrastructure failures are non-comparable rather than semantic mismatches. Existing artifacts are never overwritten unless `--overwrite` is explicit. No accepted baseline, baseline regression comparison, or final engineering report exists.
 
 Validate the corpus, inspect deterministic coverage, and run evaluation tests:
 
@@ -90,6 +94,21 @@ Validate the corpus, inspect deterministic coverage, and run evaluation tests:
 .venv/bin/python -m src.evaluation.corpus coverage
 .venv/bin/python -m pytest tests/evaluation
 ```
+
+Validate runner wiring without a provider request:
+
+```sh
+.venv/bin/python -m src.evaluation.runner validate --mode live_provider --run-id VALIDATE_ONLY --repository-commit "$(git rev-parse HEAD)" --output evaluation/runs/validate-only.json --case EVAL_001
+```
+
+Run one selected case or the complete corpus explicitly in live-provider mode:
+
+```sh
+.venv/bin/python -m src.evaluation.runner run --mode live_provider --run-id LIVE_SELECTED_001 --repository-commit "$(git rev-parse HEAD)" --model gpt-5-mini --config-identity semantic-prompt-current --output evaluation/runs/live-selected-001.json --case EVAL_001
+.venv/bin/python -m src.evaluation.runner run --mode live_provider --run-id LIVE_FULL_001 --repository-commit "$(git rev-parse HEAD)" --model gpt-5-mini --config-identity semantic-prompt-current --output evaluation/runs/live-full-001.json
+```
+
+These live commands are examples only; no full live corpus run has been completed. Re-running against an existing output path requires explicit `--overwrite`.
 
 ## Domain Models
 
@@ -177,8 +196,11 @@ Preview generation is declined for configuration failures, provider request fail
 ├── requirements.txt
 ├── src
 │   ├── evaluation
+│   │   ├── case_comparison.py
 │   │   ├── corpus.py
 │   │   ├── contracts.py
+│   │   ├── run_contracts.py
+│   │   ├── runner.py
 │   │   └── serialization.py
 │   ├── config.py
 │   ├── app_logic.py
@@ -196,7 +218,8 @@ Preview generation is declined for configuration failures, provider request fail
 └── tests
     ├── evaluation
     │   ├── test_corpus.py
-    │   └── test_contracts.py
+    │   ├── test_contracts.py
+    │   └── test_runner.py
     ├── test_config_and_app.py
     ├── test_app_logic.py
     ├── test_comparison.py
@@ -227,7 +250,7 @@ Preview generation is declined for configuration failures, provider request fail
 - Workflow routing
 - Human review queues
 - Analytics dashboards
-- Integrated evaluation runner and live batch execution
+- Completed live-provider evaluation execution has not been performed
 - Accepted evaluation baselines and regression execution
 - Generated engineering evaluation reports
 - CI/CD
