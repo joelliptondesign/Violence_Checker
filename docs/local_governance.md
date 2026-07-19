@@ -13,6 +13,8 @@ Authorized local functions:
 - Validate executor heartbeat JSONL: `python3 -m tools.repo_governance validate-heartbeat`
 - Validate the active SITREC: `python3 -m tools.repo_governance validate-sitrec --path "docs/SITREC - 2026-07-18 Violence Checker Narrative Source Control Baseline.md"`
 - Run local governance validation: `python3 -m tools.repo_governance validate-all`
+- Validate the authoritative synthetic evaluation corpus: `.venv/bin/python -m src.evaluation.corpus validate`
+- Inspect deterministic corpus coverage: `.venv/bin/python -m src.evaluation.corpus coverage`
 
 Generated artifact locations:
 
@@ -26,4 +28,5 @@ Limitations:
 - The knowledge graph is static and repository-derived; unresolved relationships remain marked unresolved.
 - The SITREC validator checks required structure and repository primacy language; it does not determine application truth.
 - The heartbeat validator checks JSONL structure for executor operation events; it does not audit operational correctness.
+- Corpus validation checks strict schema, bounded vocabulary, deterministic ordering, coverage, manually authored ground-truth consistency, and placeholder-only generated artifact locations without executing a provider.
 - Divergence from foxcommand-runtime reference tooling is intentional where FoxCommand manifest lifecycle, runtime boundary, deployment, closeout, and documentation synchronization behavior is outside Violence_Checker scope.

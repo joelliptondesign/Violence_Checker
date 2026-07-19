@@ -39,7 +39,8 @@ This graph records deterministic repository relationships discoverable from file
 | `src/contracts.py` | deterministic | `DomainValidationResult`, `DomainValidationStatus`, `InputFailureCode`, `InputValidationIssue`, `InputValidationResult`, `InputValidationStatus`, `NormalizationOperation`, `NormalizedIncident`, `PipelineFailureProvenance`, `PipelineResult`, `PolicyDecision`, `PolicyOutcome`, `PolicyReasonCode`, `ProviderStructuredResponse`, `RegexResult`, `SalesforcePayload`, `SchemaValidationResult`, `SchemaValidationStatus`, `SemanticFacts`, `ValidatedSemanticFacts`, `ValidationFailureStage`, `ValidationIssue`, `ValidationIssueCode`, `ValidationResult` | 13 |
 | `src/domain_validation.py` | deterministic | none | 2 |
 | `src/evaluation/__init__.py` | deterministic | none | 0 |
-| `src/evaluation/contracts.py` | deterministic | `BaselineClassification`, `BaselineComparison`, `BaselineComparisonObservation`, `BaselineObservationCode`, `CaseEvaluationResult`, `CaseEvaluationStatus`, `DifferenceClassification`, `DifferenceReasonCode`, `EvaluationArtifactProvenance`, `EvaluationCase`, `EvaluationCaseMetadata`, `EvaluationContract`, `EvaluationExecutionMode`, `ExpectedEvaluationOutcome`, `ExpectedField`, `ExpectedSemanticOutcome`, `FailurePattern`, `FieldDifference`, `NonComparableReason`, `ObservedEvaluationResult`, `ObservedSemanticOutcome`, `ObservedValidationOutcome` | 18 |
+| `src/evaluation/contracts.py` | deterministic | `BaselineClassification`, `BaselineComparison`, `BaselineComparisonObservation`, `BaselineObservationCode`, `CaseEvaluationResult`, `CaseEvaluationStatus`, `DifferenceClassification`, `DifferenceReasonCode`, `DocumentationQualityTag`, `EvaluationArtifactProvenance`, `EvaluationCase`, `EvaluationCaseMetadata`, `EvaluationCategory`, `EvaluationContract`, `EvaluationExecutionMode`, `ExpectedEvaluationOutcome`, `ExpectedField`, `ExpectedSemanticOutcome`, `FailurePattern`, `FieldDifference`, `NonComparableReason`, `ObservedEvaluationResult`, `ObservedSemanticOutcome`, `ObservedValidationOutcome` | 18 |
+| `src/evaluation/corpus.py` | deterministic | `CorpusCoverageSummary`, `CorpusDocument`, `CorpusIssueCode`, `CorpusValidationError`, `CorpusValidationIssue`, `_DuplicateKeyError` | 11 |
 | `src/evaluation/serialization.py` | deterministic | none | 1 |
 | `src/fixtures.py` | deterministic application component | none | 0 |
 | `src/input_validation.py` | deterministic | none | 4 |
@@ -56,6 +57,7 @@ This graph records deterministic repository relationships discoverable from file
 | `src/semantic_validation.py` | deterministic | none | 2 |
 | `tests/evaluation/__init__.py` | deterministic test | none | 0 |
 | `tests/evaluation/test_contracts.py` | deterministic test | none | 30 |
+| `tests/evaluation/test_corpus.py` | deterministic test | none | 26 |
 | `tests/test_app_logic.py` | deterministic test | none | 9 |
 | `tests/test_comparison.py` | deterministic test | none | 22 |
 | `tests/test_config_and_app.py` | deterministic test | none | 4 |
@@ -95,6 +97,7 @@ This graph records deterministic repository relationships discoverable from file
 | `src/domain_validation.py` | `src.contracts`, `src.models` |
 | `src/evaluation/__init__.py` | `.contracts`, `.serialization` |
 | `src/evaluation/contracts.py` | `__future__`, `datetime`, `enum`, `pydantic`, `src.contracts`, `src.models`, `typing` |
+| `src/evaluation/corpus.py` | `__future__`, `argparse`, `enum`, `json`, `pathlib`, `pydantic`, `src.compatibility_finding`, `src.contracts`, `src.evaluation.contracts`, `src.evaluation.serialization`, `src.policy`, `src.semantic_validation`, `typing` |
 | `src/evaluation/serialization.py` | `__future__`, `json`, `pydantic` |
 | `src/fixtures.py` | `src.models` |
 | `src/input_validation.py` | `src.contracts`, `src.models`, `typing` |
@@ -111,6 +114,7 @@ This graph records deterministic repository relationships discoverable from file
 | `src/semantic_validation.py` | `collections.abc`, `src.contracts`, `src.domain_validation`, `src.schema_validation` |
 | `tests/evaluation/__init__.py` | none |
 | `tests/evaluation/test_contracts.py` | `__future__`, `datetime`, `openai`, `pydantic`, `pytest`, `src.contracts`, `src.evaluation`, `src.models` |
+| `tests/evaluation/test_corpus.py` | `__future__`, `ast`, `hashlib`, `json`, `openai`, `pathlib`, `pytest`, `src.evaluation.contracts`, `src.evaluation.corpus`, `src.evaluation.serialization` |
 | `tests/test_app_logic.py` | `importlib`, `pytest`, `src.app_logic`, `src.contracts`, `src.fixtures`, `src.models`, `src.semantic_extractor` |
 | `tests/test_comparison.py` | `src.comparison`, `src.compatibility_finding`, `src.contracts`, `src.models`, `src.semantic_extractor`, `src.semantic_validation` |
 | `tests/test_config_and_app.py` | `importlib` |
@@ -149,13 +153,20 @@ This graph records deterministic repository relationships discoverable from file
 | `ComparisonResult` | `src/comparison.py` |
 | `CompatibilityFindingResult` | `src/compatibility_finding.py` |
 | `CompatibilityFindingStatus` | `src/compatibility_finding.py` |
+| `CorpusCoverageSummary` | `src/evaluation/corpus.py` |
+| `CorpusDocument` | `src/evaluation/corpus.py` |
+| `CorpusIssueCode` | `src/evaluation/corpus.py` |
+| `CorpusValidationError` | `src/evaluation/corpus.py` |
+| `CorpusValidationIssue` | `src/evaluation/corpus.py` |
 | `DifferenceClassification` | `src/evaluation/contracts.py` |
 | `DifferenceReasonCode` | `src/evaluation/contracts.py` |
+| `DocumentationQualityTag` | `src/evaluation/contracts.py` |
 | `DomainValidationResult` | `src/contracts.py` |
 | `DomainValidationStatus` | `src/contracts.py` |
 | `EvaluationArtifactProvenance` | `src/evaluation/contracts.py` |
 | `EvaluationCaseMetadata` | `src/evaluation/contracts.py` |
 | `EvaluationCase` | `src/evaluation/contracts.py` |
+| `EvaluationCategory` | `src/evaluation/contracts.py` |
 | `EvaluationContract` | `src/evaluation/contracts.py` |
 | `EvaluationExecutionMode` | `src/evaluation/contracts.py` |
 | `ExpectedEvaluationOutcome` | `src/evaluation/contracts.py` |
@@ -196,6 +207,7 @@ This graph records deterministic repository relationships discoverable from file
 | `ValidationResult` | `src/contracts.py` |
 | `ViolenceEventType` | `src/models.py` |
 | `ViolenceFinding` | `src/models.py` |
+| `_DuplicateKeyError` | `src/evaluation/corpus.py` |
 
 ## Tests
 

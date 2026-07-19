@@ -4,7 +4,7 @@
 
 Violence Checker is a local Phase 0 Semantic Violence Detection Pre-PoC. It demonstrates how a synthetic incident narrative can move through lexical detection, semantic fact extraction, deterministic compatibility construction, comparison, and an illustrative write-back preview.
 
-The repository is not a production system. It does not implement real Salesforce connectivity, persistence, authentication, deployment, workflow routing, analytics, a completed evaluation corpus or runner, CI/CD, containerization, FoxCommand integration, or background processing.
+The repository is not a production system. It does not implement real Salesforce connectivity, persistence, authentication, deployment, workflow routing, analytics, an evaluation runner or measured benchmark, CI/CD, containerization, FoxCommand integration, or background processing.
 
 ## Incident Input Model
 
@@ -226,19 +226,21 @@ Semantic extraction is not run on page load, fixture selection, or manual typing
 
 ## Independent Evaluation Foundation
 
-Evaluation is a repository capability independent from the operational semantic pipeline. `src/evaluation/contracts.py` defines strict typed envelopes for synthetic cases, repository-authored expectations, observed results, field differences, case outcomes, baseline classifications, and artifact provenance. `src/evaluation/serialization.py` provides canonical JSON with sorted object keys while preserving explicitly ordered collections. These modules make no provider calls, import no OpenAI SDK, perform no semantic inference, and do not mutate application contracts.
+Evaluation is a repository capability independent from the operational semantic pipeline. `src/evaluation/contracts.py` defines strict typed envelopes for synthetic cases, repository-authored expectations, observed results, field differences, case outcomes, baseline classifications, artifact provenance, twelve bounded primary categories, and bounded documentation-quality tags. `src/evaluation/serialization.py` provides canonical JSON with sorted object keys while preserving explicitly ordered collections. These modules make no provider calls, import no OpenAI SDK, perform no semantic inference, and do not mutate application contracts.
 
 Authority is deliberately separated:
 
-- `evaluation/corpus/` is the future authoritative source for repository-authored synthetic cases and ground truth.
+- `evaluation/corpus/corpus.json` is the authoritative source for the 48 repository-authored synthetic cases and manually authored ground truth in corpus version `1.0.0`.
 - `evaluation/runs/` is the future generated store for observed output. Observed output is evidence, never ground truth.
 - `evaluation/baselines/` is reserved for explicitly accepted baselines.
 - `evaluation/reports/` is reserved for generated engineering reports.
-- `tests/evaluation/` verifies the contract boundary without network access.
+- `tests/evaluation/` verifies contracts, corpus integrity, coverage, fixture preservation, and provider-call suppression without network access.
 
-An evaluation case keeps its synthetic narrative, metadata, and ground-truth expectation in distinct fields. Metadata, engineering notes, and expected outcomes must never be submitted to semantic extraction. Expected success requires an independently authored semantic payload; expected failure cannot contain success payloads. Observed failure cannot fabricate admissible semantic facts. Case status vocabulary is bounded to match, partial mismatch, failure, and non-comparable; baseline vocabulary is bounded to improved, degraded, unchanged, and incomparable. This execution defines vocabulary and invariants only, not comparison or baseline algorithms.
+An evaluation case keeps its synthetic narrative, metadata, and ground-truth expectation in distinct fields. Metadata, engineering notes, and expected outcomes must never be submitted to semantic extraction. Stable identifiers `EVAL_001` through `EVAL_048` are independent of metadata and file position. Cases are lexicographically ordered; the primary category is first in each ordered category list. Expected success requires independently authored admissible `SemanticFacts`, an exactly matching compatibility `ViolenceFinding`, and the current deterministic `PolicyDecision`. Model, regex, app, provider, and external-system output cannot author, infer, repair, or approve these expectations.
 
-The framework is deterministic even though future live provider output will be probabilistic. Canonically stored observations enable later deterministic comparison against independently authored expectations. No production corpus, integrated runner, live or batch evaluation, accepted baseline, regression execution, or engineering report generation exists. OPORD 003 does not authorize automatic modification of the semantic pipeline from evaluation results.
+`src/evaluation/corpus.py` reads only the canonical JSON corpus, rejects duplicate JSON keys, validates strict corpus and evaluation schema version `1.0.0`, rejects unknown fields and malformed or non-synthetic cases atomically, verifies identifier uniqueness and ordering, validates bounded category and tag coverage, confirms ground truth against existing validation, compatibility, and policy authorities, and rejects substantive files in generated artifact locations. Its deterministic coverage summary reports category, documentation tag, success/failure, current/historical, policy-outcome, and compound-case counts without executing semantic extraction or assigning a benchmark score.
+
+The framework and corpus are deterministic even though future live provider output will be probabilistic. No integrated runner, provider corpus execution, case comparison algorithm, live or batch evaluation, accepted baseline, regression execution, or engineering report generation exists. No semantic performance has been measured. OPORD 003 does not authorize automatic modification of the semantic pipeline from evaluation results.
 
 ## Architecture Boundaries
 
@@ -255,7 +257,7 @@ The system separates:
 - deterministic compatibility construction in `compatibility_finding.py`
 - deterministic application write policy in `policy.py`
 - deterministic stakeholder-facing label and explanation mapping in `presentation.py`
-- independent deterministic evaluation contracts in `evaluation/contracts.py` and canonical serialization in `evaluation/serialization.py`
+- independent deterministic evaluation contracts, corpus loading, validation, coverage, and canonical serialization in `evaluation/`
 - transitional compatibility enforcement in `models.py`
 - deterministic presentation and comparison logic in `app_logic.py`, `comparison.py`, and `salesforce_preview.py`
 

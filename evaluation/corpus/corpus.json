@@ -1,0 +1,3655 @@
+{
+  "cases": [
+    {
+      "case_id": "EVAL_001",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "struck a nurse on the shoulder"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "struck a nurse on the shoulder"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "completed_physical_assault"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear"
+        ],
+        "engineering_notes": "Clear current completed interpersonal assault.",
+        "primary_category": "completed_physical_assault"
+      },
+      "narrative": "Patient struck a nurse on the shoulder with a closed fist during medication administration.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_002",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "slapped the technician across the face"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "technician",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "slapped the technician across the face"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "technician",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "completed_physical_assault",
+          "negated_event"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "clear",
+          "negation_language"
+        ],
+        "engineering_notes": "Current assault follows a general denial; the witnessed event controls.",
+        "primary_category": "completed_physical_assault"
+      },
+      "narrative": "After denying any aggression, the patient slapped the technician across the face in the hallway.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_003",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "hit rn in arm twice"
+          ],
+          "injury_mentioned": true,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "hit rn in arm twice"
+          ],
+          "injury_mentioned": true,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "completed_physical_assault"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "poor_grammar",
+          "abbreviation",
+          "shorthand"
+        ],
+        "engineering_notes": "Poor grammar and abbreviations still describe completed assault and injury.",
+        "primary_category": "completed_physical_assault"
+      },
+      "narrative": "pt mad hit rn in arm twice rn sore no skin break",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_004",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "deliberately kicked the aide in the shin"
+          ],
+          "injury_mentioned": true,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "aide",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "deliberately kicked the aide in the shin"
+          ],
+          "injury_mentioned": true,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "aide",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "completed_physical_assault"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear"
+        ],
+        "engineering_notes": "Clear deliberate kick with contact and injury.",
+        "primary_category": "completed_physical_assault"
+      },
+      "narrative": "During transfer the patient deliberately kicked the aide in the shin; the aide reported bruising.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_005",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "attempted_physical_violence",
+          "evidence_text": [
+            "swung at the nurse but missed"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "attempted_physical_violence",
+          "evidence_text": [
+            "swung at the nurse but missed"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "attempted_physical_assault"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear"
+        ],
+        "engineering_notes": "Clear attempted strike without contact.",
+        "primary_category": "attempted_physical_assault"
+      },
+      "narrative": "The patient swung at the nurse but missed; no one was touched.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_006",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "attempted_physical_violence",
+          "evidence_text": [
+            "tried kick tech"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "technician",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "attempted_physical_violence",
+          "evidence_text": [
+            "tried kick tech"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "technician",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "attempted_physical_assault"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "poor_grammar",
+          "abbreviation",
+          "shorthand"
+        ],
+        "engineering_notes": "Shorthand clearly records an attempted kick.",
+        "primary_category": "attempted_physical_assault"
+      },
+      "narrative": "pt tried kick tech tech step back no contact",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_007",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "attempted_physical_violence",
+          "evidence_text": [
+            "lunged at the nurse and missed"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "attempted_physical_violence",
+          "evidence_text": [
+            "lunged at the nurse and missed"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "attempted_physical_assault",
+          "historical_disclosure",
+          "negated_event"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "historical_reference",
+          "negation_language"
+        ],
+        "engineering_notes": "Historical disclosure and current denial precede a current attempt.",
+        "primary_category": "attempted_physical_assault"
+      },
+      "narrative": "The patient said the earlier punch happened years ago, denied hitting anyone today, then lunged at the nurse and missed.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_008",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "attempted_physical_violence",
+          "evidence_text": [
+            "raised a chair as if to throw it at staff"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "staff",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "attempted_physical_violence",
+          "evidence_text": [
+            "raised a chair as if to throw it at staff"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "staff",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "attempted_physical_assault"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear"
+        ],
+        "engineering_notes": "Object is used in an attempted person-directed assault.",
+        "primary_category": "attempted_physical_assault"
+      },
+      "narrative": "Patient raised a chair as if to throw it at staff; security removed it before release.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_009",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "verbal_threat",
+          "evidence_text": [
+            "I will punch you when you open the door"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "verbal_threat",
+          "evidence_text": [
+            "I will punch you when you open the door"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "verbal_threat"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear"
+        ],
+        "engineering_notes": "Explicit current verbal threat.",
+        "primary_category": "verbal_threat"
+      },
+      "narrative": "Patient told the nurse, 'I will punch you when you open the door.' No contact occurred.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_010",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "verbal_threat",
+          "evidence_text": [
+            "gonna hurt somebody"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "verbal_threat",
+          "evidence_text": [
+            "gonna hurt somebody"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "verbal_threat"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "poor_grammar",
+          "abbreviation",
+          "shorthand"
+        ],
+        "engineering_notes": "Threat target is nonspecific but the threat is explicit.",
+        "primary_category": "verbal_threat"
+      },
+      "narrative": "pt yelling gonna hurt somebody if dc not fixed no hit",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_011",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "verbal_threat",
+          "evidence_text": [
+            "threatened to break the aide's jaw"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "accidental",
+          "negated": false,
+          "target": "aide",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "verbal_threat",
+          "evidence_text": [
+            "threatened to break the aide's jaw"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "accidental",
+          "negated": false,
+          "target": "aide",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "verbal_threat",
+          "accidental_contact"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "clear"
+        ],
+        "engineering_notes": "Threat interacts with separate accidental contact.",
+        "primary_category": "verbal_threat"
+      },
+      "narrative": "While backing away, the patient accidentally bumped the aide and then intentionally threatened to break the aide's jaw.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_012",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": null,
+          "confidence": 0.5,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "verbal_threat",
+          "evidence_text": [
+            "Maybe he said he would get her"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [
+            "Speaker, target, and threatening meaning are unresolved."
+          ],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "threat_without_violence_indication",
+            "unclear_material_intentionality"
+          ]
+        },
+        "semantic_facts": {
+          "actor": null,
+          "confidence": 0.5,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "verbal_threat",
+          "evidence_text": [
+            "Maybe he said he would get her"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [
+            "Speaker, target, and threatening meaning are unresolved."
+          ],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "verbal_threat",
+          "ambiguous_encounter"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "ambiguous_pronouns",
+          "temporal_ambiguity"
+        ],
+        "engineering_notes": "Conditional secondhand language supports only an uncertain threat representation.",
+        "primary_category": "verbal_threat"
+      },
+      "narrative": "Witness heard, 'Maybe he said he would get her,' but could not identify who spoke or whether it was a threat.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_013",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.9,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "lost balance and grabbed the nurse's sleeve"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "accidental",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [
+            "Contact occurred without interpersonal violence."
+          ],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "unclear_event_type"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.9,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "lost balance and grabbed the nurse's sleeve"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "accidental",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [
+            "Contact occurred without interpersonal violence."
+          ],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "accidental_contact"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear"
+        ],
+        "engineering_notes": "Clear accidental contact remains nonviolent with an unclear event type.",
+        "primary_category": "accidental_contact"
+      },
+      "narrative": "Patient lost balance and grabbed the nurse's sleeve; both agreed the contact was accidental.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_014",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.9,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "elbow hit the aide by accident"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "accidental",
+          "negated": false,
+          "target": "aide",
+          "uncertainty_notes": [
+            "Contact was explicitly accidental."
+          ],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "unclear_event_type"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.9,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "elbow hit the aide by accident"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "accidental",
+          "negated": false,
+          "target": "aide",
+          "uncertainty_notes": [
+            "Contact was explicitly accidental."
+          ],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "accidental_contact"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear",
+          "negation_language"
+        ],
+        "engineering_notes": "Accidental care-related contact with explicit negation of aggression.",
+        "primary_category": "accidental_contact"
+      },
+      "narrative": "During repositioning, the patient's elbow hit the aide by accident. No aggression was observed.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_015",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.8,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "stumble into tech"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "accidental",
+          "negated": false,
+          "target": "technician",
+          "uncertainty_notes": [
+            "Poorly documented contact is described as accidental."
+          ],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "unclear_event_type"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.8,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "stumble into tech"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "accidental",
+          "negated": false,
+          "target": "technician",
+          "uncertainty_notes": [
+            "Poorly documented contact is described as accidental."
+          ],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "accidental_contact",
+          "negated_event"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "poor_grammar",
+          "abbreviation",
+          "shorthand",
+          "negation_language"
+        ],
+        "engineering_notes": "Poor grammar documents accidental contact and denial of intent.",
+        "primary_category": "accidental_contact"
+      },
+      "narrative": "pt stumble into tech says wasnt trying hurt anyone tech agrees",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_016",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.8,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "door pushed by the patient struck a staff member"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "accidental",
+          "negated": false,
+          "target": "staff member",
+          "uncertainty_notes": [
+            "The contact was unintended and mediated by a door."
+          ],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "unclear_event_type"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.8,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "door pushed by the patient struck a staff member"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "accidental",
+          "negated": false,
+          "target": "staff member",
+          "uncertainty_notes": [
+            "The contact was unintended and mediated by a door."
+          ],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "accidental_contact"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear"
+        ],
+        "engineering_notes": "Unintended object-mediated contact.",
+        "primary_category": "accidental_contact"
+      },
+      "narrative": "A door pushed by the patient struck a staff member standing behind it; neither person saw the other.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_017",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "roommate",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": false,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "punched by a roommate several years ago"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "patient",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "roommate",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": false,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "punched by a roommate several years ago"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "patient",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "historical_disclosure"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear",
+          "historical_reference",
+          "negation_language"
+        ],
+        "engineering_notes": "Affirmative historical assault with current denial.",
+        "primary_category": "historical_disclosure"
+      },
+      "narrative": "Patient reported being punched by a roommate several years ago. Nothing violent occurred during this visit.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_018",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "former caregiver",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": false,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "old caregiver hit me before"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "patient",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "former caregiver",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": false,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "old caregiver hit me before"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "patient",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "historical_disclosure",
+          "negated_event"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "poor_grammar",
+          "shorthand",
+          "historical_reference",
+          "negation_language"
+        ],
+        "engineering_notes": "Historical event and current denial interact explicitly.",
+        "primary_category": "historical_disclosure"
+      },
+      "narrative": "pt says old caregiver hit me before denies any assault today calm now",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_019",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "stranger",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": false,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "stranger kicked them last winter"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "patient",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "stranger",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": false,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "stranger kicked them last winter"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "patient",
+          "uncertainty_notes": [],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "historical_disclosure"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear",
+          "historical_reference"
+        ],
+        "engineering_notes": "Completed historical assault only.",
+        "primary_category": "historical_disclosure"
+      },
+      "narrative": "During intake, the patient disclosed that a stranger kicked them last winter; there was no current incident.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_020",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": null,
+          "confidence": 0.9,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": true,
+          "current_event": false,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "assault from childhood"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "patient",
+          "uncertainty_notes": [
+            "The correction resolves timing to a historical event."
+          ],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts affirmatively represent violence or a threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "affirmative_violence_or_threat"
+          ]
+        },
+        "semantic_facts": {
+          "actor": null,
+          "confidence": 0.9,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": true,
+          "current_event": false,
+          "event_type": "completed_physical_violence",
+          "evidence_text": [
+            "assault from childhood"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "patient",
+          "uncertainty_notes": [
+            "The correction resolves timing to a historical event."
+          ],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "historical_disclosure",
+          "negated_event",
+          "correction"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "correction_language",
+          "historical_reference",
+          "negation_language",
+          "temporal_ambiguity"
+        ],
+        "engineering_notes": "Correction resolves apparent current wording to historical assault.",
+        "primary_category": "historical_disclosure"
+      },
+      "narrative": "The note first says 'hit today,' then clarifies the patient was describing an assault from childhood and denies current violence.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_021",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "did not hit or threaten anyone"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": true,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence",
+            "negated_non_event"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "did not hit or threaten anyone"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": true,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "negated_event"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear",
+          "negation_language"
+        ],
+        "engineering_notes": "Direct negation of current violence and threats.",
+        "primary_category": "negated_event"
+      },
+      "narrative": "Patient did not hit or threaten anyone during the encounter.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_022",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "denied any hitting, kicking, or threats today"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": true,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence",
+            "negated_non_event"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "denied any hitting, kicking, or threats today"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": true,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "negated_event",
+          "historical_disclosure"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "historical_reference",
+          "negation_language"
+        ],
+        "engineering_notes": "Current denial is the evaluated event; historical mention supplies context only.",
+        "primary_category": "negated_event"
+      },
+      "narrative": "Patient described an assault from years ago but repeatedly denied any hitting, kicking, or threats today.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_023",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "no aggression no threats"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": true,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence",
+            "negated_non_event"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "no aggression no threats"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": true,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "negated_event"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "poor_grammar",
+          "abbreviation",
+          "shorthand",
+          "negation_language"
+        ],
+        "engineering_notes": "Minimal shorthand clearly negates violence.",
+        "primary_category": "negated_event"
+      },
+      "narrative": "no aggression no threats pt cooperative",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_024",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "denied the patient grabbed her"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": true,
+          "target": "aide",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence",
+            "negated_non_event"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "denied the patient grabbed her"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": true,
+          "target": "aide",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "negated_event"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear",
+          "negation_language"
+        ],
+        "engineering_notes": "Corroborated negation of alleged contact.",
+        "primary_category": "negated_event"
+      },
+      "narrative": "The aide denied the patient grabbed her; video also showed no physical contact.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_025",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": true,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "Correction: no punch occurred"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence",
+            "corrected_non_event"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": true,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "Correction: no punch occurred"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "correction"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "correction_language",
+          "negation_language"
+        ],
+        "engineering_notes": "Correction reverses interpersonal allegation to object contact.",
+        "primary_category": "correction"
+      },
+      "narrative": "Initial entry: patient punched the nurse. Correction: no punch occurred; the patient struck the mattress only.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_026",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": true,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "kicked a cart and never contacted staff"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "staff",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence",
+            "corrected_non_event"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": true,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "kicked a cart and never contacted staff"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "staff",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "correction",
+          "object_directed_aggression"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "correction_language",
+          "negation_language"
+        ],
+        "engineering_notes": "Addendum reverses person-directed wording to object aggression.",
+        "primary_category": "correction"
+      },
+      "narrative": "Report stated 'kicked staff.' Later addendum says the patient kicked a cart and never contacted staff.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_027",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.9,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": true,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "glove brushed arm during care, no slap"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "accidental",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [
+            "Correction establishes accidental contact."
+          ],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "unclear_event_type"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.9,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": true,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "glove brushed arm during care, no slap"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "accidental",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [
+            "Correction establishes accidental contact."
+          ],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "correction",
+          "accidental_contact"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "poor_grammar",
+          "abbreviation",
+          "shorthand",
+          "correction_language",
+          "negation_language"
+        ],
+        "engineering_notes": "Initial violent wording is corrected to accidental contact.",
+        "primary_category": "correction"
+      },
+      "narrative": "rn wrote pt slapped me; rn corrected note: glove brushed arm during care, no slap",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_028",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": true,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "corrected the quoted words to 'I need help'"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "technician",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence",
+            "corrected_non_event"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": true,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "corrected the quoted words to 'I need help'"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "technician",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "correction",
+          "verbal_threat"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "clear",
+          "correction_language"
+        ],
+        "engineering_notes": "Correction removes the alleged threat.",
+        "primary_category": "correction"
+      },
+      "narrative": "The note said the patient threatened the technician, then corrected the quoted words to 'I need help,' with no threat or contact.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_029",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.5,
+          "conflicting_information": true,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "One witness says the patient punched the aide"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "aide",
+          "uncertainty_notes": [
+            "Witness accounts conflict and contact is unresolved."
+          ],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "conflicting_information",
+            "unclear_event_type",
+            "unclear_material_intentionality"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.5,
+          "conflicting_information": true,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "One witness says the patient punched the aide"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "aide",
+          "uncertainty_notes": [
+            "Witness accounts conflict and contact is unresolved."
+          ],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "conflicting_narrative",
+          "completed_physical_assault",
+          "ambiguous_encounter"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "conflicting_accounts"
+        ],
+        "engineering_notes": "Conflicting witnesses provide no resolvable version.",
+        "primary_category": "conflicting_narrative"
+      },
+      "narrative": "One witness says the patient punched the aide; another says the aide fell without contact. No account can be confirmed.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_030",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.5,
+          "conflicting_information": true,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "Staff reports a slap"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": true,
+          "target": "staff",
+          "uncertainty_notes": [
+            "Denial and staff allegation conflict."
+          ],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "conflicting_information",
+            "unclear_event_type",
+            "unclear_material_intentionality",
+            "negated_affirmative_finding"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.5,
+          "conflicting_information": true,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "Staff reports a slap"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": true,
+          "target": "staff",
+          "uncertainty_notes": [
+            "Denial and staff allegation conflict."
+          ],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "conflicting_narrative",
+          "negated_event",
+          "ambiguous_encounter"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "conflicting_accounts",
+          "negation_language"
+        ],
+        "engineering_notes": "Affirmative allegation and denial remain unresolved.",
+        "primary_category": "conflicting_narrative"
+      },
+      "narrative": "Patient denies striking staff. Staff reports a slap, while video is unavailable.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_031",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.5,
+          "conflicting_information": true,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "tech says pt tried to kick"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "technician",
+          "uncertainty_notes": [
+            "Accounts conflict about attempt and intent."
+          ],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "conflicting_information",
+            "unclear_event_type",
+            "unclear_material_intentionality"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.5,
+          "conflicting_information": true,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "tech says pt tried to kick"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "technician",
+          "uncertainty_notes": [
+            "Accounts conflict about attempt and intent."
+          ],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "conflicting_narrative",
+          "attempted_physical_assault",
+          "ambiguous_encounter"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "poor_grammar",
+          "abbreviation",
+          "shorthand",
+          "conflicting_accounts"
+        ],
+        "engineering_notes": "Shorthand contains conflicting interpretations of a leg movement.",
+        "primary_category": "conflicting_narrative"
+      },
+      "narrative": "tech says pt tried to kick; rn says pt only moved leg during transfer unsure intent",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_032",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.5,
+          "conflicting_information": true,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "Contact occurred, but intent cannot be resolved"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [
+            "Intentional and accidental accounts conflict."
+          ],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "conflicting_information",
+            "unclear_event_type",
+            "unclear_material_intentionality"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.5,
+          "conflicting_information": true,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "Contact occurred, but intent cannot be resolved"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [
+            "Intentional and accidental accounts conflict."
+          ],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "conflicting_narrative",
+          "accidental_contact",
+          "ambiguous_encounter"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "conflicting_accounts"
+        ],
+        "engineering_notes": "Current contact is certain while intentionality is unresolved.",
+        "primary_category": "conflicting_narrative"
+      },
+      "narrative": "The patient reports an accidental bump; the nurse reports an intentional shove. Contact occurred, but intent cannot be resolved.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_033",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "punched the wall"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "punched the wall"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "object_directed_aggression"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear",
+          "negation_language"
+        ],
+        "engineering_notes": "Intentional object aggression without interpersonal violence.",
+        "primary_category": "object_directed_aggression"
+      },
+      "narrative": "Patient angrily punched the wall. No person was struck or threatened.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_034",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "kicked a trash can away from staff"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "kicked a trash can away from staff"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "object_directed_aggression",
+          "historical_disclosure",
+          "negated_event"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "historical_reference",
+          "negation_language"
+        ],
+        "engineering_notes": "Historical mention and current denial accompany object-only aggression.",
+        "primary_category": "object_directed_aggression"
+      },
+      "narrative": "After a past fight was mentioned, the patient denied current violence and kicked a trash can away from staff.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_035",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "threw cup at floor not at anyone"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "threw cup at floor not at anyone"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "object_directed_aggression"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "poor_grammar",
+          "shorthand",
+          "negation_language"
+        ],
+        "engineering_notes": "Poor grammar clearly limits aggression to an object.",
+        "primary_category": "object_directed_aggression"
+      },
+      "narrative": "pt threw cup at floor not at anyone no one hit",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_036",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "shoved an empty chair"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "shoved an empty chair"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "object_directed_aggression"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear"
+        ],
+        "engineering_notes": "Object-directed behavior without a person target.",
+        "primary_category": "object_directed_aggression"
+      },
+      "narrative": "Patient tore a paper sign and shoved an empty chair; staff remained across the room.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_037",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "struck their own thigh repeatedly"
+          ],
+          "injury_mentioned": true,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "self",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "struck their own thigh repeatedly"
+          ],
+          "injury_mentioned": true,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "self",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "self_directed_violence"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear",
+          "negation_language"
+        ],
+        "engineering_notes": "Self-directed injury is not violence toward another person.",
+        "primary_category": "self_directed_violence"
+      },
+      "narrative": "Patient struck their own thigh repeatedly. No one else was targeted.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_038",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "threatened to hurt themself"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "self",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "threatened to hurt themself"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "self",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "self_directed_violence",
+          "negated_event"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "clear",
+          "negation_language"
+        ],
+        "engineering_notes": "Self-directed threat with explicit denial of interpersonal threat.",
+        "primary_category": "self_directed_violence"
+      },
+      "narrative": "Patient threatened to hurt themself but denied any intent to harm staff.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_039",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "hitting own head w hand"
+          ],
+          "injury_mentioned": true,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "self",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "hitting own head w hand"
+          ],
+          "injury_mentioned": true,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "self",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "self_directed_violence"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "poor_grammar",
+          "abbreviation",
+          "shorthand",
+          "negation_language"
+        ],
+        "engineering_notes": "Shorthand distinguishes self-directed action from staff-directed violence.",
+        "primary_category": "self_directed_violence"
+      },
+      "narrative": "pt hitting own head w hand no swing at staff",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_040",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "scratched their own arm"
+          ],
+          "injury_mentioned": true,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "self",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts represent no detected violence or threat.",
+          "failure_provenance": null,
+          "outcome": "WRITE_NOT_DETECTED",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "no_violence"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 1.0,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "none",
+          "evidence_text": [
+            "scratched their own arm"
+          ],
+          "injury_mentioned": true,
+          "intentionality": "intentional",
+          "negated": false,
+          "target": "self",
+          "uncertainty_notes": [],
+          "violence_present": false
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "self_directed_violence"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "clear",
+          "negation_language"
+        ],
+        "engineering_notes": "Self-directed contact only.",
+        "primary_category": "self_directed_violence"
+      },
+      "narrative": "The patient scratched their own arm while alone; documentation records no threat or contact toward others.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_041",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.4,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "neither could explain whether contact occurred"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [
+            "Event type, contact, and intent are unresolved."
+          ],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "unclear_event_type",
+            "unclear_material_intentionality"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.4,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "neither could explain whether contact occurred"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [
+            "Event type, contact, and intent are unresolved."
+          ],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "ambiguous_encounter",
+          "incomplete_report"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "ambiguous_pronouns",
+          "temporal_ambiguity"
+        ],
+        "engineering_notes": "Encounter is current but material facts remain ambiguous.",
+        "primary_category": "ambiguous_encounter"
+      },
+      "narrative": "Staff heard a bang and found the patient beside the nurse; neither could explain whether contact occurred.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_042",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.5,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "moved quickly toward the technician"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "technician",
+          "uncertainty_notes": [
+            "Purpose of the movement is unresolved."
+          ],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "unclear_event_type",
+            "unclear_material_intentionality"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.5,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "moved quickly toward the technician"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "technician",
+          "uncertainty_notes": [
+            "Purpose of the movement is unresolved."
+          ],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "ambiguous_encounter"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "incomplete",
+          "temporal_ambiguity"
+        ],
+        "engineering_notes": "Movement could be an attempt or nonviolent approach.",
+        "primary_category": "ambiguous_encounter"
+      },
+      "narrative": "Patient moved quickly toward the technician, who stepped away. The note does not say whether this was an attack.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_043",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": null,
+          "confidence": 0.4,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "He grabbed him"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [
+            "Actor, target, and intentionality are unresolved."
+          ],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "unclear_event_type",
+            "unclear_material_intentionality"
+          ]
+        },
+        "semantic_facts": {
+          "actor": null,
+          "confidence": 0.4,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "He grabbed him"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [
+            "Actor, target, and intentionality are unresolved."
+          ],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "ambiguous_encounter",
+          "incomplete_report"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "incomplete",
+          "ambiguous_pronouns",
+          "temporal_ambiguity"
+        ],
+        "engineering_notes": "Ambiguous pronouns and missing context leave intentionality unresolved.",
+        "primary_category": "ambiguous_encounter"
+      },
+      "narrative": "He grabbed him after the alarm, but the report does not identify either person or describe why.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_044",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.5,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "made contact with the nurse's arm"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [
+            "Current contact occurred but intentionality is unclear."
+          ],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "unclear_event_type",
+            "unclear_material_intentionality"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.5,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "made contact with the nurse's arm"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [
+            "Current contact occurred but intentionality is unclear."
+          ],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "ambiguous_encounter",
+          "accidental_contact"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "clear"
+        ],
+        "engineering_notes": "Current contact has unresolved intentionality.",
+        "primary_category": "ambiguous_encounter"
+      },
+      "narrative": "The patient made contact with the nurse's arm during a struggle over a blanket; witnesses could not tell if it was deliberate.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_045",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.3,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "aggressive toward staff"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "staff",
+          "uncertainty_notes": [
+            "The report omits action, contact, and intent details."
+          ],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "unclear_event_type",
+            "unclear_material_intentionality"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.3,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "aggressive toward staff"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "staff",
+          "uncertainty_notes": [
+            "The report omits action, contact, and intent details."
+          ],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "incomplete_report"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "poor_grammar",
+          "abbreviation",
+          "shorthand",
+          "incomplete"
+        ],
+        "engineering_notes": "Incomplete shorthand supports only an uncertain current event.",
+        "primary_category": "incomplete_report"
+      },
+      "narrative": "pt aggressive toward staff details unavailable",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_046",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": null,
+          "confidence": 0.3,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "attempted hit?"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [
+            "Actor, target, and whether an attempt occurred are not documented."
+          ],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "unclear_event_type",
+            "unclear_material_intentionality"
+          ]
+        },
+        "semantic_facts": {
+          "actor": null,
+          "confidence": 0.3,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "attempted hit?"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [
+            "Actor, target, and whether an attempt occurred are not documented."
+          ],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "incomplete_report"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "shorthand",
+          "incomplete",
+          "ambiguous_pronouns"
+        ],
+        "engineering_notes": "Question-mark shorthand lacks enough detail for a bounded physical-event type.",
+        "primary_category": "incomplete_report"
+      },
+      "narrative": "Incident note reads only: 'attempted hit?'",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_047",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": null,
+          "confidence": 0.3,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "contact during care, maybe intentional"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [
+            "Actor and intentionality are incompletely documented."
+          ],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "unclear_event_type",
+            "unclear_material_intentionality"
+          ]
+        },
+        "semantic_facts": {
+          "actor": null,
+          "confidence": 0.3,
+          "conflicting_information": false,
+          "contact_occurred": true,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "contact during care, maybe intentional"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": "nurse",
+          "uncertainty_notes": [
+            "Actor and intentionality are incompletely documented."
+          ],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "incomplete_report",
+          "ambiguous_encounter"
+        ],
+        "compound": true,
+        "documentation_quality_tags": [
+          "poor_grammar",
+          "abbreviation",
+          "shorthand",
+          "incomplete"
+        ],
+        "engineering_notes": "Incomplete shorthand records contact with uncertain intentionality.",
+        "primary_category": "incomplete_report"
+      },
+      "narrative": "rn: contact during care, maybe intentional, no other info",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    },
+    {
+      "case_id": "EVAL_048",
+      "ground_truth": {
+        "compatibility_finding": {
+          "actor": "patient",
+          "confidence": 0.3,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "said something threatening earlier"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [
+            "Threat content, target, and timing are missing."
+          ],
+          "violence_present": true
+        },
+        "failure_provenance": null,
+        "intentionally_not_asserted": [
+          "failure_provenance",
+          "validation_stage"
+        ],
+        "policy_decision": {
+          "explanation": "Validated facts contain explicit unresolved uncertainty for application representation.",
+          "failure_provenance": null,
+          "outcome": "WRITE_UNCERTAIN",
+          "policy_id": "violence_checker_write_disposition",
+          "policy_version": "1.0.1",
+          "reason_codes": [
+            "unclear_event_type",
+            "unclear_material_intentionality"
+          ]
+        },
+        "semantic_facts": {
+          "actor": "patient",
+          "confidence": 0.3,
+          "conflicting_information": false,
+          "contact_occurred": false,
+          "correction_present": false,
+          "current_event": true,
+          "event_type": "unclear",
+          "evidence_text": [
+            "said something threatening earlier"
+          ],
+          "injury_mentioned": false,
+          "intentionality": "unclear",
+          "negated": false,
+          "target": null,
+          "uncertainty_notes": [
+            "Threat content, target, and timing are missing."
+          ],
+          "violence_present": true
+        },
+        "semantic_outcome": "success",
+        "validation_failure_stage": null
+      },
+      "metadata": {
+        "categories": [
+          "incomplete_report"
+        ],
+        "compound": false,
+        "documentation_quality_tags": [
+          "incomplete",
+          "temporal_ambiguity"
+        ],
+        "engineering_notes": "Incomplete report cannot support a more specific threat representation.",
+        "primary_category": "incomplete_report"
+      },
+      "narrative": "Witness report: patient said something threatening earlier; exact words, target, and timing not recorded.",
+      "schema_version": "1.0.0",
+      "synthetic": true
+    }
+  ],
+  "corpus_identity": "violence-checker-synthetic-evaluation-corpus",
+  "corpus_schema_version": "1.0.0",
+  "corpus_version": "1.0.0",
+  "evaluation_schema_version": "1.0.0"
+}

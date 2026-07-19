@@ -77,11 +77,19 @@ The live smoke test uses `CASE_008`, makes at most one OpenAI request, and fails
 
 ## Evaluation Foundation
 
-`src/evaluation/` defines strict, provider-independent evaluation contracts and canonical JSON serialization. Evaluation is an independent repository capability: it describes expected and observed results without changing or executing the semantic pipeline.
+`src/evaluation/` defines strict, provider-independent evaluation contracts, canonical JSON serialization, and a deterministic corpus loader, validator, and coverage calculator. Evaluation is an independent repository capability: it describes expected and observed results without changing or executing the semantic pipeline.
 
-Repository-authored ground truth belongs under `evaluation/corpus/` and is authoritative. Generated observations belong under `evaluation/runs/` and are evidence, not ground truth. Accepted baselines and generated engineering reports have separate locations under `evaluation/baselines/` and `evaluation/reports/`. Evaluation metadata, engineering notes, and expected outcomes are structurally separate from the synthetic narrative and must never be submitted to semantic extraction.
+The 48-case `violence-checker-synthetic-evaluation-corpus` version `1.0.0` and its manually authored deterministic ground truth live under `evaluation/corpus/` and are authoritative. Stable case identifiers use `EVAL_001` through `EVAL_048`; cases are ordered by identifier and use bounded primary-category and documentation-quality vocabularies. Generated observations belong under `evaluation/runs/` and are evidence, not ground truth. Accepted baselines and generated engineering reports have separate locations under `evaluation/baselines/` and `evaluation/reports/`. Evaluation metadata, engineering notes, and expected outcomes are structurally separate from the synthetic narrative and must never be submitted to semantic extraction.
 
-The framework contracts and stored artifact serialization are deterministic even though future live provider output will be probabilistic. Stored run artifacts will enable later deterministic comparison. OPORD 003 does not authorize automatic pipeline modification, and this foundation makes no provider calls or semantic inferences.
+The corpus covers completed and attempted assault, threats, accidental contact, historical disclosures, negation, corrections, conflicts, object-directed aggression, self-directed violence, ambiguous encounters, incomplete reports, required documentation-quality conditions, and compound cases. Ground truth cannot be authored or repaired from provider, regex, app, or external-system output. The framework contracts and stored artifact serialization are deterministic even though future live provider output will be probabilistic. OPORD 003 does not authorize automatic pipeline modification, and corpus loading, validation, and coverage make no provider calls or semantic inferences.
+
+Validate the corpus, inspect deterministic coverage, and run evaluation tests:
+
+```sh
+.venv/bin/python -m src.evaluation.corpus validate
+.venv/bin/python -m src.evaluation.corpus coverage
+.venv/bin/python -m pytest tests/evaluation
+```
 
 ## Domain Models
 
@@ -169,6 +177,7 @@ Preview generation is declined for configuration failures, provider request fail
 ├── requirements.txt
 ├── src
 │   ├── evaluation
+│   │   ├── corpus.py
 │   │   ├── contracts.py
 │   │   └── serialization.py
 │   ├── config.py
@@ -186,6 +195,7 @@ Preview generation is declined for configuration failures, provider request fail
 │   └── executor_heartbeat.jsonl
 └── tests
     ├── evaluation
+    │   ├── test_corpus.py
     │   └── test_contracts.py
     ├── test_config_and_app.py
     ├── test_app_logic.py
@@ -217,7 +227,6 @@ Preview generation is declined for configuration failures, provider request fail
 - Workflow routing
 - Human review queues
 - Analytics dashboards
-- Production evaluation corpus and authoritative case content
 - Integrated evaluation runner and live batch execution
 - Accepted evaluation baselines and regression execution
 - Generated engineering evaluation reports

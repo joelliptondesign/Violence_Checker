@@ -119,10 +119,41 @@ class BaselineObservationCode(str, Enum):
     PROVENANCE_INCOMPATIBLE = "provenance_incompatible"
 
 
+class EvaluationCategory(str, Enum):
+    COMPLETED_PHYSICAL_ASSAULT = "completed_physical_assault"
+    ATTEMPTED_PHYSICAL_ASSAULT = "attempted_physical_assault"
+    VERBAL_THREAT = "verbal_threat"
+    ACCIDENTAL_CONTACT = "accidental_contact"
+    HISTORICAL_DISCLOSURE = "historical_disclosure"
+    NEGATED_EVENT = "negated_event"
+    CORRECTION = "correction"
+    CONFLICTING_NARRATIVE = "conflicting_narrative"
+    OBJECT_DIRECTED_AGGRESSION = "object_directed_aggression"
+    SELF_DIRECTED_VIOLENCE = "self_directed_violence"
+    AMBIGUOUS_ENCOUNTER = "ambiguous_encounter"
+    INCOMPLETE_REPORT = "incomplete_report"
+
+
+class DocumentationQualityTag(str, Enum):
+    CLEAR = "clear"
+    POOR_GRAMMAR = "poor_grammar"
+    ABBREVIATION = "abbreviation"
+    SHORTHAND = "shorthand"
+    INCOMPLETE = "incomplete"
+    CORRECTION_LANGUAGE = "correction_language"
+    CONFLICTING_ACCOUNTS = "conflicting_accounts"
+    HISTORICAL_REFERENCE = "historical_reference"
+    NEGATION_LANGUAGE = "negation_language"
+    AMBIGUOUS_PRONOUNS = "ambiguous_pronouns"
+    TEMPORAL_AMBIGUITY = "temporal_ambiguity"
+
+
 class EvaluationCaseMetadata(EvaluationContract):
     categories: List[StrictStr]
     documentation_quality_tags: List[StrictStr] = Field(default_factory=list)
     engineering_notes: Optional[StrictStr] = None
+    primary_category: Optional[EvaluationCategory] = None
+    compound: StrictBool = False
 
     @field_validator("categories", "documentation_quality_tags")
     @classmethod
@@ -139,6 +170,15 @@ class EvaluationCaseMetadata(EvaluationContract):
             raise ValueError("evaluation metadata requires at least one category")
         if self.engineering_notes is not None and not self.engineering_notes.strip():
             raise ValueError("engineering_notes must be omitted or non-empty")
+        if self.primary_category is not None:
+            allowed_categories = {item.value for item in EvaluationCategory}
+            allowed_tags = {item.value for item in DocumentationQualityTag}
+            if self.categories[0] != self.primary_category.value:
+                raise ValueError("primary_category must be the first ordered category")
+            if any(value not in allowed_categories for value in self.categories):
+                raise ValueError("authoritative categories must use bounded vocabulary")
+            if any(value not in allowed_tags for value in self.documentation_quality_tags):
+                raise ValueError("authoritative documentation tags must use bounded vocabulary")
         return self
 
 
