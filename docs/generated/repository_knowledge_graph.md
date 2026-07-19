@@ -39,9 +39,14 @@ This graph records deterministic repository relationships discoverable from file
 | `src/contracts.py` | deterministic | `DomainValidationResult`, `DomainValidationStatus`, `InputFailureCode`, `InputValidationIssue`, `InputValidationResult`, `InputValidationStatus`, `NormalizationOperation`, `NormalizedIncident`, `PipelineFailureProvenance`, `PipelineResult`, `PolicyDecision`, `PolicyOutcome`, `PolicyReasonCode`, `ProviderStructuredResponse`, `RegexResult`, `SalesforcePayload`, `SchemaValidationResult`, `SchemaValidationStatus`, `SemanticFacts`, `ValidatedSemanticFacts`, `ValidationFailureStage`, `ValidationIssue`, `ValidationIssueCode`, `ValidationResult` | 13 |
 | `src/domain_validation.py` | deterministic | none | 2 |
 | `src/evaluation/__init__.py` | deterministic | none | 0 |
+| `src/evaluation/artifact_cli.py` | deterministic | none | 3 |
+| `src/evaluation/baseline.py` | deterministic | `BaselineError`, `BaselineIssueCode` | 7 |
 | `src/evaluation/case_comparison.py` | deterministic | none | 4 |
 | `src/evaluation/contracts.py` | deterministic | `BaselineClassification`, `BaselineComparison`, `BaselineComparisonObservation`, `BaselineObservationCode`, `CaseEvaluationResult`, `CaseEvaluationStatus`, `DifferenceClassification`, `DifferenceReasonCode`, `DocumentationQualityTag`, `EvaluationArtifactProvenance`, `EvaluationCase`, `EvaluationCaseMetadata`, `EvaluationCategory`, `EvaluationContract`, `EvaluationExecutionMode`, `ExpectedEvaluationOutcome`, `ExpectedField`, `ExpectedSemanticOutcome`, `FailurePattern`, `FieldDifference`, `NonComparableReason`, `ObservedEvaluationResult`, `ObservedSemanticOutcome`, `ObservedValidationOutcome` | 18 |
-| `src/evaluation/corpus.py` | deterministic | `CorpusCoverageSummary`, `CorpusDocument`, `CorpusIssueCode`, `CorpusValidationError`, `CorpusValidationIssue`, `_DuplicateKeyError` | 11 |
+| `src/evaluation/corpus.py` | deterministic | `CorpusCoverageSummary`, `CorpusDocument`, `CorpusIssueCode`, `CorpusValidationError`, `CorpusValidationIssue`, `_DuplicateKeyError` | 10 |
+| `src/evaluation/regression.py` | deterministic | `RegressionError`, `RegressionIssueCode` | 14 |
+| `src/evaluation/regression_contracts.py` | deterministic | `AcceptedBaselineArtifact`, `BaselineAcceptanceProvenance`, `CaseRegressionResult`, `RegressionArtifact`, `RegressionExecutionSummary`, `RegressionValueChange` | 6 |
+| `src/evaluation/reporting.py` | deterministic | none | 6 |
 | `src/evaluation/run_contracts.py` | deterministic | `EvaluationExecutionSummary`, `EvaluationRunArtifact`, `EvaluationRunConfiguration`, `EvaluationRunnerMode`, `ImmutableEvaluationContract`, `ObservedCaseResult`, `ObservedPipelineComparison`, `RunArtifactStatus` | 4 |
 | `src/evaluation/runner.py` | deterministic | `RunnerError`, `RunnerIssueCode` | 13 |
 | `src/evaluation/serialization.py` | deterministic | none | 1 |
@@ -61,6 +66,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/evaluation/__init__.py` | deterministic test | none | 0 |
 | `tests/evaluation/test_contracts.py` | deterministic test | none | 30 |
 | `tests/evaluation/test_corpus.py` | deterministic test | none | 26 |
+| `tests/evaluation/test_regression.py` | deterministic test | none | 14 |
 | `tests/evaluation/test_runner.py` | deterministic test | `GroundTruthExecutor` | 22 |
 | `tests/test_app_logic.py` | deterministic test | none | 9 |
 | `tests/test_comparison.py` | deterministic test | none | 22 |
@@ -100,9 +106,14 @@ This graph records deterministic repository relationships discoverable from file
 | `src/contracts.py` | `enum`, `pydantic`, `src.models`, `typing` |
 | `src/domain_validation.py` | `src.contracts`, `src.models` |
 | `src/evaluation/__init__.py` | `.contracts`, `.serialization` |
+| `src/evaluation/artifact_cli.py` | `__future__`, `argparse`, `datetime`, `json`, `src.evaluation.baseline`, `src.evaluation.regression`, `src.evaluation.reporting`, `typing` |
+| `src/evaluation/baseline.py` | `__future__`, `datetime`, `enum`, `pathlib`, `pydantic`, `src.evaluation.corpus`, `src.evaluation.regression_contracts`, `src.evaluation.run_contracts`, `src.evaluation.serialization`, `typing` |
 | `src/evaluation/case_comparison.py` | `__future__`, `src.contracts`, `src.evaluation.contracts`, `src.evaluation.run_contracts`, `typing` |
 | `src/evaluation/contracts.py` | `__future__`, `datetime`, `enum`, `pydantic`, `src.contracts`, `src.models`, `typing` |
 | `src/evaluation/corpus.py` | `__future__`, `argparse`, `enum`, `json`, `pathlib`, `pydantic`, `src.compatibility_finding`, `src.contracts`, `src.evaluation.contracts`, `src.evaluation.serialization`, `src.policy`, `src.semantic_validation`, `typing` |
+| `src/evaluation/regression.py` | `__future__`, `collections`, `datetime`, `enum`, `pathlib`, `pydantic`, `src.evaluation.baseline`, `src.evaluation.contracts`, `src.evaluation.corpus`, `src.evaluation.regression_contracts`, `src.evaluation.run_contracts`, `src.evaluation.serialization`, `typing` |
+| `src/evaluation/regression_contracts.py` | `__future__`, `datetime`, `pydantic`, `src.evaluation.contracts`, `src.evaluation.run_contracts`, `typing` |
+| `src/evaluation/reporting.py` | `__future__`, `collections`, `pathlib`, `src.evaluation.contracts`, `src.evaluation.regression`, `src.evaluation.regression_contracts`, `typing` |
 | `src/evaluation/run_contracts.py` | `__future__`, `datetime`, `enum`, `pydantic`, `src.contracts`, `src.evaluation.contracts`, `typing` |
 | `src/evaluation/runner.py` | `__future__`, `argparse`, `collections`, `datetime`, `enum`, `json`, `pathlib`, `src.app_logic`, `src.contract_adapters`, `src.contracts`, `src.evaluation.case_comparison`, `src.evaluation.contracts`, `src.evaluation.corpus`, `src.evaluation.run_contracts`, `src.evaluation.serialization`, `src.models`, `typing` |
 | `src/evaluation/serialization.py` | `__future__`, `json`, `pydantic` |
@@ -122,6 +133,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/evaluation/__init__.py` | none |
 | `tests/evaluation/test_contracts.py` | `__future__`, `datetime`, `openai`, `pydantic`, `pytest`, `src.contracts`, `src.evaluation`, `src.models` |
 | `tests/evaluation/test_corpus.py` | `__future__`, `ast`, `hashlib`, `json`, `openai`, `pathlib`, `pytest`, `src.evaluation.contracts`, `src.evaluation.corpus`, `src.evaluation.serialization` |
+| `tests/evaluation/test_regression.py` | `__future__`, `ast`, `datetime`, `pathlib`, `pydantic`, `pytest`, `src.evaluation.artifact_cli`, `src.evaluation.baseline`, `src.evaluation.contracts`, `src.evaluation.corpus`, `src.evaluation.regression`, `src.evaluation.reporting`, `src.evaluation.run_contracts`, `src.evaluation.runner`, `src.evaluation.serialization`, `src.models`, `src.semantic_extractor` |
 | `tests/evaluation/test_runner.py` | `__future__`, `ast`, `datetime`, `hashlib`, `openai`, `pathlib`, `pydantic`, `pytest`, `src.contracts`, `src.evaluation.case_comparison`, `src.evaluation.contracts`, `src.evaluation.corpus`, `src.evaluation.run_contracts`, `src.evaluation.runner`, `src.evaluation.serialization`, `src.models`, `src.semantic_extractor` |
 | `tests/test_app_logic.py` | `importlib`, `pytest`, `src.app_logic`, `src.contracts`, `src.fixtures`, `src.models`, `src.semantic_extractor` |
 | `tests/test_comparison.py` | `src.comparison`, `src.compatibility_finding`, `src.contracts`, `src.models`, `src.semantic_extractor`, `src.semantic_validation` |
@@ -150,14 +162,19 @@ This graph records deterministic repository relationships discoverable from file
 
 | Contract | Declared in |
 | --- | --- |
+| `AcceptedBaselineArtifact` | `src/evaluation/regression_contracts.py` |
 | `AnalysisResult` | `src/app_logic.py` |
 | `AppConfig` | `src/config.py` |
+| `BaselineAcceptanceProvenance` | `src/evaluation/regression_contracts.py` |
 | `BaselineClassification` | `src/evaluation/contracts.py` |
 | `BaselineComparisonObservation` | `src/evaluation/contracts.py` |
 | `BaselineComparison` | `src/evaluation/contracts.py` |
+| `BaselineError` | `src/evaluation/baseline.py` |
+| `BaselineIssueCode` | `src/evaluation/baseline.py` |
 | `BaselineObservationCode` | `src/evaluation/contracts.py` |
 | `CaseEvaluationResult` | `src/evaluation/contracts.py` |
 | `CaseEvaluationStatus` | `src/evaluation/contracts.py` |
+| `CaseRegressionResult` | `src/evaluation/regression_contracts.py` |
 | `ComparisonResult` | `src/comparison.py` |
 | `CompatibilityFindingResult` | `src/compatibility_finding.py` |
 | `CompatibilityFindingStatus` | `src/compatibility_finding.py` |
@@ -209,6 +226,11 @@ This graph records deterministic repository relationships discoverable from file
 | `PolicyReasonCode` | `src/contracts.py` |
 | `ProviderStructuredResponse` | `src/contracts.py` |
 | `RegexResult` | `src/contracts.py` |
+| `RegressionArtifact` | `src/evaluation/regression_contracts.py` |
+| `RegressionError` | `src/evaluation/regression.py` |
+| `RegressionExecutionSummary` | `src/evaluation/regression_contracts.py` |
+| `RegressionIssueCode` | `src/evaluation/regression.py` |
+| `RegressionValueChange` | `src/evaluation/regression_contracts.py` |
 | `RunArtifactStatus` | `src/evaluation/run_contracts.py` |
 | `RunnerError` | `src/evaluation/runner.py` |
 | `RunnerIssueCode` | `src/evaluation/runner.py` |

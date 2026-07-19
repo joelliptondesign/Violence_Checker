@@ -40,9 +40,14 @@ src/contracts.py
 src/domain_validation.py
 src/evaluation/
 src/evaluation/__init__.py
+src/evaluation/artifact_cli.py
+src/evaluation/baseline.py
 src/evaluation/case_comparison.py
 src/evaluation/contracts.py
 src/evaluation/corpus.py
+src/evaluation/regression.py
+src/evaluation/regression_contracts.py
+src/evaluation/reporting.py
 src/evaluation/run_contracts.py
 src/evaluation/runner.py
 src/evaluation/serialization.py
@@ -66,6 +71,7 @@ tests/evaluation/
 tests/evaluation/__init__.py
 tests/evaluation/test_contracts.py
 tests/evaluation/test_corpus.py
+tests/evaluation/test_regression.py
 tests/evaluation/test_runner.py
 tests/test_app_logic.py
 tests/test_comparison.py

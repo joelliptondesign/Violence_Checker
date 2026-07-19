@@ -85,7 +85,9 @@ The corpus covers completed and attempted assault, threats, accidental contact, 
 
 The runner supports explicit `deterministic_test` and `live_provider` modes. Deterministic mode requires a caller-supplied semantic executor and is used by offline tests. Live mode is opt-in and reuses `run_analysis()` exactly once per case, including input validation, normalization, regex, semantic extraction, schema and domain validation, compatibility construction, policy, existing comparison, preview gating, and aggregate pipeline adaptation. Only case identifier and raw narrative enter the governed path; corpus metadata and expectations do not.
 
-Generated JSON artifacts under `evaluation/runs/` contain ordered observed evidence, case comparisons, bounded failure patterns, and deterministic summaries. Provider and infrastructure failures are non-comparable rather than semantic mismatches. Existing artifacts are never overwritten unless `--overwrite` is explicit. No accepted baseline, baseline regression comparison, or final engineering report exists.
+Generated JSON artifacts under `evaluation/runs/` contain ordered observed evidence, case comparisons, bounded failure patterns, and deterministic summaries. Provider and infrastructure failures are non-comparable rather than semantic mismatches. Existing run artifacts are never overwritten unless `--overwrite` is explicit.
+
+`src/evaluation/artifact_cli.py` manages explicit baseline acceptance, deterministic current-run comparison, and evidence-only engineering reports. Accepted baselines under `evaluation/baselines/` are immutable snapshots of ordered observed results, case evaluations, summaries, and provenance. Existing baseline paths are never overwritten; replacement requires a new baseline identifier and `--replaces` reference to the retained prior artifact. Regression artifacts under `evaluation/reports/` classify each case as `improved`, `degraded`, `unchanged`, or `incomparable`, record introduced and resolved differences and failure patterns, and summarize category, policy, validation, and provider evidence. A changed mismatch remains unchanged at the outcome level rather than being assumed improved. Markdown reports are generated deterministically from repository artifacts without a provider or another LLM.
 
 Validate the corpus, inspect deterministic coverage, and run evaluation tests:
 
@@ -109,6 +111,16 @@ Run one selected case or the complete corpus explicitly in live-provider mode:
 ```
 
 These live commands are examples only; no full live corpus run has been completed. Re-running against an existing output path requires explicit `--overwrite`.
+
+Explicitly accept a complete run, compare a current run, and generate an engineering report:
+
+```sh
+.venv/bin/python -m src.evaluation.artifact_cli accept-baseline --baseline-id BASELINE_001 --run evaluation/runs/accepted-run.json --output evaluation/baselines/baseline-001.json --acceptance-repository-commit "$(git rev-parse HEAD)"
+.venv/bin/python -m src.evaluation.artifact_cli compare-run --baseline evaluation/baselines/baseline-001.json --run evaluation/runs/current-run.json --comparison-id COMPARISON_001 --output evaluation/reports/comparison-001.json
+.venv/bin/python -m src.evaluation.artifact_cli generate-report --regression evaluation/reports/comparison-001.json --output evaluation/reports/comparison-001.md
+```
+
+To replace a reference baseline, choose a new identifier and output path and add `--replaces evaluation/baselines/baseline-001.json` to `accept-baseline`. No accepted baseline or generated engineering report is committed in the repository at this time, and no semantic improvement is claimed.
 
 ## Domain Models
 
@@ -196,9 +208,14 @@ Preview generation is declined for configuration failures, provider request fail
 ├── requirements.txt
 ├── src
 │   ├── evaluation
+│   │   ├── artifact_cli.py
+│   │   ├── baseline.py
 │   │   ├── case_comparison.py
 │   │   ├── corpus.py
 │   │   ├── contracts.py
+│   │   ├── regression.py
+│   │   ├── regression_contracts.py
+│   │   ├── reporting.py
 │   │   ├── run_contracts.py
 │   │   ├── runner.py
 │   │   └── serialization.py
@@ -219,6 +236,7 @@ Preview generation is declined for configuration failures, provider request fail
     ├── evaluation
     │   ├── test_corpus.py
     │   ├── test_contracts.py
+    │   ├── test_regression.py
     │   └── test_runner.py
     ├── test_config_and_app.py
     ├── test_app_logic.py
@@ -251,7 +269,7 @@ Preview generation is declined for configuration failures, provider request fail
 - Human review queues
 - Analytics dashboards
 - Completed live-provider evaluation execution has not been performed
-- Accepted evaluation baselines and regression execution
-- Generated engineering evaluation reports
+- Automatic baseline promotion or in-place baseline replacement
+- Automatic pipeline modification from evaluation evidence
 - CI/CD
 - Containerization

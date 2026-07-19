@@ -298,10 +298,13 @@ def test_loading_corpus_makes_zero_provider_calls(monkeypatch: pytest.MonkeyPatc
     assert len(load_corpus().cases) == 48
 
 
-def test_generated_artifact_locations_remain_placeholder_only() -> None:
-    for name in ("runs", "baselines", "reports"):
-        files = sorted(path.name for path in (REPO_ROOT / "evaluation" / name).iterdir())
-        assert files == ["README.md"]
+def test_generated_artifacts_cannot_change_corpus_authority() -> None:
+    artifact = REPO_ROOT / "evaluation" / "runs" / "test-authority-separation.json"
+    artifact.write_text('{"observed":"not corpus truth"}\n', encoding="utf-8")
+    try:
+        assert len(load_corpus().cases) == 48
+    finally:
+        artifact.unlink(missing_ok=True)
 
 
 def test_demonstration_fixture_source_remains_byte_for_byte_unchanged() -> None:

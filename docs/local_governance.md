@@ -16,6 +16,9 @@ Authorized local functions:
 - Validate the authoritative synthetic evaluation corpus: `.venv/bin/python -m src.evaluation.corpus validate`
 - Inspect deterministic corpus coverage: `.venv/bin/python -m src.evaluation.corpus coverage`
 - Validate evaluation runner configuration without provider execution: `.venv/bin/python -m src.evaluation.runner validate --mode live_provider --run-id VALIDATE_ONLY --repository-commit "$(git rev-parse HEAD)" --output evaluation/runs/validate-only.json --case EVAL_001`
+- Explicitly accept a run as an immutable baseline: `.venv/bin/python -m src.evaluation.artifact_cli accept-baseline --baseline-id BASELINE_001 --run evaluation/runs/accepted-run.json --output evaluation/baselines/baseline-001.json --acceptance-repository-commit "$(git rev-parse HEAD)"`
+- Compare a current run to an accepted baseline: `.venv/bin/python -m src.evaluation.artifact_cli compare-run --baseline evaluation/baselines/baseline-001.json --run evaluation/runs/current-run.json --comparison-id COMPARISON_001 --output evaluation/reports/comparison-001.json`
+- Generate an evidence-only engineering report: `.venv/bin/python -m src.evaluation.artifact_cli generate-report --regression evaluation/reports/comparison-001.json --output evaluation/reports/comparison-001.md`
 
 Generated artifact locations:
 
@@ -29,5 +32,5 @@ Limitations:
 - The knowledge graph is static and repository-derived; unresolved relationships remain marked unresolved.
 - The SITREC validator checks required structure and repository primacy language; it does not determine application truth.
 - The heartbeat validator checks JSONL structure for executor operation events; it does not audit operational correctness.
-- Corpus validation checks strict schema, bounded vocabulary, deterministic ordering, coverage, manually authored ground-truth consistency, and placeholder-only generated artifact locations without executing a provider.
+- Corpus validation checks strict schema, bounded vocabulary, deterministic ordering, coverage, and manually authored ground-truth consistency without executing a provider. Generated evidence locations remain outside corpus authority.
 - Divergence from foxcommand-runtime reference tooling is intentional where FoxCommand manifest lifecycle, runtime boundary, deployment, closeout, and documentation synchronization behavior is outside Violence_Checker scope.

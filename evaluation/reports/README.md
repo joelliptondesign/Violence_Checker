@@ -1,3 +1,3 @@
 # Generated Engineering Reports
 
-Canonical location for future generated engineering-oriented evaluation reports. Reports are derived artifacts and never authoritative ground truth. This directory contains no report artifacts yet.
+Canonical location for machine-readable regression comparisons and deterministic Markdown engineering reports. Reports are derived solely from repository run and baseline evidence, never authoritative ground truth, and make no provider call. Existing report artifacts cannot be overwritten. This directory contains no committed regression or report artifact.

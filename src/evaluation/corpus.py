@@ -406,30 +406,11 @@ def corpus_coverage(document: CorpusDocument) -> CorpusCoverageSummary:
     )
 
 
-def _generated_artifact_issues() -> List[CorpusValidationIssue]:
-    issues: List[CorpusValidationIssue] = []
-    for directory_name in ("runs", "baselines", "reports"):
-        directory = REPOSITORY_ROOT / "evaluation" / directory_name
-        substantive = sorted(
-            path.relative_to(REPOSITORY_ROOT).as_posix()
-            for path in directory.rglob("*")
-            if path.is_file() and path.name != "README.md"
-        )
-        for path in substantive:
-            issues.append(
-                _issue(
-                    CorpusIssueCode.GENERATED_ARTIFACT_PRESENT,
-                    f"substantive generated artifact is outside corpus authority: {path}",
-                )
-            )
-    return issues
-
-
 def load_corpus() -> CorpusDocument:
     """Load only the canonical authoritative corpus or fail atomically."""
 
     document = parse_corpus_text(AUTHORITATIVE_CORPUS_PATH.read_text(encoding="utf-8"))
-    issues = validate_corpus(document) + _generated_artifact_issues()
+    issues = validate_corpus(document)
     if issues:
         raise CorpusValidationError(issues)
     return document
