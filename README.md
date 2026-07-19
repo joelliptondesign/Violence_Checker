@@ -22,9 +22,21 @@ raw Incident narrative
 
 Raw narrative remains authoritative evidence. Provider SDK objects stop at the provider adapter. Invalid output fails closed; no stage repairs missing semantics or supplies silent defaults. The former document-level facts, compatibility finding, and operational finding are not current contracts and have no compatibility layer.
 
-## Setup and use
+## Completed recovery baseline
 
-Python 3.10 or newer is required.
+The provider returns semantic candidate content with temporary local references only. Repository code assigns incident identity, semantic and extraction contract identity, canonical identifiers and ordering, and final reference remapping before strict schema and domain validation. Provider metadata cannot override those deterministic values.
+
+The current stakeholder workflow has been verified across all eight synthetic fixtures. CASE_003 completes as a historical disclosure with no active current interpersonal violence. Representative free-form manual narratives, including supported violence, non-violence, and bounded ambiguity, traverse the same one-request pipeline; narrative wording remains user-authored and unrestricted except for deterministic input-boundary limits. Invalid input and non-analysis interactions make zero provider requests.
+
+At 390, 360, and 320 CSS pixels, the Streamlit interface has no page-level horizontal overflow, preserves technical-detail access, and stacks the primary semantic result before the regex baseline. Deployment preparation supports Streamlit secrets, environment variables, and ignored local `.env` configuration, but hosted deployment and hosted acceptance remain manual follow-on work.
+
+## Demonstration-use boundary
+
+This repository and its Streamlit interface are a synthetic demonstration only. Use the included synthetic fixtures or manually entered synthetic demonstration text. Do not submit real patient, hospital, protected health information (PHI), confidential, or production incident data. This is not a production hospital system. The Salesforce output is an illustrative preview and performs no external write.
+
+## Local setup and use
+
+Use Python 3.12 to match the hosted configuration documented below.
 
 ```sh
 python3 -m venv .venv
@@ -33,7 +45,9 @@ cp .env.example .env
 .venv/bin/streamlit run app.py
 ```
 
-Set `OPENAI_API_KEY` for live extraction. `OPENAI_MODEL` is optional and defaults to the repository demonstration model. The app starts without credentials, but an analysis request requires them.
+For local development, copy `.env.example` to the ignored `.env` file and set `OPENAI_API_KEY`. `OPENAI_MODEL` is optional and defaults to the repository demonstration model. Conventional environment variables are also supported and take precedence over values loaded from `.env`. Do not commit `.env` or `.streamlit/secrets.toml`.
+
+The app starts and renders without credentials. Pressing **Run Analysis** with valid input and no provider credential produces a bounded configuration-failure result; it does not crash the application or issue a provider request.
 
 Choose a synthetic fixture or enter a manual narrative, then press **Run Analysis**. One provider request occurs for each valid analysis action. The interface displays the original narrative, lexical baseline, proposition result, deterministic policy disposition, comparison, and policy-gated illustrative Salesforce preview.
 
@@ -42,6 +56,17 @@ The optional smoke test makes at most one provider request:
 ```sh
 .venv/bin/python -m scripts.live_smoke_test
 ```
+
+## Streamlit Community Cloud preparation
+
+No hosted deployment or hosted URL is represented by this repository state. To configure a future Streamlit Community Cloud deployment:
+
+1. Select repository `joelliptondesign/Violence_Checker`, branch `main`, and entrypoint `app.py`.
+2. In **Advanced settings**, select Python 3.12. Community Cloud selects Python there; this repository therefore does not use `runtime.txt` as a deployment control.
+3. In the Advanced settings **Secrets** field, enter `OPENAI_API_KEY` and optionally `OPENAI_MODEL` as top-level TOML keys. Enter values only in the Cloud secret manager, never in Git.
+4. Deploy only after the intended operator has reviewed the synthetic-only and no-PHI boundary.
+
+Configuration precedence is deterministic: Streamlit secrets, then conventional environment variables, then the ignored local `.env`, then the default model where applicable. Cold starts may take a few minutes while the hosted environment installs the pinned dependencies. Startup, source selection, fixture selection, and manual typing make zero provider requests. Each valid explicit analysis action makes exactly one request with SDK retries disabled.
 
 ## Evaluation
 

@@ -166,16 +166,7 @@ def _display_technical_details(result) -> None:
 def _display_results(result) -> None:
     _display_validation(result.validation_result)
 
-    regex_column, semantic_column = st.columns(2)
-    with regex_column:
-        st.header("Regex Baseline")
-        st.subheader("Detected" if result.regex_result["detected"] else "Not Detected")
-        st.write("Matched terms")
-        st.write(result.regex_result["matched_terms"] or [])
-        st.write("Matched patterns")
-        st.code("\n".join(result.regex_result["matched_patterns"]) or "No patterns matched")
-        st.caption("Illustrative lexical baseline based only on matching terms and patterns.")
-
+    semantic_column, regex_column = st.columns(2)
     with semantic_column:
         st.header("Semantic Analysis")
         st.subheader(policy_outcome_label(result.policy_decision))
@@ -191,6 +182,15 @@ def _display_results(result) -> None:
             st.write(f"- {explanation}")
         st.caption("Deterministic policy applied to a validated proposition-oriented semantic envelope.")
         _display_technical_details(result)
+
+    with regex_column:
+        st.header("Regex Baseline")
+        st.subheader("Detected" if result.regex_result["detected"] else "Not Detected")
+        st.write("Matched terms")
+        st.write(result.regex_result["matched_terms"] or [])
+        st.write("Matched patterns")
+        st.code("\n".join(result.regex_result["matched_patterns"]) or "No patterns matched")
+        st.caption("Illustrative lexical baseline based only on matching terms and patterns.")
 
     st.header("Comparison")
     if result.comparison.display_status == "Material Difference Detected":
@@ -236,6 +236,10 @@ def main() -> None:
     st.title("Phase 0 Semantic Violence Detection Pre-PoC")
     st.write(
         "Synthetic local pre-PoC for comparing an illustrative regex baseline with validated semantic extraction."
+    )
+    st.info(
+        "Synthetic demonstration only, including manual narratives. Do not submit real patient, hospital, PHI, "
+        "confidential, or production incident data. This is not a production hospital system."
     )
 
     incident, scenario_label = _selected_incident()

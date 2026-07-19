@@ -15,6 +15,7 @@ from tests.successor_helpers import envelope
 
 
 SOURCE_INSTRUCTION = "Select a fixture or enter a manual narrative, then press Run Analysis."
+DEMONSTRATION_NOTICE = "Synthetic demonstration only, including manual narratives."
 
 
 def fresh_app_test():
@@ -65,7 +66,36 @@ def test_empty_initial_state_has_no_active_workflow_or_analysis_output():
     assert app_test.radio[0].value is None
     assert len(app_test.selectbox) == len(app_test.button) == len(app_test.text_area) == 0
     assert "No active incident selected." in all_rendered_text(app_test)
+    rendered = all_rendered_text(app_test)
+    assert DEMONSTRATION_NOTICE in rendered
+    assert "Do not submit real patient, hospital, PHI" in rendered
+    assert "not a production hospital system" in rendered
     assert_no_analysis_output(app_test)
+
+
+def test_missing_provider_configuration_renders_bounded_failure_without_secret_value():
+    fixture = SYNTHETIC_INCIDENTS[0]
+    incident = fixture["incident"]
+    result = build_analysis_result(
+        incident,
+        extractor=lambda value: SemanticExtractionResult(
+            SemanticExtractionStatus.CONFIGURATION_FAILURE,
+            failure_message="OPENAI_API_KEY is required for semantic extraction.",
+        ),
+    )
+    with patch("src.app_logic.run_analysis", return_value=result) as analyzer:
+        app_test = fresh_app_test()
+        app_test.radio[0].set_value("Synthetic fixture").run()
+        app_test.selectbox[0].set_value(fixture).run()
+        app_test.button[0].click().run(timeout=10)
+
+    rendered = all_rendered_text(app_test)
+    assert "Unable to Determine" in rendered
+    assert "Semantic analysis is unavailable because the provider is not configured." in rendered
+    assert "Preview is available only after successful validated semantic extraction." in rendered
+    assert "deployment-secret" not in rendered
+    assert not any("Illustrative_" in str(item.value) for item in app_test.json)
+    assert analyzer.call_count == 1
 
 
 def test_fixture_selection_alone_shows_raw_narrative_without_analysis():
@@ -118,7 +148,7 @@ def test_rejected_manual_input_shows_bounded_failure_without_analysis_result():
     assert_no_analysis_output(app_test)
 
 
-def test_successful_run_renders_two_columns_successor_details_and_preview_once():
+def test_successful_run_renders_primary_result_before_baseline_details_and_preview_once():
     fixture = SYNTHETIC_INCIDENTS[0]
     incident = fixture["incident"]
     result = build_analysis_result(
@@ -135,6 +165,7 @@ def test_successful_run_renders_two_columns_successor_details_and_preview_once()
         app_test.button[0].click().run(timeout=10)
 
     rendered = all_rendered_text(app_test)
+    headers = header_values(app_test)
     assert "Regex Baseline" in header_values(app_test)
     assert "Semantic Analysis" in header_values(app_test)
     assert "Comparison" in header_values(app_test)
@@ -143,6 +174,8 @@ def test_successful_run_renders_two_columns_successor_details_and_preview_once()
     assert "Propositions:" in rendered
     assert "Active propositions:" in rendered
     assert "Policy version: 2.0.0" in rendered
+    assert headers.index("Semantic Analysis") < headers.index("Regex Baseline")
+    assert len(app_test.get("column")) == 4
     assert any(
         "Illustrative_Write_Disposition__c" in str(item.value)
         for item in app_test.json

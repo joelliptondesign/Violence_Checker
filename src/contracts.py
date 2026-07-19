@@ -229,6 +229,7 @@ class RegexResult(BaseModel):
 
 SEMANTIC_SCHEMA_IDENTITY = "violence-checker.proposition-semantics"
 SEMANTIC_SCHEMA_VERSION = "1.0.0"
+EXTRACTION_CONTRACT_IDENTITY = "violence-checker.proposition-extraction@1.0.0"
 POLICY_CANDIDATE_SCHEMA_IDENTITY = "violence-checker.policy-candidate"
 POLICY_CANDIDATE_SCHEMA_VERSION = "1.0.0"
 
@@ -420,7 +421,9 @@ class EvidenceSupport(BaseModel):
 class ExtractionMetadata(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid")
 
-    extraction_contract_identity: StrictStr
+    extraction_contract_identity: StrictStr = Field(
+        description="Required non-empty extraction contract identity; use violence-checker.proposition-extraction@1.0.0."
+    )
     provider_name: Optional[StrictStr] = None
     model_identifier: Optional[StrictStr] = None
     request_id: Optional[StrictStr] = None
@@ -456,8 +459,242 @@ class ViolenceSemanticEnvelope(BaseModel):
     extraction_metadata: ExtractionMetadata
 
 
-class ProviderStructuredResponse(ViolenceSemanticEnvelope):
-    """Provider-only structured response; converted before validation."""
+class ProviderEntityCandidate(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    local_ref: StrictStr
+    entity_kind: EntityKind
+    label: Optional[StrictStr] = None
+
+
+class ProviderTargetCandidate(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    target_kind: TargetKind = Field(
+        description="Use entity exactly when target_ref names a provider entity; use self or undetermined only with a null target_ref."
+    )
+    target_ref: Optional[StrictStr] = Field(
+        default=None,
+        description="Provider-local entity reference required for entity targets and forbidden for self or undetermined targets.",
+    )
+
+    @model_validator(mode="after")
+    def require_reference_shape(self) -> "ProviderTargetCandidate":
+        if self.target_kind == TargetKind.ENTITY and self.target_ref is None:
+            raise ValueError("entity target requires target_ref")
+        if self.target_kind != TargetKind.ENTITY and self.target_ref is not None:
+            raise ValueError("only entity target may contain target_ref")
+        return self
+
+
+class ProviderAttributionCandidate(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    source_kind: AttributionSourceKind
+    source_ref: Optional[StrictStr] = None
+
+
+class ProviderPropositionCandidate(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    local_ref: StrictStr
+    actor_ref: StrictStr
+    conduct_kind: ConductKind = Field(
+        description="Semantic conduct category; it must use the completion and contact tuple required by the extraction instructions."
+    )
+    target: ProviderTargetCandidate
+    completion: Completion = Field(
+        description="Physical conduct: attempted, completed, or undetermined; contact-only: completed; threat expression: threatened or undetermined; threatening movement: not_applicable or undetermined."
+    )
+    contact: Contact = Field(
+        description="Attempted physical conduct: did_not_occur; completed physical conduct or contact-only: occurred; threat expression: not_applicable."
+    )
+    temporal_scope: TemporalScope
+    intentionality: SemanticIntentionality
+    assertion_status: AssertionStatus
+    attribution: Optional[ProviderAttributionCandidate] = None
+
+    @model_validator(mode="after")
+    def require_admissible_conduct_shape(self) -> "ProviderPropositionCandidate":
+        if self.conduct_kind == ConductKind.THREAT_EXPRESSION:
+            if self.completion not in {Completion.THREATENED, Completion.UNDETERMINED} or self.contact != Contact.NOT_APPLICABLE:
+                raise ValueError("threat expression requires threatened or undetermined completion and not-applicable contact")
+        elif self.conduct_kind == ConductKind.PHYSICAL_CONDUCT:
+            if self.completion not in {Completion.ATTEMPTED, Completion.COMPLETED, Completion.UNDETERMINED}:
+                raise ValueError("physical conduct has invalid completion")
+            if self.completion == Completion.ATTEMPTED and self.contact != Contact.DID_NOT_OCCUR:
+                raise ValueError("attempted physical conduct requires did-not-occur contact")
+            if self.completion == Completion.COMPLETED and self.contact != Contact.OCCURRED:
+                raise ValueError("completed physical conduct requires occurred contact")
+        elif self.conduct_kind == ConductKind.CONTACT_ONLY:
+            if self.completion != Completion.COMPLETED or self.contact != Contact.OCCURRED:
+                raise ValueError("contact-only conduct requires completed and occurred")
+        elif self.conduct_kind == ConductKind.THREATENING_MOVEMENT:
+            if self.completion not in {Completion.NOT_APPLICABLE, Completion.UNDETERMINED}:
+                raise ValueError("threatening movement cannot be attempted or completed conduct")
+        if self.intentionality == SemanticIntentionality.ACCIDENTAL and self.conduct_kind not in {ConductKind.CONTACT_ONLY, ConductKind.PHYSICAL_CONDUCT}:
+            raise ValueError("accidental intentionality is limited to contact or physical conduct")
+        return self
+
+
+class ProviderRelationshipCandidate(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    local_ref: StrictStr
+    relationship_kind: RelationshipKind
+    source_proposition_ref: StrictStr
+    target_proposition_ref: StrictStr
+    disputed_dimensions: List[UncertaintyDimension]
+
+
+class ProviderUncertaintyCandidate(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    local_ref: StrictStr
+    proposition_ref: StrictStr
+    dimension: UncertaintyDimension
+    note: Optional[StrictStr] = None
+
+
+class ProviderEvidenceCandidate(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    local_ref: StrictStr
+    text: StrictStr
+
+
+class ProviderEvidenceSupportCandidate(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    evidence_ref: StrictStr
+    subject_kind: EvidenceSubjectKind
+    subject_ref: StrictStr
+    role: EvidenceSupportRole
+
+    @model_validator(mode="after")
+    def require_role_allowed_for_subject_kind(self) -> "ProviderEvidenceSupportCandidate":
+        allowed = {
+            EvidenceSubjectKind.PROPOSITION: {EvidenceSupportRole.SUPPORTS_ASSERTION, EvidenceSupportRole.SUPPORTS_NEGATION},
+            EvidenceSubjectKind.RELATIONSHIP: {EvidenceSupportRole.SUPPORTS_NEGATION, EvidenceSupportRole.SUPPORTS_SUPERSESSION, EvidenceSupportRole.SUPPORTS_CONFLICT},
+            EvidenceSubjectKind.UNCERTAINTY: {EvidenceSupportRole.SUPPORTS_UNCERTAINTY},
+        }[self.subject_kind]
+        if self.role not in allowed:
+            raise ValueError("evidence role is not allowed for provider subject kind")
+        return self
+
+
+class ProviderStructuredResponse(BaseModel):
+    """Strict provider-only semantic candidates; all local references terminate at the adapter."""
+
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    entities: List[ProviderEntityCandidate]
+    propositions: List[ProviderPropositionCandidate]
+    relationships: List[ProviderRelationshipCandidate]
+    uncertainties: List[ProviderUncertaintyCandidate]
+    evidence_excerpts: List[ProviderEvidenceCandidate]
+    evidence_supports: List[ProviderEvidenceSupportCandidate] = Field(
+        description="Must contain at least one coherent evidence support for every proposition, relationship, and uncertainty."
+    )
+
+    @model_validator(mode="before")
+    @classmethod
+    def discard_obsolete_repository_metadata(cls, value: object) -> object:
+        """Accept legacy callers without restoring provider metadata authority."""
+        if isinstance(value, dict) and "extraction_metadata" in value:
+            value = {key: item for key, item in value.items() if key != "extraction_metadata"}
+        return value
+
+    @field_validator(
+        "entities",
+        "propositions",
+        "relationships",
+        "uncertainties",
+        "evidence_excerpts",
+    )
+    @classmethod
+    def require_unique_local_references(cls, value: List[BaseModel]) -> List[BaseModel]:
+        references = [item.local_ref for item in value]
+        if any(not reference.strip() for reference in references):
+            raise ValueError("provider local references must not be empty")
+        if len(references) != len(set(references)):
+            raise ValueError("provider local references must be unique within each collection")
+        return value
+
+    @model_validator(mode="after")
+    def require_admissible_uncertainty_and_support(self) -> "ProviderStructuredResponse":
+        entities = {item.local_ref: item for item in self.entities}
+        propositions = {item.local_ref: item for item in self.propositions}
+        relationships = {item.local_ref: item for item in self.relationships}
+        uncertainties = {item.local_ref: item for item in self.uncertainties}
+        conflict_dimensions: Dict[str, set[UncertaintyDimension]] = {}
+        for relationship in self.relationships:
+            if relationship.relationship_kind == RelationshipKind.CONFLICTS_WITH:
+                for reference in (relationship.source_proposition_ref, relationship.target_proposition_ref):
+                    conflict_dimensions.setdefault(reference, set()).update(relationship.disputed_dimensions)
+
+        for uncertainty in self.uncertainties:
+            proposition = propositions.get(uncertainty.proposition_ref)
+            if proposition is None or proposition.actor_ref not in entities:
+                continue
+            target_entity = entities.get(proposition.target.target_ref) if proposition.target.target_ref else None
+            if proposition.target.target_kind == TargetKind.SELF:
+                direction = Direction.SELF_DIRECTED
+            elif proposition.target.target_kind != TargetKind.ENTITY or target_entity is None:
+                direction = Direction.UNDETERMINED
+            elif target_entity.entity_kind == EntityKind.OBJECT:
+                direction = Direction.OBJECT_DIRECTED
+            elif target_entity.entity_kind in {EntityKind.PERSON, EntityKind.PEOPLE_COLLECTIVE} and proposition.actor_ref != proposition.target.target_ref and entities[proposition.actor_ref].entity_kind != EntityKind.UNSPECIFIED:
+                direction = Direction.INTERPERSONAL
+            else:
+                direction = Direction.UNDETERMINED
+            unresolved = {
+                UncertaintyDimension.ACTOR_IDENTITY: entities[proposition.actor_ref].entity_kind == EntityKind.UNSPECIFIED,
+                UncertaintyDimension.TARGET_IDENTITY: proposition.target.target_kind == TargetKind.UNDETERMINED or (target_entity is not None and target_entity.entity_kind == EntityKind.UNSPECIFIED),
+                UncertaintyDimension.CONDUCT_TYPE: proposition.conduct_kind == ConductKind.UNDETERMINED,
+                UncertaintyDimension.DIRECTION: direction == Direction.UNDETERMINED,
+                UncertaintyDimension.CONTACT: proposition.contact == Contact.UNDETERMINED,
+                UncertaintyDimension.COMPLETION: proposition.completion == Completion.UNDETERMINED,
+                UncertaintyDimension.INTENTIONALITY: proposition.intentionality == SemanticIntentionality.UNDETERMINED,
+                UncertaintyDimension.TEMPORAL_SCOPE: proposition.temporal_scope == TemporalScope.UNDETERMINED,
+                UncertaintyDimension.THREAT_MEANING: proposition.conduct_kind in {ConductKind.THREAT_EXPRESSION, ConductKind.THREATENING_MOVEMENT, ConductKind.UNDETERMINED},
+                UncertaintyDimension.ASSERTION_STATUS: proposition.assertion_status == AssertionStatus.UNCERTAIN,
+            }[uncertainty.dimension]
+            disputed = uncertainty.dimension in conflict_dimensions.get(proposition.local_ref, set())
+            if not unresolved and not disputed:
+                raise ValueError("provider uncertainty must identify an unresolved or disputed dimension")
+
+        for support in self.evidence_supports:
+            if support.subject_kind == EvidenceSubjectKind.PROPOSITION:
+                subject = propositions.get(support.subject_ref)
+                if subject is None:
+                    continue
+                expected = EvidenceSupportRole.SUPPORTS_NEGATION if subject.assertion_status == AssertionStatus.NEGATED else EvidenceSupportRole.SUPPORTS_ASSERTION
+            elif support.subject_kind == EvidenceSubjectKind.RELATIONSHIP:
+                subject = relationships.get(support.subject_ref)
+                if subject is None:
+                    continue
+                expected = {
+                    RelationshipKind.NEGATES: EvidenceSupportRole.SUPPORTS_NEGATION,
+                    RelationshipKind.SUPERSEDES: EvidenceSupportRole.SUPPORTS_SUPERSESSION,
+                    RelationshipKind.CONFLICTS_WITH: EvidenceSupportRole.SUPPORTS_CONFLICT,
+                }[subject.relationship_kind]
+            else:
+                if support.subject_ref not in uncertainties:
+                    continue
+                expected = EvidenceSupportRole.SUPPORTS_UNCERTAINTY
+            if support.role != expected:
+                raise ValueError("provider evidence role is incoherent with its referenced subject")
+
+        supported = {(item.subject_kind, item.subject_ref) for item in self.evidence_supports}
+        required = (
+            {(EvidenceSubjectKind.PROPOSITION, item.local_ref) for item in self.propositions}
+            | {(EvidenceSubjectKind.RELATIONSHIP, item.local_ref) for item in self.relationships}
+            | {(EvidenceSubjectKind.UNCERTAINTY, item.local_ref) for item in self.uncertainties}
+        )
+        if required - supported:
+            raise ValueError("every provider proposition, relationship, and uncertainty requires evidence support")
+        return self
 
 
 class DerivedProposition(BaseModel):

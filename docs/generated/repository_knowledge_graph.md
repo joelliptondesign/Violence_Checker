@@ -33,9 +33,9 @@ This graph records deterministic repository relationships discoverable from file
 | `scripts/live_smoke_test.py` | deterministic | none | 1 |
 | `src/app_logic.py` | deterministic application component | `AnalysisResult` | 6 |
 | `src/comparison.py` | deterministic application component | `ComparisonResult` | 1 |
-| `src/config.py` | provider-facing | `AppConfig` | 1 |
+| `src/config.py` | provider-facing | `AppConfig` | 3 |
 | `src/contract_adapters.py` | deterministic | none | 2 |
-| `src/contracts.py` | deterministic | `AssertionStatus`, `Attribution`, `AttributionSourceKind`, `Completion`, `ConductKind`, `Contact`, `DerivedProposition`, `DerivedSemanticView`, `Direction`, `DomainValidationResult`, `DomainValidationStatus`, `EntityKind`, `EntityReference`, `EvidenceExcerpt`, `EvidenceSubjectKind`, `EvidenceSupport`, `EvidenceSupportRole`, `ExtractionMetadata`, `InputFailureCode`, `InputValidationIssue`, `InputValidationResult`, `InputValidationStatus`, `NormalizationOperation`, `NormalizedIncident`, `PipelineFailureProvenance`, `PipelineResult`, `PolicyCandidateView`, `PolicyDecision`, `PolicyOutcome`, `PolicyReasonCode`, `PropositionTarget`, `ProviderStructuredResponse`, `RegexResult`, `RelationshipKind`, `SalesforcePayload`, `SchemaValidationResult`, `SchemaValidationStatus`, `SemanticIntentionality`, `SemanticRelationship`, `SemanticUncertainty`, `TargetKind`, `TemporalScope`, `UncertaintyDimension`, `ValidatedSemanticEnvelope`, `ValidationFailureStage`, `ValidationIssue`, `ValidationIssueCode`, `ValidationResult`, `ViolenceProposition`, `ViolenceSemanticEnvelope` | 15 |
+| `src/contracts.py` | deterministic | `AssertionStatus`, `Attribution`, `AttributionSourceKind`, `Completion`, `ConductKind`, `Contact`, `DerivedProposition`, `DerivedSemanticView`, `Direction`, `DomainValidationResult`, `DomainValidationStatus`, `EntityKind`, `EntityReference`, `EvidenceExcerpt`, `EvidenceSubjectKind`, `EvidenceSupport`, `EvidenceSupportRole`, `ExtractionMetadata`, `InputFailureCode`, `InputValidationIssue`, `InputValidationResult`, `InputValidationStatus`, `NormalizationOperation`, `NormalizedIncident`, `PipelineFailureProvenance`, `PipelineResult`, `PolicyCandidateView`, `PolicyDecision`, `PolicyOutcome`, `PolicyReasonCode`, `PropositionTarget`, `ProviderAttributionCandidate`, `ProviderEntityCandidate`, `ProviderEvidenceCandidate`, `ProviderEvidenceSupportCandidate`, `ProviderPropositionCandidate`, `ProviderRelationshipCandidate`, `ProviderStructuredResponse`, `ProviderTargetCandidate`, `ProviderUncertaintyCandidate`, `RegexResult`, `RelationshipKind`, `SalesforcePayload`, `SchemaValidationResult`, `SchemaValidationStatus`, `SemanticIntentionality`, `SemanticRelationship`, `SemanticUncertainty`, `TargetKind`, `TemporalScope`, `UncertaintyDimension`, `ValidatedSemanticEnvelope`, `ValidationFailureStage`, `ValidationIssue`, `ValidationIssueCode`, `ValidationResult`, `ViolenceProposition`, `ViolenceSemanticEnvelope` | 20 |
 | `src/domain_validation.py` | deterministic | none | 7 |
 | `src/evaluation/__init__.py` | deterministic | none | 0 |
 | `src/evaluation/artifact_cli.py` | deterministic | none | 3 |
@@ -56,7 +56,7 @@ This graph records deterministic repository relationships discoverable from file
 | `src/narrative_normalizer.py` | deterministic | none | 1 |
 | `src/policy.py` | deterministic | none | 4 |
 | `src/presentation.py` | deterministic | none | 5 |
-| `src/provider_adapter.py` | deterministic | none | 1 |
+| `src/provider_adapter.py` | deterministic | none | 7 |
 | `src/regex_baseline.py` | deterministic application component | none | 1 |
 | `src/salesforce_preview.py` | provider-facing | none | 2 |
 | `src/schema_validation.py` | deterministic | none | 3 |
@@ -74,9 +74,9 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/successor_helpers.py` | deterministic test | none | 1 |
 | `tests/test_app_logic.py` | deterministic test | none | 5 |
 | `tests/test_comparison.py` | deterministic test | none | 5 |
-| `tests/test_config_and_app.py` | deterministic test | none | 4 |
-| `tests/test_contracts.py` | deterministic test | none | 5 |
-| `tests/test_fixture_policy_regression.py` | deterministic test | none | 2 |
+| `tests/test_config_and_app.py` | deterministic test | none | 10 |
+| `tests/test_contracts.py` | deterministic test | none | 13 |
+| `tests/test_fixture_policy_regression.py` | deterministic test | `Responses` | 5 |
 | `tests/test_fixtures.py` | deterministic test | none | 3 |
 | `tests/test_input_boundary.py` | deterministic test | none | 6 |
 | `tests/test_models.py` | deterministic test | none | 3 |
@@ -85,11 +85,11 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_regex_baseline.py` | deterministic test | none | 9 |
 | `tests/test_repo_governance.py` | deterministic test | none | 12 |
 | `tests/test_salesforce_preview.py` | deterministic test | none | 4 |
-| `tests/test_semantic_authority_boundary.py` | deterministic test | none | 3 |
-| `tests/test_semantic_extractor.py` | deterministic test | `FakeClient`, `FakeResponses`, `RaisingResponses` | 9 |
-| `tests/test_semantic_prompt.py` | deterministic test | none | 2 |
+| `tests/test_semantic_authority_boundary.py` | deterministic test | none | 7 |
+| `tests/test_semantic_extractor.py` | deterministic test | `FakeClient`, `FakeResponses`, `RaisingResponses` | 12 |
+| `tests/test_semantic_prompt.py` | deterministic test | none | 5 |
 | `tests/test_semantic_validation.py` | deterministic test | none | 10 |
-| `tests/test_streamlit_empty_state.py` | deterministic test | none | 12 |
+| `tests/test_streamlit_empty_state.py` | deterministic test | none | 13 |
 | `tests/test_successor_downstream_authority.py` | deterministic test | none | 5 |
 | `tests/test_successor_policy_authority.py` | deterministic test | none | 7 |
 | `tests/test_successor_validation_authority.py` | deterministic test | none | 16 |
@@ -109,7 +109,7 @@ This graph records deterministic repository relationships discoverable from file
 | `scripts/live_smoke_test.py` | `src.config`, `src.fixtures`, `src.semantic_extractor`, `src.semantic_validation` |
 | `src/app_logic.py` | `dataclasses`, `src.comparison`, `src.contracts`, `src.input_validation`, `src.models`, `src.narrative_normalizer`, `src.policy`, `src.regex_baseline`, `src.salesforce_preview`, `src.semantic_extractor`, `src.semantic_validation`, `typing` |
 | `src/comparison.py` | `dataclasses`, `src.contracts`, `src.models`, `src.semantic_extractor`, `typing` |
-| `src/config.py` | `dotenv`, `os`, `pathlib`, `pydantic`, `typing` |
+| `src/config.py` | `dotenv`, `os`, `pathlib`, `pydantic`, `streamlit`, `typing` |
 | `src/contract_adapters.py` | `src.app_logic`, `src.contracts`, `typing` |
 | `src/contracts.py` | `enum`, `pydantic`, `src.models`, `typing` |
 | `src/domain_validation.py` | `src.contracts` |
@@ -132,7 +132,7 @@ This graph records deterministic repository relationships discoverable from file
 | `src/narrative_normalizer.py` | `re`, `src.contracts`, `src.models`, `unicodedata` |
 | `src/policy.py` | `src.contracts`, `typing` |
 | `src/presentation.py` | `src.contracts`, `typing` |
-| `src/provider_adapter.py` | `src.contracts` |
+| `src/provider_adapter.py` | `collections`, `src.contracts`, `src.models`, `typing` |
 | `src/regex_baseline.py` | `re`, `typing` |
 | `src/salesforce_preview.py` | `src.contracts`, `typing` |
 | `src/schema_validation.py` | `re`, `src.contracts`, `typing` |
@@ -151,8 +151,8 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_app_logic.py` | `src.app_logic`, `src.contracts`, `src.models`, `src.semantic_extractor`, `tests.successor_helpers` |
 | `tests/test_comparison.py` | `src.app_logic`, `src.contracts`, `src.models`, `src.semantic_extractor`, `tests.successor_helpers` |
 | `tests/test_config_and_app.py` | `importlib` |
-| `tests/test_contracts.py` | `pydantic`, `pytest`, `src.contracts`, `src.provider_adapter`, `tests.successor_helpers` |
-| `tests/test_fixture_policy_regression.py` | `src.app_logic`, `src.contracts`, `src.fixtures`, `src.semantic_extractor`, `tests.successor_helpers` |
+| `tests/test_contracts.py` | `pydantic`, `pytest`, `src.contracts`, `src.models`, `src.provider_adapter`, `tests.successor_helpers` |
+| `tests/test_fixture_policy_regression.py` | `src.app_logic`, `src.config`, `src.contracts`, `src.fixtures`, `src.presentation`, `src.semantic_extractor`, `tests.successor_helpers` |
 | `tests/test_fixtures.py` | `src.fixtures` |
 | `tests/test_input_boundary.py` | `pytest`, `src.app_logic`, `src.contracts`, `src.fixtures`, `src.input_validation`, `src.models`, `src.narrative_normalizer`, `src.semantic_extractor`, `tests.successor_helpers` |
 | `tests/test_models.py` | `pydantic`, `pytest`, `src.models` |
@@ -161,7 +161,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_regex_baseline.py` | `src.fixtures`, `src.regex_baseline` |
 | `tests/test_repo_governance.py` | `__future__`, `importlib`, `json`, `pathlib`, `subprocess`, `sys`, `tools.repo_governance` |
 | `tests/test_salesforce_preview.py` | `pytest`, `src.contracts`, `src.policy`, `src.salesforce_preview`, `src.semantic_validation`, `tests.successor_helpers` |
-| `tests/test_semantic_authority_boundary.py` | `ast`, `pathlib`, `src.contracts`, `src.provider_adapter`, `tests.successor_helpers` |
+| `tests/test_semantic_authority_boundary.py` | `ast`, `pathlib`, `pydantic`, `pytest`, `src.contracts`, `src.models`, `src.provider_adapter`, `src.semantic_validation`, `tests.successor_helpers` |
 | `tests/test_semantic_extractor.py` | `importlib`, `src.config`, `src.models`, `src.semantic_extractor`, `tests.successor_helpers` |
 | `tests/test_semantic_prompt.py` | `src.semantic_prompt` |
 | `tests/test_semantic_validation.py` | `copy`, `pytest`, `src.contracts`, `src.domain_validation`, `src.evaluation.corpus`, `src.schema_validation`, `src.semantic_validation`, `tests.successor_helpers` |
@@ -259,7 +259,15 @@ This graph records deterministic repository relationships discoverable from file
 | `PolicyOutcome` | `src/contracts.py` |
 | `PolicyReasonCode` | `src/contracts.py` |
 | `PropositionTarget` | `src/contracts.py` |
+| `ProviderAttributionCandidate` | `src/contracts.py` |
+| `ProviderEntityCandidate` | `src/contracts.py` |
+| `ProviderEvidenceCandidate` | `src/contracts.py` |
+| `ProviderEvidenceSupportCandidate` | `src/contracts.py` |
+| `ProviderPropositionCandidate` | `src/contracts.py` |
+| `ProviderRelationshipCandidate` | `src/contracts.py` |
 | `ProviderStructuredResponse` | `src/contracts.py` |
+| `ProviderTargetCandidate` | `src/contracts.py` |
+| `ProviderUncertaintyCandidate` | `src/contracts.py` |
 | `RegexResult` | `src/contracts.py` |
 | `RegressionArtifact` | `src/evaluation/regression_contracts.py` |
 | `RegressionError` | `src/evaluation/regression.py` |

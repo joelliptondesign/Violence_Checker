@@ -17,7 +17,9 @@ Document-level `SemanticFacts`, compatibility findings, and `operational_finding
 
 ## Execution sequence
 
-`run_analysis()` validates the incident, normalizes narrative formatting, runs the deterministic regex baseline, and invokes semantic extraction once. `extract_semantic_envelope()` performs exactly one Responses API structured-output request. `provider_adapter.py` immediately converts the structured provider response into the provider-independent envelope; no provider object crosses that boundary.
+`run_analysis()` validates the incident, normalizes narrative formatting, runs the deterministic regex baseline, and invokes semantic extraction once. `extract_semantic_envelope()` performs exactly one Responses API structured-output request with SDK retries disabled. The provider-facing contract contains semantic candidates and temporary local references only. It does not author incident identity, extraction metadata, schema identity/version, canonical identifiers, canonical ordering, or final references.
+
+`provider_adapter.py` immediately terminates the provider object and deterministically assigns the validated incident identity, semantic schema identity/version, extraction contract identity, canonical entity/proposition/relationship/uncertainty/evidence/support identifiers, collection ordering, and final reference remapping. Obsolete provider-supplied extraction metadata is discarded and cannot override repository values.
 
 Schema validation establishes exact contract shape, schema identity, bounded vocabularies, identifier form, uniqueness, canonical collection order, and reference integrity. Domain validation independently checks evidence containment, semantic combinations, relationship meaning, cycles, uncertainty scoping, attribution, and incident identity. Invalid candidates stop before derivation or policy; validators do not repair them.
 
@@ -36,6 +38,14 @@ Provider confidence and free-form prose never decide policy. Presentation, regex
 
 `PipelineResult` carries the original incident, normalized narrative, regex result, validation statuses, the optional validated `semantic_envelope`, optional `derived_semantics`, policy decision, and typed failure provenance. Success requires all current successor stages. No ad hoc semantic dictionary connects major stages.
 
+## Interaction and verification boundary
+
+Narrative wording is user-authored free-form evidence. Deterministic input rules reject malformed, empty, whitespace-only, non-substantive, invalid-code-point, or over-20,000-character input before extraction; they do not constrain narrative semantics or vocabulary.
+
+Import, startup, source selection, fixture selection, and manual typing issue zero provider requests. Invalid submission also issues zero. Each valid explicit **Run Analysis** action issues exactly one request. There is no automatic analysis, retry, critic, repair, fallback, batch, or unattended inference path.
+
+Repository verification covers all eight stakeholder fixtures, CASE_003 historical-disclosure behavior, and representative free-form manual narratives. Mobile inspection at 390, 360, and 320 CSS pixels confirmed responsive stacking without page-level overflow and primary semantic meaning before regex detail.
+
 ## Evaluation boundary
 
 Current evaluation uses corpus/evaluation schema `2.0.0`, successor semantic identity/version provenance, typed expected envelopes and derived views, proposition-addressed deterministic difference paths, and separately asserted validation and policy expectations. The current authoritative corpus is `evaluation/corpus/successor_corpus.json`.
@@ -46,6 +56,8 @@ Creation-time corpus, runs, accepted baseline, comparison, and engineering repor
 
 ## Operational boundaries
 
-The application is a local demonstration. Salesforce output is an illustrative dictionary only. There are no credentials, Salesforce identifiers, connections, writes, automated interventions, or claims that the policy constitutes clinical, legal, or safety judgment.
+The application is a synthetic demonstration. Salesforce output is an illustrative dictionary only. Real patient, hospital, PHI, confidential, and production incident data must not be submitted. There are no committed credentials, Salesforce identifiers, connections, writes, automated interventions, or claims that the policy constitutes clinical, legal, or safety judgment.
+
+Configuration precedence is Streamlit secrets, conventional environment variables, ignored local `.env`, and then the default model where applicable. `app.py` is prepared as the sole Streamlit Community Cloud entrypoint with pinned dependencies and bounded missing-configuration behavior. Hosted deployment and hosted acceptance have not occurred; deployment remains a manual operator action.
 
 The approved design basis, successor specification, and migration strategy remain under `docs/`. They describe why this architecture is bounded and how creation-time evidence is isolated.

@@ -47,7 +47,7 @@ The default output is `docs/SITREC - <date> Violence Checker Successor Semantic 
 - successor corpus validation and deterministic coverage; and
 - the complete automated test suite.
 
-Use `baseline-readiness --skip-tests` only when the complete suite was already run against the same unchanged working state. The command does not stage, commit, call a provider, accept a baseline, or mutate historical evidence.
+Use `baseline-readiness --skip-tests` only when the complete suite was already run against the same unchanged working state. Before commit it accepts an unstaged candidate but rejects staged paths; after commit it should run against a clean worktree. The command does not stage, commit, call a provider, accept a baseline, or mutate historical evidence.
 
 ## Generated artifacts
 

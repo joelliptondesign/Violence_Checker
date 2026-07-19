@@ -45,6 +45,26 @@ def test_extractor_makes_exactly_one_request_and_returns_typed_candidate():
     assert client.responses.calls[0]["input"] == narrative
 
 
+def test_default_provider_client_disables_sdk_retries(monkeypatch):
+    narrative = "Patient struck the nurse."
+    client = FakeClient(envelope(narrative=narrative, provider=True))
+    constructor_calls = []
+
+    def fake_openai(**kwargs):
+        constructor_calls.append(kwargs)
+        return client
+
+    monkeypatch.setattr("src.semantic_extractor.OpenAI", fake_openai)
+    result = extract_semantic_envelope(
+        Incident(incident_id="CASE_001", narrative=narrative),
+        config=AppConfig(openai_api_key="test", openai_model="test-model"),
+    )
+
+    assert result.status == SemanticExtractionStatus.SUCCESS
+    assert constructor_calls == [{"api_key": "test", "max_retries": 0}]
+    assert len(client.responses.calls) == 1
+
+
 def test_missing_configuration_fails_without_request():
     result = extract_semantic_envelope(
         Incident(incident_id="CASE_001", narrative="text"),
@@ -107,3 +127,16 @@ def test_request_contains_only_prompt_model_contract_and_narrative():
     assert call["model"] == "test-model"
     assert call["input"] == narrative
     assert call["text_format"].__name__ == "ProviderStructuredResponse"
+
+
+def test_arbitrary_free_form_manual_narrative_crosses_provider_boundary_unchanged():
+    narrative = "At 02:13—after saying, ‘leave me alone!’—A struck B twice. [manual note #47]"
+    client = FakeClient(envelope(narrative=narrative, provider=True))
+    result = extract_semantic_envelope(
+        Incident(incident_id="MANUAL", narrative=narrative),
+        config=AppConfig(openai_api_key="test", openai_model="test-model"),
+        client=client,
+    )
+    assert result.status == SemanticExtractionStatus.SUCCESS
+    assert len(client.responses.calls) == 1
+    assert client.responses.calls[0]["input"] == narrative

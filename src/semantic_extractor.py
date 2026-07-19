@@ -50,7 +50,10 @@ def extract_semantic_envelope(
             failure_message="OPENAI_API_KEY is required for semantic extraction.",
         )
 
-    resolved_client = client or OpenAI(api_key=resolved_config.openai_api_key)
+    resolved_client = client or OpenAI(
+        api_key=resolved_config.openai_api_key,
+        max_retries=0,
+    )
 
     try:
         response = resolved_client.responses.parse(
@@ -83,8 +86,8 @@ def extract_semantic_envelope(
         )
 
     try:
-        semantic_candidate = semantic_candidate_from_provider_response(parsed)
-    except ValidationError as exc:
+        semantic_candidate = semantic_candidate_from_provider_response(parsed, incident=incident)
+    except (ValidationError, ValueError, TypeError) as exc:
         return SemanticExtractionResult(
             status=SemanticExtractionStatus.VALIDATION_FAILURE,
             failure_message=exc.__class__.__name__,

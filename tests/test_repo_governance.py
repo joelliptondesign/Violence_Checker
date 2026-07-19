@@ -62,8 +62,15 @@ def test_heartbeat_jsonl_validation_accepts_local_telemetry() -> None:
 
 def test_sitrec_validation_accepts_current_active_sitrec() -> None:
     findings = governance.validate_sitrec_file(ACTIVE_SITREC)
+    text = ACTIVE_SITREC.read_text(encoding="utf-8")
 
     assert findings == []
+    assert "Provider authority is limited to semantic candidates" in text
+    assert "CASE_003" in text
+    assert "all eight stakeholder fixtures" in text
+    assert "390, 360, and 320 CSS pixels" in text
+    assert "Streamlit Community Cloud deployment remains a manual operator follow-on" in text
+    assert "no hosted deployment, hosted URL, or hosted acceptance is claimed" in text
 
 
 def test_sitrec_lifecycle_selects_one_newest_current_record() -> None:

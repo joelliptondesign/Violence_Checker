@@ -11,16 +11,17 @@ Repository: `Violence_Checker`. This is a local Python and Streamlit demonstrati
 
 ## B. CURRENT STATE
 
-Current repository facts: the approved successor architecture is active across provider output, validation, derivation, policy, application orchestration, downstream presentation, and evaluation. `ViolenceSemanticEnvelope` is the sole current semantic authority. The repository-authored `violence-checker-synthetic-proposition-evaluation-corpus` contains 48 synthetic cases under evaluation schema `2.0.0`. Creation-time artifacts remain immutable and readable only through their creation-time schema family.
+Current repository facts: the approved successor architecture is active across provider extraction, deterministic adaptation, validation, derivation, policy, application orchestration, downstream presentation, and evaluation. `ViolenceSemanticEnvelope` is the sole current semantic authority. Live provider execution is restored: CASE_003, all eight stakeholder fixtures, and representative free-form manual narratives have completed their authorized workflows. Mobile usability is verified, and local plus Streamlit Community Cloud configuration is deployment-ready. The repository-authored `violence-checker-synthetic-proposition-evaluation-corpus` contains 48 synthetic cases under evaluation schema `2.0.0`. Creation-time artifacts remain immutable and readable only through their creation-time schema family.
 
 ## C. CORE INVARIANTS
 
-- Raw narrative is the evidence authority; normalization is formatting-only.
-- Exactly one provider request is permitted per valid analysis or selected live evaluation case.
-- Provider SDK objects terminate at the adapter boundary.
+- Raw free-form narrative is the evidence authority; normalization is formatting-only.
+- Exactly one provider request is permitted per valid explicit analysis or selected live evaluation case; non-analysis interactions and invalid input issue zero.
+- Provider authority is limited to semantic candidates with temporary local references; provider SDK objects terminate at the adapter boundary.
+- Repository code owns incident identity, extraction metadata, semantic schema identity/version, canonical identifiers, ordering, final references, validation, derivation, policy, and downstream representation.
 - Schema validation and violence-domain validation fail closed before policy.
 - Derivation, policy, presentation, comparison, serialization, and reporting are deterministic.
-- No silent semantic defaults, output-derived ground truth, compatibility reconstruction, or dual current semantic authority is permitted.
+- No retries, semantic repair, silent semantic defaults, output-derived ground truth, compatibility reconstruction, or dual current semantic authority is permitted.
 - Historical evaluation artifacts remain byte-immutable and cannot be promoted into the successor baseline family.
 
 ## D. SYSTEM MODEL
@@ -32,9 +33,9 @@ Current repository facts: the approved successor architecture is active across p
 | Component | Authority |
 | --- | --- |
 | Repository-authored corpus | Synthetic evaluation ground truth |
-| Raw narrative | Evidence and excerpt-containment authority |
-| Provider | Bounded candidate semantic claims only |
-| Contract adapter | Provider-object termination and typed conversion |
+| Raw narrative | Free-form evidence and excerpt-containment authority |
+| Provider | Bounded candidate semantic claims with temporary local references only |
+| Contract adapter | Provider termination; repository-owned incident/schema/extraction identity, canonical IDs/order, and final reference remapping |
 | Schema/domain validators | Admissibility and fail-closed rejection |
 | Semantic derivation | Typed active-set and direction views |
 | Deterministic policy | Sole illustrative disposition authority |
@@ -43,31 +44,31 @@ Current repository facts: the approved successor architecture is active across p
 
 ## F. DATA / CONTRACT MODEL
 
-Semantic schema `violence-checker.proposition-semantics` version `1.0.0` defines typed entities, propositions, relationships, uncertainties, evidence excerpts, evidence supports, and extraction metadata. `PipelineResult` carries the semantic envelope, derived view, validation outcome, and policy result without a compatibility or operational-finding authority. Current evaluation artifacts use schema `2.0.0`; recognized creation-time artifacts use schema `1.0.0` and remain intentionally incomparable with successor artifacts.
+Semantic schema `violence-checker.proposition-semantics` version `1.0.0` defines typed entities, propositions, relationships, uncertainties, evidence excerpts, evidence supports, and repository-assigned extraction metadata. The extraction contract identity is deterministic and cannot be overridden by provider output. `PipelineResult` carries the semantic envelope, derived view, validation outcome, and policy result without a compatibility or operational-finding authority. Current evaluation artifacts use schema `2.0.0`; recognized creation-time artifacts use schema `1.0.0` and remain intentionally incomparable with successor artifacts.
 
 ## G. SYSTEM BOUNDARIES
 
-The repository does not provide a real Salesforce connection or write, clinical decision support, legal or safety determination, hospital workflow, production deployment, PHI handling, external persistence, authentication, customer-authority control, or FoxCommand Runtime integration. Provider types and provider-authored disposition do not cross the provider boundary.
+The repository does not provide a real Salesforce connection or write, clinical decision support, legal or safety determination, hospital workflow, PHI handling, external persistence, authentication, customer-authority control, or FoxCommand Runtime integration. Synthetic-only and no-PHI notices are mandatory. Streamlit Community Cloud deployment remains a manual operator follow-on; no hosted deployment, hosted URL, or hosted acceptance is claimed. Provider types, provider metadata authority, and provider-authored disposition do not cross the provider boundary.
 
 ## H. CURRENT CAPABILITIES
 
-The app accepts fixtures or manual narratives, shows lexical and proposition results, applies total deterministic policy, and builds a policy-gated illustrative Salesforce preview. Offline evaluation validates 48 successor cases and supports explicit case selection, run creation, separately authorized baseline acceptance, within-family regression comparison, and evidence-only reports. Permanent Gate A–F tests and composed repository baseline-readiness governance protect the successor authority.
+The app accepts fixtures or unrestricted free-form manual narratives within deterministic input limits, shows lexical and proposition results, applies total deterministic policy, and builds a policy-gated illustrative Salesforce preview. CASE_003 completes as historical disclosure with no active current interpersonal violence; all eight stakeholder fixtures and representative manual violence, non-violence, and ambiguous narratives have completed verification. Mobile widths 390, 360, and 320 CSS pixels are verified with semantic-first stacking and no page-level overflow. Offline evaluation validates 48 successor cases and supports explicit case selection, run creation, separately authorized baseline acceptance, within-family regression comparison, and evidence-only reports. Permanent Gate A–F tests and composed repository baseline-readiness governance protect the successor authority.
 
 ## I. KNOWN LIMITATIONS
 
-The lexical baseline is intentionally shallow. Provider quality is not guaranteed. The ontology is bounded to repository-demonstrated distinctions. Live-provider evaluation is external and non-deterministic even though its surrounding contracts are deterministic. Creation-time and successor artifact families are intentionally incomparable. The static knowledge graph uses repository naming and AST evidence and leaves unresolved relationships explicit.
+The lexical baseline is intentionally shallow. Provider quality is not guaranteed. The ontology is bounded to repository-demonstrated distinctions. Live-provider evaluation is external and non-deterministic even though its surrounding contracts are deterministic. Streamlit Community Cloud deployment and hosted acceptance have not occurred. Creation-time and successor artifact families are intentionally incomparable. The static knowledge graph uses repository naming and AST evidence and leaves unresolved relationships explicit.
 
 ## J. INTERACTION MODEL
 
-Analysis begins only after explicit `Run Analysis`. Empty input fails before extraction, and narrative changes invalidate stale output. A valid analysis performs lexical matching and one provider request, then all downstream steps are local and deterministic. Live corpus execution is explicit and performs one request per valid selected case. Baseline acceptance is a separate operator action and never occurs during evaluation or governance validation.
+Analysis begins only after explicit `Run Analysis`. Import, startup, source and fixture selection, manual typing, and invalid input issue zero provider requests. Narrative changes invalidate stale output. A valid analysis performs lexical matching and exactly one provider request with SDK retries disabled, then all downstream steps are local and deterministic. Streamlit secrets override environment variables, which override ignored local `.env`; missing configuration fails safely. Mobile rendering places the stakeholder semantic result before regex detail. Live corpus execution is explicit and performs one request per valid selected case. Baseline acceptance and hosted deployment are separate operator actions and never occur during evaluation or governance validation.
 
 ## K. GUARANTEES
 
-Strict contracts reject malformed or inadmissible semantics before policy. Policy is total over admissible states. Collections and serialized current artifacts have canonical ordering. Successor baseline acceptance rejects legacy runs. Existing governed artifact paths are protected from implicit overwrite. Repository generation is deterministic for the same operational date and repository state.
+Strict contracts reject malformed or inadmissible semantics before policy. Provider metadata cannot override deterministic repository bookkeeping. Policy is total over admissible states. Collections and serialized current artifacts have canonical ordering. Successor baseline acceptance rejects legacy runs. Existing governed artifact paths are protected from implicit overwrite. Repository generation is deterministic for the same operational date and repository state.
 
 ## L. NON-GUARANTEES
 
-The repository does not guarantee model accuracy, exhaustive violence ontology coverage, production suitability, PHI-safe operation, human-review workflow, external-system persistence, cross-schema semantic equivalence, or that governance validation proves application truth.
+The repository does not guarantee model accuracy, exhaustive violence ontology coverage, production suitability, PHI-safe operation, human-review workflow, external-system persistence, hosted availability or acceptance, cross-schema semantic equivalence, or that governance validation proves application truth.
 
 ## M. GROUNDING ANCHORS
 
@@ -98,11 +99,12 @@ Repository state is authoritative. If this SITREC conflicts with code, contracts
 ## O. REHYDRATION INSTRUCTIONS
 
 1. Read `README.md`, `docs/architecture.md`, this SITREC, `docs/local_governance.md`, and `docs/opord_004_verification_authority.md`.
-2. Inspect `src/contracts.py`, the provider/validation/derivation/policy chain, `src/app_logic.py`, `src/evaluation/`, and `evaluation/corpus/successor_corpus.json`.
-3. Inspect `git status --short` before mutation and preserve unrelated unstaged work.
+2. Inspect `src/contracts.py`, `src/provider_adapter.py`, the validation/derivation/policy chain, `src/app_logic.py`, `src/config.py`, `app.py`, `src/evaluation/`, and `evaluation/corpus/successor_corpus.json`.
+3. Inspect `git status --short` before mutation and preserve unrelated work.
 4. Run `python3 -m tools.repo_governance validate-all`; for baseline decisions run `python3 -m tools.repo_governance baseline-readiness`.
-5. Preserve the one-request boundary, fail-closed validation, deterministic policy, sole successor authority, and historical artifact immutability.
-6. Regenerate this artifact with the governed `sitrec` command whenever current repository truth changes.
+5. Preserve provider semantic-only authority, repository bookkeeping, the one-request/zero-request boundaries, fail-closed validation, deterministic policy, sole successor authority, and historical artifact immutability.
+6. Treat Streamlit Community Cloud deployment and hosted acceptance as manual follow-on actions.
+7. Regenerate this artifact with the governed `sitrec` command whenever current repository truth changes.
 
 ## P. SITREC LIFECYCLE
 
@@ -114,7 +116,7 @@ Exactly one top-level SITREC may represent `2026-07-19`. The generator targets `
 
 ## R. VALIDATION
 
-Generation and validation are separate responsibilities. After generation run `python3 -m tools.repo_governance validate-sitrec --path "<generated path>"`, `python3 -m tools.repo_governance validate-all`, and `python3 -m tools.repo_governance validate-heartbeat`. Baseline establishment additionally requires `python3 -m tools.repo_governance baseline-readiness`, protected-hash checks, generated-artifact freshness, and an unstaged/uncommitted Git state.
+Generation and validation are separate responsibilities. After generation run `python3 -m tools.repo_governance validate-sitrec --path "<generated path>"`, `python3 -m tools.repo_governance validate-all`, and `python3 -m tools.repo_governance validate-heartbeat`. Baseline establishment additionally requires `python3 -m tools.repo_governance baseline-readiness`, protected-hash checks, generated-artifact freshness, and a clean committed Git state.
 
 ## S. PLANNER / EXECUTOR RESPONSIBILITY MODEL
 
