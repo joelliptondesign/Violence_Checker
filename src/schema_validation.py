@@ -1,28 +1,29 @@
-"""Deterministic structural validation for provider-independent semantic candidates."""
+"""Strict structural validation for proposition-oriented semantic envelopes."""
 
-from collections.abc import Mapping
-from typing import Any
-
-from pydantic import BaseModel, ValidationError
+import re
+from typing import Iterable, Optional
 
 from src.contracts import (
+    EvidenceSubjectKind,
     ProviderStructuredResponse,
+    RelationshipKind,
+    SEMANTIC_SCHEMA_IDENTITY,
+    SEMANTIC_SCHEMA_VERSION,
     SchemaValidationResult,
     SchemaValidationStatus,
-    SemanticFacts,
     ValidationIssue,
     ValidationIssueCode,
+    ViolenceSemanticEnvelope,
 )
 
 
-_BOOLEAN_FIELDS = {
-    "violence_present",
-    "contact_occurred",
-    "injury_mentioned",
-    "current_event",
-    "negated",
-    "correction_present",
-    "conflicting_information",
+_ID_PATTERNS = {
+    "entities": re.compile(r"ENT-\d{4}"),
+    "propositions": re.compile(r"PROP-\d{4}"),
+    "relationships": re.compile(r"REL-\d{4}"),
+    "uncertainties": re.compile(r"UNC-\d{4}"),
+    "evidence_excerpts": re.compile(r"EVID-\d{4}"),
+    "evidence_supports": re.compile(r"SUP-\d{4}"),
 }
 
 
@@ -30,66 +31,44 @@ def _issue(code: ValidationIssueCode, field: str, message: str) -> ValidationIss
     return ValidationIssue(code=code, field=field, message=message)
 
 
-def _pydantic_issue(error: dict[str, Any]) -> ValidationIssue:
-    location = error.get("loc", ())
-    field = str(location[0]) if location else "candidate"
-    error_type = str(error.get("type", ""))
-
-    if field == "event_type":
-        return _issue(ValidationIssueCode.INVALID_EVENT_TYPE, field, "event_type must be a supported value.")
-    if field == "intentionality":
-        return _issue(
-            ValidationIssueCode.INVALID_INTENTIONALITY,
-            field,
-            "intentionality must be a supported value.",
-        )
-    if field in _BOOLEAN_FIELDS:
-        return _issue(ValidationIssueCode.INVALID_BOOLEAN, field, f"{field} must be a boolean.")
-    if field == "actor":
-        return _issue(ValidationIssueCode.INVALID_ACTOR, field, "actor must be a string or null.")
-    if field == "target":
-        return _issue(ValidationIssueCode.INVALID_TARGET, field, "target must be a string or null.")
-    if field == "evidence_text":
-        if len(location) > 1:
-            return _issue(
-                ValidationIssueCode.INVALID_EVIDENCE_ITEM,
-                f"evidence_text.{location[1]}",
-                "Each evidence_text item must be a string.",
+def _check_ids(
+    issues: list[ValidationIssue],
+    collection_name: str,
+    identifiers: Iterable[str],
+) -> None:
+    pattern = _ID_PATTERNS[collection_name]
+    seen: set[str] = set()
+    for index, identifier in enumerate(identifiers, start=1):
+        field = f"{collection_name}.{index - 1}"
+        expected = {
+            "entities": "ENT",
+            "propositions": "PROP",
+            "relationships": "REL",
+            "uncertainties": "UNC",
+            "evidence_excerpts": "EVID",
+            "evidence_supports": "SUP",
+        }[collection_name] + f"-{index:04d}"
+        if pattern.fullmatch(identifier) is None:
+            issues.append(_issue(ValidationIssueCode.INVALID_IDENTIFIER, field, "Identifier has an invalid form."))
+        elif identifier != expected:
+            issues.append(
+                _issue(
+                    ValidationIssueCode.INVALID_COLLECTION_ORDER,
+                    field,
+                    f"Expected canonical identifier {expected} at this position.",
+                )
             )
-        return _issue(
-            ValidationIssueCode.INVALID_EVIDENCE_COLLECTION,
-            field,
-            "evidence_text must be a list of strings.",
-        )
-    if field == "confidence":
-        if error_type in {"greater_than_equal", "less_than_equal"}:
-            return _issue(
-                ValidationIssueCode.CONFIDENCE_OUT_OF_RANGE,
-                field,
-                "confidence must be between 0 and 1.",
-            )
-        return _issue(
-            ValidationIssueCode.INVALID_CONFIDENCE_TYPE,
-            field,
-            "confidence must be a floating-point number.",
-        )
-    if field == "uncertainty_notes":
-        if len(location) > 1:
-            return _issue(
-                ValidationIssueCode.INVALID_UNCERTAINTY_ITEM,
-                f"uncertainty_notes.{location[1]}",
-                "Each uncertainty_notes item must be a string.",
-            )
-        return _issue(
-            ValidationIssueCode.INVALID_UNCERTAINTY_COLLECTION,
-            field,
-            "uncertainty_notes must be a list of strings.",
-        )
-    return _issue(ValidationIssueCode.INVALID_CANDIDATE_TYPE, field, "Semantic candidate is malformed.")
+        if identifier in seen:
+            issues.append(_issue(ValidationIssueCode.DUPLICATE_IDENTIFIER, field, "Identifier is duplicated."))
+        seen.add(identifier)
 
 
-def validate_semantic_schema(candidate: object) -> SchemaValidationResult:
-    """Validate structure only; no relationships between semantic fields are evaluated."""
+def validate_semantic_schema(
+    candidate: object,
+    *,
+    expected_incident_id: Optional[str] = None,
+) -> SchemaValidationResult:
+    """Validate exact structure, identities, references, and canonical IDs only."""
     if isinstance(candidate, ProviderStructuredResponse):
         return SchemaValidationResult(
             status=SchemaValidationStatus.FAILED,
@@ -97,56 +76,114 @@ def validate_semantic_schema(candidate: object) -> SchemaValidationResult:
                 _issue(
                     ValidationIssueCode.PROVIDER_OBJECT_NOT_ALLOWED,
                     "candidate",
-                    "Provider response objects are not accepted by semantic schema validation.",
+                    "Provider response objects must terminate at the provider adapter.",
                 )
             ],
         )
-
-    if isinstance(candidate, SemanticFacts):
-        values: object = candidate.model_dump()
-    elif isinstance(candidate, Mapping) and not isinstance(candidate, BaseModel):
-        values = dict(candidate)
-    else:
+    if not isinstance(candidate, ViolenceSemanticEnvelope):
         return SchemaValidationResult(
             status=SchemaValidationStatus.FAILED,
             issues=[
                 _issue(
                     ValidationIssueCode.INVALID_CANDIDATE_TYPE,
                     "candidate",
-                    "Semantic candidate must be SemanticFacts or a supported mapping.",
+                    "Semantic validation requires a typed provider-independent envelope.",
                 )
             ],
         )
 
-    expected_fields = list(SemanticFacts.model_fields)
-    supplied_fields = set(values)
-    boundary_issues = [
-        _issue(
-            ValidationIssueCode.MISSING_REQUIRED_FIELD,
-            field,
-            f"Required semantic field {field} is missing.",
+    issues: list[ValidationIssue] = []
+    if candidate.schema_identity != SEMANTIC_SCHEMA_IDENTITY:
+        issues.append(
+            _issue(
+                ValidationIssueCode.UNSUPPORTED_SCHEMA_IDENTITY,
+                "schema_identity",
+                "Semantic schema identity is unsupported.",
+            )
         )
-        for field in expected_fields
-        if field not in supplied_fields
-    ]
-    boundary_issues.extend(
-        _issue(
-            ValidationIssueCode.UNSUPPORTED_FIELD,
-            field,
-            f"Unsupported semantic field {field} is not allowed.",
+    if candidate.schema_version != SEMANTIC_SCHEMA_VERSION:
+        issues.append(
+            _issue(
+                ValidationIssueCode.UNSUPPORTED_SCHEMA_VERSION,
+                "schema_version",
+                "Semantic schema version is unsupported.",
+            )
         )
-        for field in sorted(supplied_fields - set(expected_fields))
-    )
-    if boundary_issues:
-        return SchemaValidationResult(status=SchemaValidationStatus.FAILED, issues=boundary_issues)
+    if expected_incident_id is not None and candidate.incident_id != expected_incident_id:
+        issues.append(
+            _issue(
+                ValidationIssueCode.INCIDENT_ID_MISMATCH,
+                "incident_id",
+                "Semantic envelope incident identity does not match the validated incident.",
+            )
+        )
+    if not candidate.entities:
+        issues.append(_issue(ValidationIssueCode.MISSING_REQUIRED_FIELD, "entities", "At least one entity is required."))
+    if not candidate.propositions:
+        issues.append(_issue(ValidationIssueCode.MISSING_REQUIRED_FIELD, "propositions", "At least one proposition is required."))
+    if not candidate.evidence_excerpts:
+        issues.append(_issue(ValidationIssueCode.MISSING_REQUIRED_FIELD, "evidence_excerpts", "At least one evidence excerpt is required."))
+    if not candidate.evidence_supports:
+        issues.append(_issue(ValidationIssueCode.MISSING_REQUIRED_FIELD, "evidence_supports", "At least one evidence support is required."))
 
-    try:
-        facts = SemanticFacts.model_validate(values)
-    except ValidationError as exc:
-        issues = [_pydantic_issue(error) for error in exc.errors()]
+    _check_ids(issues, "entities", (item.entity_id for item in candidate.entities))
+    _check_ids(issues, "propositions", (item.proposition_id for item in candidate.propositions))
+    _check_ids(issues, "relationships", (item.relationship_id for item in candidate.relationships))
+    _check_ids(issues, "uncertainties", (item.uncertainty_id for item in candidate.uncertainties))
+    _check_ids(issues, "evidence_excerpts", (item.evidence_id for item in candidate.evidence_excerpts))
+    _check_ids(issues, "evidence_supports", (item.support_id for item in candidate.evidence_supports))
+
+    entity_ids = {item.entity_id for item in candidate.entities}
+    proposition_ids = {item.proposition_id for item in candidate.propositions}
+    relationship_ids = {item.relationship_id for item in candidate.relationships}
+    uncertainty_ids = {item.uncertainty_id for item in candidate.uncertainties}
+    evidence_ids = {item.evidence_id for item in candidate.evidence_excerpts}
+
+    for index, proposition in enumerate(candidate.propositions):
+        if proposition.actor_ref not in entity_ids:
+            issues.append(_issue(ValidationIssueCode.DANGLING_REFERENCE, f"propositions.{index}.actor_ref", "Actor reference does not resolve."))
+        if proposition.target.target_ref is not None and proposition.target.target_ref not in entity_ids:
+            issues.append(_issue(ValidationIssueCode.DANGLING_REFERENCE, f"propositions.{index}.target.target_ref", "Target reference does not resolve."))
+        if proposition.attribution and proposition.attribution.source_ref is not None and proposition.attribution.source_ref not in entity_ids:
+            issues.append(_issue(ValidationIssueCode.DANGLING_REFERENCE, f"propositions.{index}.attribution.source_ref", "Attribution source reference does not resolve."))
+
+    for index, relationship in enumerate(candidate.relationships):
+        field = f"relationships.{index}"
+        if relationship.source_proposition_ref not in proposition_ids or relationship.target_proposition_ref not in proposition_ids:
+            issues.append(_issue(ValidationIssueCode.DANGLING_REFERENCE, field, "Relationship endpoint does not resolve."))
+        if relationship.source_proposition_ref == relationship.target_proposition_ref:
+            issues.append(_issue(ValidationIssueCode.INVALID_RELATIONSHIP, field, "Relationship endpoints must be distinct."))
+        if relationship.relationship_kind == RelationshipKind.CONFLICTS_WITH:
+            if relationship.source_proposition_ref >= relationship.target_proposition_ref:
+                issues.append(_issue(ValidationIssueCode.INVALID_RELATIONSHIP, field, "Conflict endpoints are not canonical."))
+            if not relationship.disputed_dimensions:
+                issues.append(_issue(ValidationIssueCode.INVALID_RELATIONSHIP, field, "Conflict requires disputed dimensions."))
+        elif relationship.disputed_dimensions:
+            issues.append(_issue(ValidationIssueCode.INVALID_RELATIONSHIP, field, "Only conflict relationships carry disputed dimensions."))
+
+    for index, uncertainty in enumerate(candidate.uncertainties):
+        if uncertainty.proposition_ref not in proposition_ids:
+            issues.append(_issue(ValidationIssueCode.DANGLING_REFERENCE, f"uncertainties.{index}.proposition_ref", "Uncertainty proposition does not resolve."))
+
+    subject_ids = {
+        EvidenceSubjectKind.PROPOSITION: proposition_ids,
+        EvidenceSubjectKind.RELATIONSHIP: relationship_ids,
+        EvidenceSubjectKind.UNCERTAINTY: uncertainty_ids,
+    }
+    for index, support in enumerate(candidate.evidence_supports):
+        field = f"evidence_supports.{index}"
+        if support.evidence_ref not in evidence_ids:
+            issues.append(_issue(ValidationIssueCode.DANGLING_REFERENCE, f"{field}.evidence_ref", "Evidence reference does not resolve."))
+        if support.subject_ref not in subject_ids[support.subject_kind]:
+            issues.append(_issue(ValidationIssueCode.DANGLING_REFERENCE, f"{field}.subject_ref", "Evidence subject does not resolve for its declared kind."))
+
+    duplicate_texts = len({item.text for item in candidate.evidence_excerpts}) != len(candidate.evidence_excerpts)
+    if duplicate_texts:
+        issues.append(_issue(ValidationIssueCode.DUPLICATE_IDENTIFIER, "evidence_excerpts", "Duplicate exact evidence excerpts are not allowed."))
+
+    if issues:
         return SchemaValidationResult(status=SchemaValidationStatus.FAILED, issues=issues)
-
     return SchemaValidationResult(
         status=SchemaValidationStatus.PASSED,
-        semantic_facts=facts,
+        semantic_envelope=candidate,
     )

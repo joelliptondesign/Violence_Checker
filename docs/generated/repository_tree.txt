@@ -9,12 +9,18 @@ app.py
 docs/
 docs/SITREC - 2026-07-17 Violence Checker Phase 0 Demonstration Baseline.md
 docs/SITREC - 2026-07-18 Violence Checker Narrative Source Control Baseline.md
+docs/SITREC - 2026-07-19 Violence Checker Successor Semantic Baseline.md
 docs/architecture.md
 docs/demo_runbook.md
 docs/generated/
 docs/generated/repository_knowledge_graph.md
 docs/generated/repository_tree.txt
 docs/local_governance.md
+docs/opord_004_repository_assessment.md
+docs/opord_004_verification_authority.md
+docs/semantic_design_basis.md
+docs/semantic_migration_and_legacy_strategy.md
+docs/successor_semantic_contract_specification.md
 evaluation/
 evaluation/README.md
 evaluation/baselines/
@@ -23,6 +29,7 @@ evaluation/baselines/initial-evaluation-baseline-001.json
 evaluation/corpus/
 evaluation/corpus/README.md
 evaluation/corpus/corpus.json
+evaluation/corpus/successor_corpus.json
 evaluation/reports/
 evaluation/reports/README.md
 evaluation/reports/initial-operational-comparison-001.json
@@ -37,7 +44,6 @@ scripts/live_smoke_test.py
 src/
 src/app_logic.py
 src/comparison.py
-src/compatibility_finding.py
 src/config.py
 src/contract_adapters.py
 src/contracts.py
@@ -49,6 +55,7 @@ src/evaluation/baseline.py
 src/evaluation/case_comparison.py
 src/evaluation/contracts.py
 src/evaluation/corpus.py
+src/evaluation/legacy_artifacts.py
 src/evaluation/regression.py
 src/evaluation/regression_contracts.py
 src/evaluation/reporting.py
@@ -65,18 +72,22 @@ src/provider_adapter.py
 src/regex_baseline.py
 src/salesforce_preview.py
 src/schema_validation.py
+src/semantic_derivation.py
 src/semantic_extractor.py
 src/semantic_prompt.py
 src/semantic_validation.py
 telemetry/
 telemetry/executor_heartbeat.jsonl
 tests/
+tests/__init__.py
 tests/evaluation/
 tests/evaluation/__init__.py
 tests/evaluation/test_contracts.py
 tests/evaluation/test_corpus.py
 tests/evaluation/test_regression.py
 tests/evaluation/test_runner.py
+tests/evaluation/test_successor_artifact_lifecycle.py
+tests/successor_helpers.py
 tests/test_app_logic.py
 tests/test_comparison.py
 tests/test_config_and_app.py
@@ -95,9 +106,14 @@ tests/test_semantic_extractor.py
 tests/test_semantic_prompt.py
 tests/test_semantic_validation.py
 tests/test_streamlit_empty_state.py
+tests/test_successor_downstream_authority.py
+tests/test_successor_policy_authority.py
+tests/test_successor_validation_authority.py
 tools/
 tools/__init__.py
+tools/build_successor_corpus.py
 tools/repo_governance/
 tools/repo_governance/__init__.py
 tools/repo_governance/__main__.py
 tools/repo_governance/governance.py
+tools/repo_governance/sitrec.py

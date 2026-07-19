@@ -10,7 +10,7 @@ from tools.repo_governance import governance
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-ACTIVE_SITREC = REPO_ROOT / "docs" / "SITREC - 2026-07-18 Violence Checker Narrative Source Control Baseline.md"
+ACTIVE_SITREC = REPO_ROOT / "docs" / "SITREC - 2026-07-19 Violence Checker Successor Semantic Baseline.md"
 
 
 def test_governance_tooling_imports_without_foxcommand_runtime_path() -> None:
@@ -21,33 +21,26 @@ def test_governance_tooling_imports_without_foxcommand_runtime_path() -> None:
 
 
 def test_repository_tree_generation_is_stable_and_excludes_secrets() -> None:
-    output = REPO_ROOT / governance.DEFAULT_REPOSITORY_TREE_PATH
+    first = governance.build_repository_tree(REPO_ROOT)
+    second = governance.build_repository_tree(REPO_ROOT)
 
-    first = governance.write_repository_tree(REPO_ROOT, output)
-    first_text = output.read_text(encoding="utf-8")
-    second = governance.write_repository_tree(REPO_ROOT, output)
-    second_text = output.read_text(encoding="utf-8")
-
-    assert first["entries"] == second["entries"]
-    assert first_text == second_text
-    assert ".git/" not in first_text
-    assert ".env\n" not in first_text
-    assert ".streamlit/secrets.toml" not in first_text
+    assert first == second
+    assert ".git/" not in first
+    assert ".env\n" not in first
+    assert ".streamlit/secrets.toml" not in first
 
 
 def test_knowledge_graph_generation_is_stable_and_marks_boundaries() -> None:
-    output = REPO_ROOT / governance.DEFAULT_KNOWLEDGE_GRAPH_PATH
-
-    governance.write_knowledge_graph(REPO_ROOT, output)
-    first_text = output.read_text(encoding="utf-8")
-    governance.write_knowledge_graph(REPO_ROOT, output)
-    second_text = output.read_text(encoding="utf-8")
+    first_text = governance.build_knowledge_graph(REPO_ROOT)
+    second_text = governance.build_knowledge_graph(REPO_ROOT)
 
     assert first_text == second_text
     assert "`src/app_logic.py`" in first_text
     assert "`src/semantic_extractor.py`" in first_text
     assert "Provider-facing components" in first_text
     assert "Unresolved Relationships" in first_text
+    assert "`tests/evaluation/test_runner.py`" in first_text
+    assert "`src/evaluation/runner.py`" in first_text
 
 
 def test_generated_artifact_outputs_must_remain_inside_repository() -> None:
@@ -71,6 +64,33 @@ def test_sitrec_validation_accepts_current_active_sitrec() -> None:
     findings = governance.validate_sitrec_file(ACTIVE_SITREC)
 
     assert findings == []
+
+
+def test_sitrec_lifecycle_selects_one_newest_current_record() -> None:
+    assert governance.active_sitrec_paths(REPO_ROOT) == [
+        "docs/SITREC - 2026-07-19 Violence Checker Successor Semantic Baseline.md"
+    ]
+    assert governance.validate_sitrec_lifecycle(REPO_ROOT) == []
+
+
+def test_generated_governance_artifacts_are_fresh() -> None:
+    assert governance.validate_generated_freshness(REPO_ROOT) == []
+
+
+def test_generated_freshness_detects_drift_without_mutating_repository(tmp_path: Path) -> None:
+    (tmp_path / "docs" / "generated").mkdir(parents=True)
+    (tmp_path / "docs" / "generated" / "repository_tree.txt").write_text("stale\n")
+    (tmp_path / "docs" / "generated" / "repository_knowledge_graph.md").write_text("stale\n")
+
+    findings = governance.validate_generated_freshness(tmp_path)
+
+    assert {finding.message for finding in findings} == {"generated artifact is stale"}
+
+
+def test_baseline_static_authorities_are_ready() -> None:
+    assert governance.validate_protected_hashes(REPO_ROOT) == []
+    assert governance.validate_current_authority(REPO_ROOT) == []
+    assert governance.validate_repository_state(REPO_ROOT) == []
 
 
 def test_cli_executes_without_foxcommand_runtime_python_path() -> None:

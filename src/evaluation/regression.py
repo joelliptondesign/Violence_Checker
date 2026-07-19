@@ -26,6 +26,7 @@ from src.evaluation.regression_contracts import (
     RegressionExecutionSummary,
     RegressionValueChange,
 )
+from src.evaluation.legacy_artifacts import LegacyArtifact, load_legacy_artifact
 from src.evaluation.run_contracts import EvaluationRunArtifact, ObservedCaseResult
 from src.evaluation.serialization import canonical_json
 
@@ -239,6 +240,11 @@ def compare_artifacts(
         raise RegressionError(RegressionIssueCode.INCOMPATIBLE_CORPUS, "corpus identity or version differs")
     if baseline.evaluation_schema_version != current.evaluation_schema_version:
         raise RegressionError(RegressionIssueCode.INCOMPATIBLE_SCHEMA, "evaluation schema version differs")
+    if (baseline.semantic_schema_identity, baseline.semantic_schema_version) != (
+        current.semantic_schema_identity,
+        current.semantic_schema_version,
+    ):
+        raise RegressionError(RegressionIssueCode.INCOMPATIBLE_SCHEMA, "semantic schema identity or version differs")
     if baseline.requested_case_ids != current.requested_case_ids:
         raise RegressionError(RegressionIssueCode.INCOMPATIBLE_CASE_SET, "ordered case identifiers differ")
 
@@ -265,6 +271,8 @@ def compare_artifacts(
         corpus_identity=current.corpus_identity,
         corpus_version=current.corpus_version,
         evaluation_schema_version=current.evaluation_schema_version,
+        semantic_schema_identity=current.semantic_schema_identity,
+        semantic_schema_version=current.semantic_schema_version,
         comparison_timestamp=comparison_timestamp,
         requested_case_ids=current.requested_case_ids,
         case_regressions=regressions,
@@ -282,6 +290,11 @@ def compare_run(
 ) -> RegressionArtifact:
     baseline = load_baseline_artifact(baseline_path)
     current = load_run_artifact(current_run_path)
+    if isinstance(baseline, LegacyArtifact) or isinstance(current, LegacyArtifact):
+        raise RegressionError(
+            RegressionIssueCode.INCOMPATIBLE_SCHEMA,
+            "legacy and successor artifact families are explicitly incomparable",
+        )
     artifact = compare_artifacts(
         baseline=baseline,
         current=current,
@@ -298,11 +311,15 @@ def compare_run(
     return artifact
 
 
-def load_regression_artifact(path: str) -> RegressionArtifact:
+def load_regression_artifact(path: str):
     source = resolve_report_path(path, ".json")
     if not source.is_file():
         raise RegressionError(RegressionIssueCode.ARTIFACT_MISSING, f"regression artifact not found: {source.name}")
     try:
-        return RegressionArtifact.model_validate_json(source.read_text(encoding="utf-8"))
+        raw = source.read_text(encoding="utf-8")
+        import json
+        if json.loads(raw).get("evaluation_schema_version") == "1.0.0":
+            return load_legacy_artifact(source, "comparison")
+        return RegressionArtifact.model_validate_json(raw)
     except (OSError, ValidationError, ValueError) as error:
         raise RegressionError(RegressionIssueCode.INVALID_ARTIFACT, "regression artifact is invalid") from error

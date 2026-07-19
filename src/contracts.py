@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictStr, field_validator, model_validator
 
-from src.models import Incident, Intentionality, ViolenceEventType, ViolenceFinding
+from src.models import Incident
 
 
 class SchemaValidationStatus(str, Enum):
@@ -49,6 +49,21 @@ class ValidationIssueCode(str, Enum):
     NEGATED_CURRENT_AFFIRMATIVE_VIOLENCE = "negated_current_affirmative_violence"
     CONFLICT_WITHOUT_UNCERTAINTY = "conflict_without_uncertainty"
     EMPTY_EVIDENCE_ITEM = "empty_evidence_item"
+    UNSUPPORTED_SCHEMA_IDENTITY = "unsupported_schema_identity"
+    UNSUPPORTED_SCHEMA_VERSION = "unsupported_schema_version"
+    INCIDENT_ID_MISMATCH = "incident_id_mismatch"
+    INVALID_IDENTIFIER = "invalid_identifier"
+    DUPLICATE_IDENTIFIER = "duplicate_identifier"
+    INVALID_COLLECTION_ORDER = "invalid_collection_order"
+    DANGLING_REFERENCE = "dangling_reference"
+    INVALID_TARGET_REFERENCE = "invalid_target_reference"
+    INVALID_RELATIONSHIP = "invalid_relationship"
+    RELATIONSHIP_CYCLE = "relationship_cycle"
+    INVALID_UNCERTAINTY = "invalid_uncertainty"
+    INVALID_EVIDENCE_SUPPORT = "invalid_evidence_support"
+    EVIDENCE_NOT_CONTAINED = "evidence_not_contained"
+    MISSING_EVIDENCE_SUPPORT = "missing_evidence_support"
+    INVALID_CONDUCT_COMBINATION = "invalid_conduct_combination"
 
 
 class PolicyOutcome(str, Enum):
@@ -66,18 +81,11 @@ class PolicyReasonCode(str, Enum):
     PROVIDER_VALIDATION_FAILED = "provider_validation_failed"
     SCHEMA_VALIDATION_FAILED = "schema_validation_failed"
     DOMAIN_VALIDATION_FAILED = "domain_validation_failed"
-    COMPATIBILITY_CONSTRUCTION_FAILED = "compatibility_construction_failed"
     UNSUPPORTED_POLICY_INPUT = "unsupported_policy_input"
     CONFLICTING_INFORMATION = "conflicting_information"
-    THREAT_WITHOUT_VIOLENCE_INDICATION = "threat_without_violence_indication"
-    UNCLEAR_EVENT_TYPE = "unclear_event_type"
-    UNCLEAR_MATERIAL_INTENTIONALITY = "unclear_material_intentionality"
-    MATERIAL_UNCERTAINTY_NOTES = "material_uncertainty_notes"
-    NEGATED_AFFIRMATIVE_FINDING = "negated_affirmative_finding"
-    AFFIRMATIVE_VIOLENCE_OR_THREAT = "affirmative_violence_or_threat"
-    NO_VIOLENCE = "no_violence"
-    NEGATED_NON_EVENT = "negated_non_event"
-    CORRECTED_NON_EVENT = "corrected_non_event"
+    SCOPED_SEMANTIC_UNCERTAINTY = "scoped_semantic_uncertainty"
+    AFFIRMED_CURRENT_INTERPERSONAL_VIOLENCE = "affirmed_current_interpersonal_violence"
+    NO_ACTIVE_CURRENT_INTERPERSONAL_VIOLENCE = "no_active_current_interpersonal_violence"
 
 
 class PipelineFailureProvenance(str, Enum):
@@ -88,7 +96,6 @@ class PipelineFailureProvenance(str, Enum):
     PROVIDER_VALIDATION = "provider_validation"
     SCHEMA_VALIDATION = "schema_validation"
     DOMAIN_VALIDATION = "domain_validation"
-    COMPATIBILITY_CONSTRUCTION = "compatibility_construction"
     UNSUPPORTED_POLICY_INPUT = "unsupported_policy_input"
 
 
@@ -186,7 +193,7 @@ class NormalizationOperation(str, Enum):
 
 
 class NormalizedIncident(BaseModel):
-    model_config = ConfigDict(strict=True)
+    model_config = ConfigDict(strict=True, extra="forbid")
 
     incident_id: StrictStr
     original_narrative: StrictStr
@@ -206,7 +213,7 @@ class NormalizedIncident(BaseModel):
 
 
 class RegexResult(BaseModel):
-    model_config = ConfigDict(strict=True)
+    model_config = ConfigDict(strict=True, extra="forbid")
 
     detected: StrictBool
     matched_terms: List[StrictStr]
@@ -220,51 +227,276 @@ class RegexResult(BaseModel):
         return self.model_dump()
 
 
-class SemanticFacts(BaseModel):
-    """Provider-independent extracted facts; confidence remains provider-reported."""
+SEMANTIC_SCHEMA_IDENTITY = "violence-checker.proposition-semantics"
+SEMANTIC_SCHEMA_VERSION = "1.0.0"
+POLICY_CANDIDATE_SCHEMA_IDENTITY = "violence-checker.policy-candidate"
+POLICY_CANDIDATE_SCHEMA_VERSION = "1.0.0"
+
+
+class EntityKind(str, Enum):
+    PERSON = "person"
+    PEOPLE_COLLECTIVE = "people_collective"
+    OBJECT = "object"
+    UNSPECIFIED = "unspecified"
+
+
+class ConductKind(str, Enum):
+    PHYSICAL_CONDUCT = "physical_conduct"
+    THREAT_EXPRESSION = "threat_expression"
+    THREATENING_MOVEMENT = "threatening_movement"
+    CONTACT_ONLY = "contact_only"
+    UNDETERMINED = "undetermined"
+
+
+class TargetKind(str, Enum):
+    ENTITY = "entity"
+    SELF = "self"
+    NONE = "none"
+    UNDETERMINED = "undetermined"
+
+
+class Direction(str, Enum):
+    INTERPERSONAL = "interpersonal"
+    OBJECT_DIRECTED = "object-directed"
+    SELF_DIRECTED = "self-directed"
+    UNDETERMINED = "undetermined"
+
+
+class Completion(str, Enum):
+    THREATENED = "threatened"
+    ATTEMPTED = "attempted"
+    COMPLETED = "completed"
+    NOT_APPLICABLE = "not_applicable"
+    UNDETERMINED = "undetermined"
+
+
+class Contact(str, Enum):
+    OCCURRED = "occurred"
+    DID_NOT_OCCUR = "did_not_occur"
+    UNDETERMINED = "undetermined"
+    NOT_APPLICABLE = "not_applicable"
+
+
+class TemporalScope(str, Enum):
+    CURRENT_INCIDENT = "current_incident"
+    HISTORICAL = "historical"
+    UNDETERMINED = "undetermined"
+
+
+class AssertionStatus(str, Enum):
+    AFFIRMED = "affirmed"
+    NEGATED = "negated"
+    UNCERTAIN = "uncertain"
+
+
+class SemanticIntentionality(str, Enum):
+    INTENTIONAL = "intentional"
+    ACCIDENTAL = "accidental"
+    UNDETERMINED = "undetermined"
+    NOT_APPLICABLE = "not_applicable"
+
+
+class RelationshipKind(str, Enum):
+    NEGATES = "negates"
+    SUPERSEDES = "supersedes"
+    CONFLICTS_WITH = "conflicts_with"
+
+
+class UncertaintyDimension(str, Enum):
+    ACTOR_IDENTITY = "actor_identity"
+    TARGET_IDENTITY = "target_identity"
+    CONDUCT_TYPE = "conduct_type"
+    DIRECTION = "direction"
+    CONTACT = "contact"
+    COMPLETION = "completion"
+    INTENTIONALITY = "intentionality"
+    TEMPORAL_SCOPE = "temporal_scope"
+    THREAT_MEANING = "threat_meaning"
+    ASSERTION_STATUS = "assertion_status"
+
+
+class EvidenceSubjectKind(str, Enum):
+    PROPOSITION = "proposition"
+    RELATIONSHIP = "relationship"
+    UNCERTAINTY = "uncertainty"
+
+
+class EvidenceSupportRole(str, Enum):
+    SUPPORTS_ASSERTION = "supports_assertion"
+    SUPPORTS_NEGATION = "supports_negation"
+    SUPPORTS_SUPERSESSION = "supports_supersession"
+    SUPPORTS_CONFLICT = "supports_conflict"
+    SUPPORTS_UNCERTAINTY = "supports_uncertainty"
+
+
+class AttributionSourceKind(str, Enum):
+    PATIENT = "patient"
+    STAFF = "staff"
+    WITNESS = "witness"
+    UNSPECIFIED = "unspecified"
+
+
+class EntityReference(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    entity_id: StrictStr
+    entity_kind: EntityKind
+    label: Optional[StrictStr] = None
+
+
+class PropositionTarget(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    target_kind: TargetKind
+    target_ref: Optional[StrictStr] = None
+
+    @model_validator(mode="after")
+    def require_reference_shape(self) -> "PropositionTarget":
+        if self.target_kind == TargetKind.ENTITY and self.target_ref is None:
+            raise ValueError("entity target requires target_ref")
+        if self.target_kind != TargetKind.ENTITY and self.target_ref is not None:
+            raise ValueError("only entity target may contain target_ref")
+        return self
+
+
+class Attribution(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    source_kind: AttributionSourceKind
+    source_ref: Optional[StrictStr] = None
+
+
+class ViolenceProposition(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    proposition_id: StrictStr
+    actor_ref: StrictStr
+    conduct_kind: ConductKind
+    target: PropositionTarget
+    completion: Completion
+    contact: Contact
+    temporal_scope: TemporalScope
+    intentionality: SemanticIntentionality
+    assertion_status: AssertionStatus
+    attribution: Optional[Attribution] = None
+
+
+class SemanticRelationship(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    relationship_id: StrictStr
+    relationship_kind: RelationshipKind
+    source_proposition_ref: StrictStr
+    target_proposition_ref: StrictStr
+    disputed_dimensions: List[UncertaintyDimension]
+
+
+class SemanticUncertainty(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    uncertainty_id: StrictStr
+    proposition_ref: StrictStr
+    dimension: UncertaintyDimension
+    note: Optional[StrictStr] = None
+
+
+class EvidenceExcerpt(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    evidence_id: StrictStr
+    text: StrictStr
+
+
+class EvidenceSupport(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    support_id: StrictStr
+    evidence_ref: StrictStr
+    subject_kind: EvidenceSubjectKind
+    subject_ref: StrictStr
+    role: EvidenceSupportRole
+
+
+class ExtractionMetadata(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    extraction_contract_identity: StrictStr
+    provider_name: Optional[StrictStr] = None
+    model_identifier: Optional[StrictStr] = None
+    request_id: Optional[StrictStr] = None
+    provider_confidence: Optional[StrictFloat] = Field(default=None, ge=0.0, le=1.0)
+
+    @field_validator(
+        "extraction_contract_identity",
+        "provider_name",
+        "model_identifier",
+        "request_id",
+    )
+    @classmethod
+    def require_present_identifiers_to_be_non_empty(cls, value: Optional[str]) -> Optional[str]:
+        if value is not None and not value.strip():
+            raise ValueError("extraction provenance identifiers must not be empty")
+        return value
+
+
+class ViolenceSemanticEnvelope(BaseModel):
+    """Sole provider-independent current semantic authority."""
 
     model_config = ConfigDict(strict=True, extra="forbid")
 
-    violence_present: StrictBool
-    event_type: ViolenceEventType
-    actor: Optional[StrictStr]
-    target: Optional[StrictStr]
-    contact_occurred: StrictBool
-    injury_mentioned: StrictBool
-    current_event: StrictBool
-    intentionality: Intentionality
-    negated: StrictBool
-    correction_present: StrictBool
-    conflicting_information: StrictBool
-    evidence_text: List[StrictStr]
-    confidence: StrictFloat = Field(ge=0.0, le=1.0)
-    uncertainty_notes: List[StrictStr]
+    schema_identity: StrictStr
+    schema_version: StrictStr
+    incident_id: StrictStr
+    entities: List[EntityReference]
+    propositions: List[ViolenceProposition]
+    relationships: List[SemanticRelationship]
+    uncertainties: List[SemanticUncertainty]
+    evidence_excerpts: List[EvidenceExcerpt]
+    evidence_supports: List[EvidenceSupport]
+    extraction_metadata: ExtractionMetadata
 
 
+class ProviderStructuredResponse(ViolenceSemanticEnvelope):
+    """Provider-only structured response; converted before validation."""
 
-class ProviderStructuredResponse(BaseModel):
-    """OpenAI structured-output schema contained inside semantic extraction."""
 
+class DerivedProposition(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid")
 
-    violence_present: StrictBool
-    event_type: ViolenceEventType
-    actor: Optional[StrictStr]
-    target: Optional[StrictStr]
-    contact_occurred: StrictBool
-    injury_mentioned: StrictBool
-    current_event: StrictBool
-    intentionality: Intentionality
-    negated: StrictBool
-    correction_present: StrictBool
-    conflicting_information: StrictBool
-    evidence_text: List[StrictStr]
-    confidence: StrictFloat = Field(ge=0.0, le=1.0)
-    uncertainty_notes: List[StrictStr]
+    proposition_id: StrictStr
+    direction: Direction
+    active: StrictBool
+
+
+class DerivedSemanticView(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    schema_identity: StrictStr
+    schema_version: StrictStr
+    incident_id: StrictStr
+    propositions: List[DerivedProposition]
+    active_proposition_ids: List[StrictStr]
+
+
+class PolicyCandidateView(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    schema_identity: StrictStr
+    schema_version: StrictStr
+    incident_id: StrictStr
+    active_current_interpersonal_affirmed: List[StrictStr]
+    active_current_interpersonal_uncertain: List[StrictStr]
+    active_current_interpersonal_negated: List[StrictStr]
+    active_current_interpersonal_accidental: List[StrictStr]
+    active_current_interpersonal_violence: List[StrictStr]
+    active_potential_interpersonal_uncertain: List[StrictStr]
+    active_conflict_relationships: List[StrictStr]
+    active_uncertainties: List[StrictStr]
+    active_current_interpersonal_uncertainties: List[StrictStr]
 
 
 class ValidationIssue(BaseModel):
-    model_config = ConfigDict(strict=True)
+    model_config = ConfigDict(strict=True, extra="forbid")
 
     code: ValidationIssueCode
     field: StrictStr
@@ -272,20 +504,20 @@ class ValidationIssue(BaseModel):
 
 
 class SchemaValidationResult(BaseModel):
-    model_config = ConfigDict(strict=True)
+    model_config = ConfigDict(strict=True, extra="forbid")
 
     status: SchemaValidationStatus
     issues: List[ValidationIssue] = Field(default_factory=list)
-    semantic_facts: Optional[SemanticFacts] = None
+    semantic_envelope: Optional[ViolenceSemanticEnvelope] = None
 
     @model_validator(mode="after")
     def require_consistent_outcome(self) -> "SchemaValidationResult":
-        if self.status == SchemaValidationStatus.PASSED and (self.semantic_facts is None or self.issues):
-            raise ValueError("passed schema validation requires facts and no issues")
-        if self.status == SchemaValidationStatus.FAILED and (self.semantic_facts is not None or not self.issues):
-            raise ValueError("failed schema validation requires issues and no facts")
-        if self.status == SchemaValidationStatus.NOT_RUN and (self.semantic_facts is not None or self.issues):
-            raise ValueError("schema validation not-run state cannot contain facts or issues")
+        if self.status == SchemaValidationStatus.PASSED and (self.semantic_envelope is None or self.issues):
+            raise ValueError("passed schema validation requires an envelope and no issues")
+        if self.status == SchemaValidationStatus.FAILED and (self.semantic_envelope is not None or not self.issues):
+            raise ValueError("failed schema validation requires issues and no envelope")
+        if self.status == SchemaValidationStatus.NOT_RUN and (self.semantic_envelope is not None or self.issues):
+            raise ValueError("schema validation not-run state cannot contain an envelope or issues")
         return self
 
     @property
@@ -294,7 +526,7 @@ class SchemaValidationResult(BaseModel):
 
 
 class DomainValidationResult(BaseModel):
-    model_config = ConfigDict(strict=True)
+    model_config = ConfigDict(strict=True, extra="forbid")
 
     status: DomainValidationStatus
     issues: List[ValidationIssue] = Field(default_factory=list)
@@ -314,21 +546,23 @@ class DomainValidationResult(BaseModel):
         return self.status == DomainValidationStatus.PASSED
 
 
-class ValidatedSemanticFacts(BaseModel):
+class ValidatedSemanticEnvelope(BaseModel):
     """Admissibility carrier available only after both validation stages pass."""
 
-    model_config = ConfigDict(strict=True)
+    model_config = ConfigDict(strict=True, extra="forbid")
 
-    facts: SemanticFacts
+    envelope: ViolenceSemanticEnvelope
+    derived: DerivedSemanticView
+    policy_candidate: PolicyCandidateView
 
 
 class ValidationResult(BaseModel):
-    model_config = ConfigDict(strict=True)
+    model_config = ConfigDict(strict=True, extra="forbid")
 
     schema_validation: SchemaValidationResult
     domain_validation: DomainValidationResult
     failure_stage: ValidationFailureStage
-    validated_facts: Optional[ValidatedSemanticFacts] = None
+    validated_envelope: Optional[ValidatedSemanticEnvelope] = None
 
     @model_validator(mode="after")
     def require_stage_consistency(self) -> "ValidationResult":
@@ -336,22 +570,22 @@ class ValidationResult(BaseModel):
             if (
                 self.schema_validation.status != SchemaValidationStatus.NOT_RUN
                 or self.domain_validation.status != DomainValidationStatus.NOT_RUN
-                or self.validated_facts is not None
+                or self.validated_envelope is not None
             ):
                 raise ValueError("not-run validation cannot contain stage results or facts")
         elif self.failure_stage == ValidationFailureStage.NONE:
-            if not self.schema_validation.passed or not self.domain_validation.passed or self.validated_facts is None:
-                raise ValueError("successful validation requires both stages and validated facts")
+            if not self.schema_validation.passed or not self.domain_validation.passed or self.validated_envelope is None:
+                raise ValueError("successful validation requires both stages and a validated envelope")
         elif self.failure_stage == ValidationFailureStage.SCHEMA:
             if self.schema_validation.status != SchemaValidationStatus.FAILED:
                 raise ValueError("schema failure stage requires failed schema validation")
-            if self.domain_validation.status != DomainValidationStatus.NOT_RUN or self.validated_facts is not None:
-                raise ValueError("schema failure cannot run domain validation or expose facts")
+            if self.domain_validation.status != DomainValidationStatus.NOT_RUN or self.validated_envelope is not None:
+                raise ValueError("schema failure cannot run domain validation or expose an envelope")
         elif self.failure_stage == ValidationFailureStage.DOMAIN:
             if not self.schema_validation.passed or self.domain_validation.status != DomainValidationStatus.FAILED:
                 raise ValueError("domain failure requires passed schema and failed domain validation")
-            if self.validated_facts is not None:
-                raise ValueError("domain failure cannot expose validated facts")
+            if self.validated_envelope is not None:
+                raise ValueError("domain failure cannot expose a validated envelope")
         return self
 
     @property
@@ -360,23 +594,13 @@ class ValidationResult(BaseModel):
 
 
 class SalesforcePayload(BaseModel):
-    model_config = ConfigDict(strict=True)
+    model_config = ConfigDict(strict=True, extra="forbid")
 
     illustrative_incident_identifier: StrictStr
-    illustrative_violence_detected: StrictBool
-    illustrative_violence_event_type: StrictStr
-    illustrative_actor: Optional[StrictStr]
-    illustrative_target: Optional[StrictStr]
-    illustrative_contact_occurred: StrictBool
-    illustrative_injury_mentioned: StrictBool
-    illustrative_current_event: StrictBool
-    illustrative_intentionality: StrictStr
-    illustrative_negation_present: StrictBool
-    illustrative_correction_present: StrictBool
-    illustrative_conflicting_information: StrictBool
-    illustrative_confidence: StrictFloat = Field(ge=0.0, le=1.0)
+    illustrative_semantic_schema: StrictStr
+    illustrative_active_propositions: List[StrictStr]
+    illustrative_interpersonal_propositions: List[StrictStr]
     illustrative_evidence: List[StrictStr]
-    illustrative_uncertainty_notes: List[StrictStr]
     illustrative_validation_status: StrictStr
     illustrative_write_disposition: StrictStr
 
@@ -384,20 +608,10 @@ class SalesforcePayload(BaseModel):
     def from_preview_dict(cls, value: Dict[str, object]) -> "SalesforcePayload":
         return cls(
             illustrative_incident_identifier=value["Illustrative_Incident_Identifier__c"],
-            illustrative_violence_detected=value["Illustrative_Violence_Detected__c"],
-            illustrative_violence_event_type=value["Illustrative_Violence_Event_Type__c"],
-            illustrative_actor=value["Illustrative_Actor__c"],
-            illustrative_target=value["Illustrative_Target__c"],
-            illustrative_contact_occurred=value["Illustrative_Contact_Occurred__c"],
-            illustrative_injury_mentioned=value["Illustrative_Injury_Mentioned__c"],
-            illustrative_current_event=value["Illustrative_Current_Event__c"],
-            illustrative_intentionality=value["Illustrative_Intentionality__c"],
-            illustrative_negation_present=value["Illustrative_Negation_Present__c"],
-            illustrative_correction_present=value["Illustrative_Correction_Present__c"],
-            illustrative_conflicting_information=value["Illustrative_Conflicting_Information__c"],
-            illustrative_confidence=value["Illustrative_Confidence__c"],
+            illustrative_semantic_schema=value["Illustrative_Semantic_Schema__c"],
+            illustrative_active_propositions=value["Illustrative_Active_Propositions__c"],
+            illustrative_interpersonal_propositions=value["Illustrative_Interpersonal_Propositions__c"],
             illustrative_evidence=value["Illustrative_Evidence__c"],
-            illustrative_uncertainty_notes=value["Illustrative_Uncertainty_Notes__c"],
             illustrative_validation_status=value["Illustrative_Validation_Status__c"],
             illustrative_write_disposition=value["Illustrative_Write_Disposition__c"],
         )
@@ -405,34 +619,24 @@ class SalesforcePayload(BaseModel):
     def to_preview_dict(self) -> Dict[str, object]:
         return {
             "Illustrative_Incident_Identifier__c": self.illustrative_incident_identifier,
-            "Illustrative_Violence_Detected__c": self.illustrative_violence_detected,
-            "Illustrative_Violence_Event_Type__c": self.illustrative_violence_event_type,
-            "Illustrative_Actor__c": self.illustrative_actor,
-            "Illustrative_Target__c": self.illustrative_target,
-            "Illustrative_Contact_Occurred__c": self.illustrative_contact_occurred,
-            "Illustrative_Injury_Mentioned__c": self.illustrative_injury_mentioned,
-            "Illustrative_Current_Event__c": self.illustrative_current_event,
-            "Illustrative_Intentionality__c": self.illustrative_intentionality,
-            "Illustrative_Negation_Present__c": self.illustrative_negation_present,
-            "Illustrative_Correction_Present__c": self.illustrative_correction_present,
-            "Illustrative_Conflicting_Information__c": self.illustrative_conflicting_information,
-            "Illustrative_Confidence__c": self.illustrative_confidence,
+            "Illustrative_Semantic_Schema__c": self.illustrative_semantic_schema,
+            "Illustrative_Active_Propositions__c": list(self.illustrative_active_propositions),
+            "Illustrative_Interpersonal_Propositions__c": list(self.illustrative_interpersonal_propositions),
             "Illustrative_Evidence__c": list(self.illustrative_evidence),
-            "Illustrative_Uncertainty_Notes__c": list(self.illustrative_uncertainty_notes),
             "Illustrative_Validation_Status__c": self.illustrative_validation_status,
             "Illustrative_Write_Disposition__c": self.illustrative_write_disposition,
         }
 
 
 class PipelineResult(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(strict=True, extra="forbid", arbitrary_types_allowed=True)
 
     incident: Incident
     normalized_incident: NormalizedIncident
     regex_result: RegexResult
-    semantic_facts: Optional[SemanticFacts]
+    semantic_envelope: Optional[ViolenceSemanticEnvelope]
+    derived_semantics: Optional[DerivedSemanticView]
     validation_result: ValidationResult
-    operational_finding: Optional[ViolenceFinding]
     policy_decision: PolicyDecision
     salesforce_payload: Optional[SalesforcePayload]
     presentation_payload: Dict[str, Any]

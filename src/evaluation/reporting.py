@@ -33,7 +33,6 @@ def _current_pattern_counts(cases: Iterable[CaseRegressionResult]) -> Counter[st
 _RUNTIME_FAILURE_FINDINGS = {
     FailurePattern.PROVIDER_FAILURE.value,
     FailurePattern.VALIDATION_FAILURE.value,
-    FailurePattern.COMPATIBILITY_FAILURE.value,
     FailurePattern.POLICY_FAILURE.value,
     FailurePattern.MISSING_OBSERVATION.value,
     FailurePattern.VALIDATION_REJECTION.value,
@@ -41,17 +40,12 @@ _RUNTIME_FAILURE_FINDINGS = {
 }
 
 _COMPARISON_DIFFERENCE_FINDINGS = {
-    FailurePattern.COMPATIBILITY_DIFFERENCE.value,
     FailurePattern.UNSUPPORTED_EVIDENCE.value,
     FailurePattern.EVIDENCE_OMISSION.value,
-    FailurePattern.UNCERTAINTY_NOTE_DIFFERENCE.value,
     FailurePattern.POLICY_MISMATCH.value,
 }
 
-_LEGACY_CLASSIFICATION_FINDINGS = {
-    FailurePattern.EXCESSIVE_UNCERTAINTY.value,
-    FailurePattern.INSUFFICIENT_UNCERTAINTY.value,
-}
+_LEGACY_CLASSIFICATION_FINDINGS: set[str] = set()
 
 
 def _lines_for_frequency(counts: Counter[str]) -> List[str]:

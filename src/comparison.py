@@ -1,9 +1,18 @@
-from dataclasses import dataclass
-from typing import Dict, List, Optional
+"""Deterministic regex-versus-successor comparison without semantic inference."""
 
-from src.compatibility_finding import CompatibilityFindingResult, CompatibilityFindingStatus
-from src.contracts import ValidationFailureStage, ValidationResult
-from src.models import Incident, Intentionality, ViolenceEventType
+from dataclasses import dataclass
+from typing import Dict, List
+
+from src.contracts import (
+    Direction,
+    PolicyDecision,
+    PolicyOutcome,
+    RelationshipKind,
+    TemporalScope,
+    ValidationFailureStage,
+    ValidationResult,
+)
+from src.models import Incident
 from src.semantic_extractor import SemanticExtractionResult, SemanticExtractionStatus
 
 
@@ -13,7 +22,6 @@ class ComparisonResult:
     regex_result: Dict[str, object]
     semantic_result: SemanticExtractionResult
     validation_result: ValidationResult
-    compatibility_result: Optional[CompatibilityFindingResult]
     semantic_validation_status: str
     classification_alignment: str
     material_difference_detected: bool
@@ -28,229 +36,86 @@ def build_comparison_result(
     regex_result: Dict[str, object],
     semantic_result: SemanticExtractionResult,
     validation_result: ValidationResult,
-    compatibility_result: Optional[CompatibilityFindingResult] = None,
+    policy_decision: PolicyDecision,
 ) -> ComparisonResult:
-    classification_alignment = _classification_alignment(
-        regex_result,
-        semantic_result,
-        validation_result,
-        compatibility_result,
-    )
-    divergence_observations = _build_divergence_observations(
-        classification_alignment,
-        semantic_result,
-        validation_result,
-    )
-    semantic_enrichment_observations = _build_semantic_enrichment_observations(
-        regex_result,
-        semantic_result,
-        validation_result,
-        compatibility_result,
-    )
-    material_difference_detected = bool(divergence_observations or semantic_enrichment_observations)
-    observations = divergence_observations + semantic_enrichment_observations
-    display_status = _display_status(
-        classification_alignment,
-        divergence_observations,
-        semantic_enrichment_observations,
-    )
+    if semantic_result.status != SemanticExtractionStatus.SUCCESS or not validation_result.passed:
+        alignment = "semantic_failure"
+    else:
+        regex_detected = bool(regex_result.get("detected"))
+        semantic_detected = policy_decision.outcome == PolicyOutcome.WRITE_DETECTED
+        if regex_detected and semantic_detected:
+            alignment = "aligned_positive"
+        elif not regex_detected and not semantic_detected:
+            alignment = "aligned_negative"
+        elif regex_detected:
+            alignment = "regex_positive_semantic_negative"
+        else:
+            alignment = "regex_negative_semantic_positive"
 
+    divergence: list[str] = []
+    if alignment == "semantic_failure":
+        if validation_result.failure_stage == ValidationFailureStage.SCHEMA:
+            divergence.append("Semantic schema validation failed and comparison is unavailable.")
+        elif validation_result.failure_stage == ValidationFailureStage.DOMAIN:
+            divergence.append("Semantic domain validation failed and comparison is unavailable.")
+        else:
+            divergence.append("Semantic extraction failed and no validated comparison is available.")
+    elif alignment == "regex_positive_semantic_negative":
+        divergence.append("Regex detected violence-related language, but deterministic policy found no affirmed current interpersonal violence.")
+    elif alignment == "regex_negative_semantic_positive":
+        divergence.append("Regex did not detect violence-related language, but validated propositions support current interpersonal violence.")
+
+    enrichment: list[str] = []
+    validated = validation_result.validated_envelope
+    if validated is not None:
+        envelope = validated.envelope
+        derived = {item.proposition_id: item for item in validated.derived.propositions}
+        if any(item.temporal_scope == TemporalScope.HISTORICAL for item in envelope.propositions):
+            enrichment.append("Semantic extraction preserves historical conduct as proposition-scoped context.")
+        directions = {item.direction for item in derived.values()}
+        if Direction.OBJECT_DIRECTED in directions:
+            enrichment.append("Semantic extraction distinguishes object-directed conduct.")
+        if Direction.SELF_DIRECTED in directions:
+            enrichment.append("Semantic extraction distinguishes self-directed conduct.")
+        if any(item.relationship_kind == RelationshipKind.SUPERSEDES for item in envelope.relationships):
+            enrichment.append("Semantic extraction preserves an explicit correction and supersession relationship.")
+        if any(item.relationship_kind == RelationshipKind.CONFLICTS_WITH for item in envelope.relationships):
+            enrichment.append("Semantic extraction preserves competing assertions without selecting a winner.")
+        if envelope.uncertainties:
+            enrichment.append("Semantic extraction provides proposition-scoped bounded uncertainty.")
+        if envelope.evidence_supports:
+            enrichment.append("Semantic extraction links exact narrative evidence to semantic subjects.")
+
+    observations = divergence + enrichment
     if not observations:
         observations = ["No material difference identified."]
+    if alignment == "semantic_failure":
+        display = "Semantic Comparison Unavailable"
+    elif divergence:
+        display = "Material Difference Detected"
+    elif enrichment:
+        display = "Classification Aligned, Semantic Context Added"
+    else:
+        display = "No Material Difference Identified"
 
+    status = semantic_result.status.value
+    if semantic_result.status == SemanticExtractionStatus.SUCCESS:
+        if validation_result.failure_stage == ValidationFailureStage.SCHEMA:
+            status = "schema_validation_failure"
+        elif validation_result.failure_stage == ValidationFailureStage.DOMAIN:
+            status = "domain_validation_failure"
+        else:
+            status = "success"
     return ComparisonResult(
         incident=incident,
         regex_result=regex_result,
         semantic_result=semantic_result,
         validation_result=validation_result,
-        compatibility_result=compatibility_result,
-        semantic_validation_status=_semantic_validation_status(semantic_result, validation_result),
-        classification_alignment=classification_alignment,
-        material_difference_detected=material_difference_detected,
-        divergence_observations=divergence_observations,
-        semantic_enrichment_observations=semantic_enrichment_observations,
-        display_status=display_status,
+        semantic_validation_status=status,
+        classification_alignment=alignment,
+        material_difference_detected=bool(divergence or enrichment),
+        divergence_observations=divergence,
+        semantic_enrichment_observations=enrichment,
+        display_status=display,
         observations=observations,
     )
-
-
-def _classification_alignment(
-    regex_result: Dict[str, object],
-    semantic_result: SemanticExtractionResult,
-    validation_result: ValidationResult,
-    compatibility_result: Optional[CompatibilityFindingResult],
-) -> str:
-    if semantic_result.status != SemanticExtractionStatus.SUCCESS:
-        return "semantic_failure"
-
-    if not validation_result.passed:
-        return "semantic_failure"
-
-    if compatibility_result is None or compatibility_result.status != CompatibilityFindingStatus.SUCCESS:
-        return "semantic_failure"
-    finding = compatibility_result.finding
-    if finding is None:
-        return "semantic_failure"
-
-    regex_detected = bool(regex_result.get("detected"))
-
-    if regex_detected and finding.violence_present:
-        return "aligned_positive"
-
-    if not regex_detected and not finding.violence_present:
-        return "aligned_negative"
-
-    if regex_detected and not finding.violence_present:
-        return "regex_positive_semantic_negative"
-
-    return "regex_negative_semantic_positive"
-
-
-def _build_divergence_observations(
-    classification_alignment: str,
-    semantic_result: SemanticExtractionResult,
-    validation_result: ValidationResult,
-) -> List[str]:
-    if classification_alignment == "regex_positive_semantic_negative":
-        return [
-            "Regex detected violence-related language, but semantic extraction determined no violence."
-        ]
-
-    if classification_alignment == "regex_negative_semantic_positive":
-        return [
-            "Regex did not detect violence-related language, but semantic extraction determined violence was present."
-        ]
-
-    if classification_alignment == "semantic_failure":
-        if semantic_result.status == SemanticExtractionStatus.SUCCESS:
-            if validation_result.failure_stage == ValidationFailureStage.SCHEMA:
-                return ["Semantic schema validation failed and comparison is unavailable."]
-            if validation_result.failure_stage == ValidationFailureStage.DOMAIN:
-                return ["Semantic domain validation failed and comparison is unavailable."]
-        return ["Semantic extraction failed and no validated semantic comparison is available."]
-
-    return []
-
-
-def _build_semantic_enrichment_observations(
-    regex_result: Dict[str, object],
-    semantic_result: SemanticExtractionResult,
-    validation_result: ValidationResult,
-    compatibility_result: Optional[CompatibilityFindingResult],
-) -> List[str]:
-    if (
-        semantic_result.status != SemanticExtractionStatus.SUCCESS
-        or not validation_result.passed
-        or compatibility_result is None
-        or compatibility_result.status != CompatibilityFindingStatus.SUCCESS
-        or compatibility_result.finding is None
-    ):
-        return []
-
-    finding = compatibility_result.finding
-    observations: List[str] = []
-
-    _append_unique(
-        observations,
-        not finding.current_event,
-        "Semantic extraction identifies the violence language as historical or non-current.",
-    )
-    _append_unique(
-        observations,
-        finding.event_type == ViolenceEventType.VERBAL_THREAT,
-        "Semantic extraction distinguishes a verbal threat from physical violence.",
-    )
-    _append_unique(
-        observations,
-        finding.event_type == ViolenceEventType.ATTEMPTED_PHYSICAL_VIOLENCE,
-        "Semantic extraction distinguishes attempted physical violence from completed contact.",
-    )
-    _append_unique(
-        observations,
-        finding.event_type == ViolenceEventType.COMPLETED_PHYSICAL_VIOLENCE,
-        "Semantic extraction identifies completed physical violence.",
-    )
-    _append_unique(
-        observations,
-        finding.intentionality == Intentionality.ACCIDENTAL,
-        "Semantic extraction identifies accidental contact rather than intentional violence.",
-    )
-    _append_unique(
-        observations,
-        finding.violence_present
-        and finding.event_type != ViolenceEventType.COMPLETED_PHYSICAL_VIOLENCE
-        and not finding.contact_occurred,
-        "Semantic extraction identifies no person-directed physical contact.",
-    )
-    _append_unique(
-        observations,
-        finding.negated,
-        "Semantic extraction identifies negated violence language.",
-    )
-    _append_unique(
-        observations,
-        finding.correction_present,
-        "Semantic extraction applies or identifies a correction.",
-    )
-    _append_unique(
-        observations,
-        finding.conflicting_information,
-        "Semantic extraction identifies conflicting statements.",
-    )
-    _append_unique(
-        observations,
-        finding.injury_mentioned,
-        "Semantic extraction identifies an injury mention.",
-    )
-    _append_unique(
-        observations,
-        finding.actor is not None or finding.target is not None,
-        "Semantic extraction identifies actor or target information not represented by regex.",
-    )
-    _append_unique(
-        observations,
-        bool(finding.evidence_text),
-        "Semantic extraction provides supporting evidence excerpts not represented by regex.",
-    )
-    _append_unique(
-        observations,
-        bool(finding.uncertainty_notes) or finding.confidence < 1.0,
-        "Semantic extraction provides confidence or uncertainty information not represented by regex.",
-    )
-
-    return observations
-
-
-def _semantic_validation_status(
-    semantic_result: SemanticExtractionResult,
-    validation_result: ValidationResult,
-) -> str:
-    if semantic_result.status != SemanticExtractionStatus.SUCCESS:
-        return semantic_result.status.value
-    if validation_result.failure_stage == ValidationFailureStage.SCHEMA:
-        return "schema_validation_failure"
-    if validation_result.failure_stage == ValidationFailureStage.DOMAIN:
-        return "domain_validation_failure"
-    return "success"
-
-
-def _display_status(
-    classification_alignment: str,
-    divergence_observations: List[str],
-    semantic_enrichment_observations: List[str],
-) -> str:
-    if classification_alignment == "semantic_failure":
-        return "Semantic Comparison Unavailable"
-
-    if divergence_observations:
-        return "Material Difference Detected"
-
-    if semantic_enrichment_observations:
-        return "Classification Aligned, Semantic Context Added"
-
-    return "No Material Difference Identified"
-
-
-def _append_unique(observations: List[str], condition: bool, observation: str) -> None:
-    if condition and observation not in observations:
-        observations.append(observation)

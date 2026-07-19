@@ -20,6 +20,8 @@ from src.evaluation.run_contracts import (
     ImmutableEvaluationContract,
     ObservedCaseResult,
 )
+from src.contracts import SEMANTIC_SCHEMA_IDENTITY, SEMANTIC_SCHEMA_VERSION
+from src.evaluation.corpus import EVALUATION_SCHEMA_VERSION
 
 
 class BaselineAcceptanceProvenance(ImmutableEvaluationContract):
@@ -56,6 +58,8 @@ class AcceptedBaselineArtifact(ImmutableEvaluationContract):
     corpus_identity: StrictStr
     corpus_version: StrictStr
     evaluation_schema_version: StrictStr
+    semantic_schema_identity: StrictStr
+    semantic_schema_version: StrictStr
     execution_mode: EvaluationRunnerMode
     model_identifier: Optional[StrictStr] = None
     extraction_configuration_identity: Optional[StrictStr] = None
@@ -74,6 +78,8 @@ class AcceptedBaselineArtifact(ImmutableEvaluationContract):
         "corpus_identity",
         "corpus_version",
         "evaluation_schema_version",
+        "semantic_schema_identity",
+        "semantic_schema_version",
         "model_identifier",
         "extraction_configuration_identity",
     )
@@ -87,6 +93,13 @@ class AcceptedBaselineArtifact(ImmutableEvaluationContract):
     def require_snapshot_consistency(self) -> "AcceptedBaselineArtifact":
         if self.artifact_type != "accepted_evaluation_baseline":
             raise ValueError("unsupported baseline artifact type")
+        if self.evaluation_schema_version != EVALUATION_SCHEMA_VERSION:
+            raise ValueError("unsupported evaluation schema version")
+        if (self.semantic_schema_identity, self.semantic_schema_version) != (
+            SEMANTIC_SCHEMA_IDENTITY,
+            SEMANTIC_SCHEMA_VERSION,
+        ):
+            raise ValueError("unsupported semantic schema identity or version")
         observed_ids = tuple(item.case_id for item in self.observed_cases)
         evaluation_ids = tuple(item.case_id for item in self.case_evaluations)
         if observed_ids != self.requested_case_ids or evaluation_ids != self.requested_case_ids:
@@ -171,6 +184,8 @@ class RegressionArtifact(ImmutableEvaluationContract):
     corpus_identity: StrictStr
     corpus_version: StrictStr
     evaluation_schema_version: StrictStr
+    semantic_schema_identity: StrictStr
+    semantic_schema_version: StrictStr
     comparison_timestamp: datetime
     requested_case_ids: Tuple[StrictStr, ...]
     case_regressions: Tuple[CaseRegressionResult, ...]
@@ -187,6 +202,8 @@ class RegressionArtifact(ImmutableEvaluationContract):
         "corpus_identity",
         "corpus_version",
         "evaluation_schema_version",
+        "semantic_schema_identity",
+        "semantic_schema_version",
     )
     @classmethod
     def require_identifiers(cls, value: str) -> str:
@@ -198,6 +215,13 @@ class RegressionArtifact(ImmutableEvaluationContract):
     def require_comparison_consistency(self) -> "RegressionArtifact":
         if self.artifact_type != "evaluation_regression_comparison":
             raise ValueError("unsupported regression artifact type")
+        if self.evaluation_schema_version != EVALUATION_SCHEMA_VERSION:
+            raise ValueError("unsupported evaluation schema version")
+        if (self.semantic_schema_identity, self.semantic_schema_version) != (
+            SEMANTIC_SCHEMA_IDENTITY,
+            SEMANTIC_SCHEMA_VERSION,
+        ):
+            raise ValueError("unsupported semantic schema identity or version")
         if self.comparison_timestamp.tzinfo is None or self.comparison_timestamp.utcoffset() is None:
             raise ValueError("comparison_timestamp must be timezone-aware")
         if tuple(item.case_id for item in self.case_regressions) != self.requested_case_ids:

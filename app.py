@@ -95,7 +95,7 @@ def _display_semantic_details(semantic_result, validation_result) -> None:
         st.write(f"Failure detail: {semantic_result.failure_message or 'Semantic extraction failed.'}")
         return
 
-    if not validation_result.passed or validation_result.validated_facts is None:
+    if not validation_result.passed or validation_result.validated_envelope is None:
         stage = validation_result.failure_stage.value
         issues = (
             validation_result.schema_validation.issues
@@ -107,25 +107,21 @@ def _display_semantic_details(semantic_result, validation_result) -> None:
             st.write(f"- {issue.code.value}: {issue.message}")
         return
 
-    facts = validation_result.validated_facts.facts
-    st.write(f"Violence present: {facts.violence_present}")
-    st.write(f"Event type: {facts.event_type.value}")
-    st.write(f"Actor: {facts.actor}")
-    st.write(f"Target: {facts.target}")
-    st.write(f"Contact occurred: {facts.contact_occurred}")
-    st.write(f"Injury mentioned: {facts.injury_mentioned}")
-    st.write(f"Current event: {facts.current_event}")
-    st.write(f"Intentionality: {facts.intentionality.value}")
-    st.write(f"Negation: {facts.negated}")
-    st.write(f"Correction: {facts.correction_present}")
-    st.write(f"Conflicting information: {facts.conflicting_information}")
-    st.write(f"Confidence: {facts.confidence}")
-
-    st.write("Evidence excerpts")
-    st.write(facts.evidence_text or [])
-
-    st.write("Uncertainty notes")
-    st.write(facts.uncertainty_notes or [])
+    validated = validation_result.validated_envelope
+    envelope = validated.envelope
+    st.write(f"Semantic schema: {envelope.schema_identity}@{envelope.schema_version}")
+    st.write(f"Entities: {len(envelope.entities)}")
+    st.write(f"Propositions: {len(envelope.propositions)}")
+    st.write(f"Active propositions: {validated.derived.active_proposition_ids}")
+    st.write("Proposition details")
+    st.write([item.model_dump(mode="json") for item in envelope.propositions])
+    st.write("Relationships")
+    st.write([item.model_dump(mode="json") for item in envelope.relationships])
+    st.write("Bounded uncertainties")
+    st.write([item.model_dump(mode="json") for item in envelope.uncertainties])
+    st.write("Evidence excerpts and supports")
+    st.write([item.model_dump(mode="json") for item in envelope.evidence_excerpts])
+    st.write([item.model_dump(mode="json") for item in envelope.evidence_supports])
 
 
 def _display_validation(validation_result) -> None:
@@ -164,12 +160,6 @@ def _display_policy(decision, *, include_technical_details: bool = True) -> None
 def _display_technical_details(result) -> None:
     with st.expander("Technical Details", expanded=False):
         _display_semantic_details(result.semantic_result, result.validation_result)
-        if result.compatibility_result is None:
-            st.write("Compatibility construction: not available")
-        else:
-            st.write(
-                f"Compatibility construction: {result.compatibility_result.status.value}"
-            )
         _display_policy_details(result.policy_decision)
 
 
@@ -191,7 +181,7 @@ def _display_results(result) -> None:
         st.subheader(policy_outcome_label(result.policy_decision))
         st.write(
             semantic_summary(
-                result.validation_result.validated_facts,
+                result.validation_result.validated_envelope,
                 result.policy_decision,
             )
         )
@@ -199,7 +189,7 @@ def _display_results(result) -> None:
         st.markdown("**Why this result**")
         for explanation in policy_reason_explanations(result.policy_decision):
             st.write(f"- {explanation}")
-        st.caption("Deterministic policy applied to validated structured semantic facts.")
+        st.caption("Deterministic policy applied to a validated proposition-oriented semantic envelope.")
         _display_technical_details(result)
 
     st.header("Comparison")

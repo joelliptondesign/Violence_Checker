@@ -8,9 +8,8 @@ from src.contracts import (
     PolicyReasonCode,
     ValidationFailureStage,
     ValidationResult,
-    ValidatedSemanticFacts,
+    ValidatedSemanticEnvelope,
 )
-from src.models import ViolenceEventType
 
 
 POLICY_OUTCOME_LABELS = {
@@ -53,32 +52,19 @@ POLICY_REASON_EXPLANATIONS = {
     PolicyReasonCode.DOMAIN_VALIDATION_FAILED: (
         "The extracted information contained an invalid combination of facts."
     ),
-    PolicyReasonCode.COMPATIBILITY_CONSTRUCTION_FAILED: (
-        "The validated facts could not be prepared for downstream representation."
-    ),
     PolicyReasonCode.UNSUPPORTED_POLICY_INPUT: (
         "The validated result is not supported by this policy version."
     ),
     PolicyReasonCode.CONFLICTING_INFORMATION: "The narrative contains conflicting information.",
-    PolicyReasonCode.THREAT_WITHOUT_VIOLENCE_INDICATION: (
-        "The narrative indicates a threat, but the violence indicator is not affirmative."
+    PolicyReasonCode.SCOPED_SEMANTIC_UNCERTAINTY: (
+        "An active current interpersonal proposition has explicit bounded uncertainty."
     ),
-    PolicyReasonCode.UNCLEAR_EVENT_TYPE: "The event type cannot be determined confidently.",
-    PolicyReasonCode.UNCLEAR_MATERIAL_INTENTIONALITY: (
-        "The available information does not establish whether the event was intentional."
+    PolicyReasonCode.AFFIRMED_CURRENT_INTERPERSONAL_VIOLENCE: (
+        "An active current interpersonal proposition affirms violence or a threat."
     ),
-    PolicyReasonCode.MATERIAL_UNCERTAINTY_NOTES: (
-        "Additional information is needed before a confident classification can be made."
+    PolicyReasonCode.NO_ACTIVE_CURRENT_INTERPERSONAL_VIOLENCE: (
+        "No active current interpersonal proposition affirms violence or a threat."
     ),
-    PolicyReasonCode.NEGATED_AFFIRMATIVE_FINDING: (
-        "The narrative negates an otherwise affirmative finding."
-    ),
-    PolicyReasonCode.AFFIRMATIVE_VIOLENCE_OR_THREAT: (
-        "The validated facts indicate violence or a threat."
-    ),
-    PolicyReasonCode.NO_VIOLENCE: "The validated facts indicate no violence or threat.",
-    PolicyReasonCode.NEGATED_NON_EVENT: "The narrative explicitly indicates the event did not occur.",
-    PolicyReasonCode.CORRECTED_NON_EVENT: "The narrative corrects an earlier statement.",
 }
 
 VALIDATION_SUMMARIES = {
@@ -107,41 +93,20 @@ def policy_reason_explanations(decision: PolicyDecision) -> list[str]:
     return [POLICY_REASON_EXPLANATIONS[reason] for reason in decision.reason_codes]
 
 
-EVENT_TYPE_LABELS = {
-    ViolenceEventType.NONE: "no violence event",
-    ViolenceEventType.VERBAL_THREAT: "a verbal threat",
-    ViolenceEventType.ATTEMPTED_PHYSICAL_VIOLENCE: "attempted physical violence",
-    ViolenceEventType.COMPLETED_PHYSICAL_VIOLENCE: "completed physical violence",
-    ViolenceEventType.UNCLEAR: "an unclear event",
-}
-
-
 def semantic_summary(
-    validated_facts: Optional[ValidatedSemanticFacts],
+    validated: Optional[ValidatedSemanticEnvelope],
     decision: PolicyDecision,
 ) -> str:
-    """Summarize validated facts and policy outcome without inference."""
-    if decision.outcome == PolicyOutcome.WRITE_FAILED or validated_facts is None:
-        return "Semantic analysis was unable to produce validated facts."
-
-    facts = validated_facts.facts
-    event_label = EVENT_TYPE_LABELS[facts.event_type]
-    actor = facts.actor or "The narrative's actor"
-    target_phrase = f" involving {facts.target}" if facts.target else ""
-
+    """Summarize only typed policy and derived views without semantic inference."""
+    if decision.outcome == PolicyOutcome.WRITE_FAILED or validated is None:
+        return "Semantic analysis was unable to produce a validated proposition envelope."
+    candidate = validated.policy_candidate
     if decision.outcome == PolicyOutcome.WRITE_DETECTED:
-        summary = f"{actor} is described as responsible for {event_label}{target_phrase}."
+        count = len(candidate.active_current_interpersonal_violence)
+        return f"{count} active current interpersonal proposition(s) support the detected outcome."
     elif decision.outcome == PolicyOutcome.WRITE_NOT_DETECTED:
-        summary = "The validated facts do not describe a current violence event or threat."
-    else:
-        summary = f"The validated facts describe {event_label}{target_phrase}, but the policy result remains uncertain."
-
-    details = []
-    if facts.contact_occurred:
-        details.append("Physical contact occurred.")
-    if facts.injury_mentioned:
-        details.append("An injury was documented.")
-    return " ".join([summary, *details])
+        return "No validated active current interpersonal proposition supports a detected outcome."
+    return "Validated active current interpersonal propositions contain bounded uncertainty."
 
 
 def validation_summary(validation: ValidationResult) -> str:

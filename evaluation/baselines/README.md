@@ -1,3 +1,5 @@
 # Accepted Evaluation Baselines
 
-Canonical location for explicitly accepted immutable evaluation baselines. Acceptance is an explicit command that snapshots one complete run, its ordered observations and case evaluations, summary, execution identity, and acceptance provenance. Existing baseline files cannot be overwritten. Replacement creates a new baseline identifier and file that references the retained prior baseline; automatic promotion is not implemented. This directory contains no committed baseline artifact.
+A current baseline is an explicit immutable snapshot of one complete successor run, including ordered observations, comparisons, summary, semantic schema provenance, and acceptance provenance. Existing files cannot be overwritten; replacement requires a new identity and a retained predecessor reference.
+
+Creation-time schema `1.0.0` baselines remain byte-immutable and readable. They cannot be used as successor baselines or silently upgraded.

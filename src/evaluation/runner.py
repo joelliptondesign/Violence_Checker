@@ -12,7 +12,13 @@ from typing import Callable, List, Optional, Sequence, Tuple
 
 from src.app_logic import AnalysisResult, run_analysis
 from src.contract_adapters import pipeline_result_from_analysis
-from src.contracts import InputValidationResult, PipelineFailureProvenance, ValidationFailureStage
+from src.contracts import (
+    InputValidationResult,
+    PipelineFailureProvenance,
+    SEMANTIC_SCHEMA_IDENTITY,
+    SEMANTIC_SCHEMA_VERSION,
+    ValidationFailureStage,
+)
 from src.evaluation.case_comparison import compare_case
 from src.evaluation.contracts import CaseEvaluationResult, CaseEvaluationStatus, EvaluationCase, FailurePattern
 from src.evaluation.corpus import EVALUATION_SCHEMA_VERSION, REPOSITORY_ROOT, CorpusDocument, load_corpus
@@ -213,6 +219,8 @@ def build_run_artifact(
 ) -> EvaluationRunArtifact:
     return EvaluationRunArtifact(
         evaluation_schema_version=EVALUATION_SCHEMA_VERSION,
+        semantic_schema_identity=SEMANTIC_SCHEMA_IDENTITY,
+        semantic_schema_version=SEMANTIC_SCHEMA_VERSION,
         corpus_identity=corpus.corpus_identity,
         corpus_version=corpus.corpus_version,
         run_id=configuration.run_id,

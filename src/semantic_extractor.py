@@ -37,7 +37,7 @@ class SemanticExtractionResult:
         return self.status == SemanticExtractionStatus.SUCCESS
 
 
-def extract_violence_finding(
+def extract_semantic_envelope(
     incident: Incident,
     *,
     config: Optional[AppConfig] = None,

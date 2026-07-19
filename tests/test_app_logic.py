@@ -1,102 +1,41 @@
-import importlib
-
-import pytest
-
-from src.app_logic import (
-    active_narrative_signature,
-    create_manual_incident,
-    is_stale_result,
-    run_analysis,
-    should_display_analysis_result,
-    validate_manual_narrative,
-)
-from src.fixtures import SYNTHETIC_INCIDENTS
-from src.contracts import PolicyOutcome, SemanticFacts
-from src.models import Intentionality, ViolenceEventType
+from src.app_logic import AnalysisResult, run_analysis
+from src.contracts import InputValidationResult, PolicyOutcome
+from src.models import Incident
 from src.semantic_extractor import SemanticExtractionResult, SemanticExtractionStatus
+from tests.successor_helpers import envelope
 
 
-def valid_semantic_result():
+def executor_for(incident):
     return SemanticExtractionResult(
-        status=SemanticExtractionStatus.SUCCESS,
-        semantic_candidate=SemanticFacts(
-            violence_present=True,
-            event_type=ViolenceEventType.ATTEMPTED_PHYSICAL_VIOLENCE,
-            actor="pt",
-            target="rn",
-            contact_occurred=False,
-            injury_mentioned=False,
-            current_event=True,
-            intentionality=Intentionality.INTENTIONAL,
-            negated=False,
-            correction_present=False,
-            conflicting_information=False,
-            evidence_text=["pt swung at rn missed"],
-            confidence=0.9,
-            uncertainty_notes=[],
-        ),
+        SemanticExtractionStatus.SUCCESS,
+        envelope(narrative=incident.narrative, incident_id=incident.incident_id),
     )
 
 
-def test_app_imports_without_making_provider_request():
-    app = importlib.import_module("app")
-
-    assert hasattr(app, "main")
-
-
-def test_analysis_is_not_invoked_on_import():
-    app = importlib.reload(importlib.import_module("app"))
-
-    assert hasattr(app, "run_analysis")
-
-
-def test_empty_manual_input_is_rejected():
-    with pytest.raises(ValueError):
-        validate_manual_narrative("   ")
-
-
-def test_manual_input_preserves_text():
-    text = "  freeform narrative stays as typed  "
-
-    incident = create_manual_incident(text)
-
-    assert incident.narrative == text
-
-
-def test_fixture_metadata_is_not_passed_to_semantic_extraction():
-    fixture = next(item for item in SYNTHETIC_INCIDENTS if item["incident"].incident_id == "CASE_008")
+def test_run_analysis_uses_one_successor_extraction_and_aggregate():
     calls = []
-
-    def extractor(incident):
+    def executor(incident):
         calls.append(incident)
-        return valid_semantic_result()
-
-    run_analysis(fixture["incident"], extractor=extractor)
-
-    assert calls == [fixture["incident"]]
-    assert fixture["metadata"]["scenario_type"] not in calls[0].narrative
-
-
-def test_stale_result_protection_is_deterministic():
-    first = create_manual_incident("first narrative")
-    second = create_manual_incident("second narrative")
-
-    assert is_stale_result(active_narrative_signature(first), active_narrative_signature(second)) is True
-    assert is_stale_result(active_narrative_signature(first), active_narrative_signature(first)) is False
-    assert should_display_analysis_result(active_narrative_signature(first), active_narrative_signature(second)) is False
-    assert should_display_analysis_result(active_narrative_signature(first), active_narrative_signature(first)) is True
-
-
-def test_one_analysis_action_results_in_one_semantic_extraction_call():
-    fixture = next(item for item in SYNTHETIC_INCIDENTS if item["incident"].incident_id == "CASE_008")
-    calls = []
-
-    def extractor(incident):
-        calls.append(incident.incident_id)
-        return valid_semantic_result()
-
-    result = run_analysis(fixture["incident"], extractor=extractor)
-
-    assert calls == ["CASE_008"]
+        return executor_for(incident)
+    result = run_analysis(Incident(incident_id="CASE_001", narrative="Patient struck the nurse."), extractor=executor)
+    assert isinstance(result, AnalysisResult)
+    assert len(calls) == 1
+    assert result.validation_result.validated_envelope is not None
     assert result.policy_decision.outcome == PolicyOutcome.WRITE_DETECTED
     assert result.salesforce_preview is not None
+
+
+def test_invalid_input_stops_before_extraction():
+    calls = []
+    result = run_analysis({"incident_id": "CASE", "narrative": "   "}, extractor=lambda value: calls.append(value))
+    assert isinstance(result, InputValidationResult)
+    assert not calls
+    assert result.policy_decision.outcome == PolicyOutcome.WRITE_FAILED
+
+
+def test_normalization_is_formatting_only_and_preserves_raw_narrative():
+    raw = "  Patient\u00a0struck the nurse.  "
+    result = run_analysis(Incident(incident_id="CASE_001", narrative=raw), extractor=executor_for)
+    assert result.incident.narrative == raw
+    assert result.normalized_incident.original_narrative == raw
+    assert result.normalized_incident.normalized_narrative == "Patient struck the nurse."

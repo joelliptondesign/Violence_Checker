@@ -1,4 +1,4 @@
-"""Strict, provider-independent contracts for future evaluation artifacts.
+"""Strict, provider-independent contracts for current successor evaluation.
 
 These models describe evaluation data only. They do not execute the semantic
 pipeline, infer expected values, compare cases, or call a provider.
@@ -13,12 +13,12 @@ from typing import Any, List, Optional
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, StrictBool, StrictStr, field_validator, model_validator
 
 from src.contracts import (
+    DerivedSemanticView,
     PipelineFailureProvenance,
     PolicyDecision,
-    SemanticFacts,
     ValidationFailureStage,
+    ViolenceSemanticEnvelope,
 )
-from src.models import ViolenceFinding
 
 
 class EvaluationContract(BaseModel):
@@ -61,7 +61,7 @@ class EvaluationExecutionMode(str, Enum):
 class ExpectedField(str, Enum):
     FAILURE_PROVENANCE = "failure_provenance"
     VALIDATION_STAGE = "validation_stage"
-    COMPATIBILITY_FINDING = "compatibility_finding"
+    DERIVED_SEMANTICS = "derived_semantics"
     POLICY_DECISION = "policy_decision"
 
 
@@ -102,26 +102,10 @@ class CaseEvaluationStatus(str, Enum):
 class FailurePattern(str, Enum):
     PROVIDER_FAILURE = "provider_failure"
     VALIDATION_FAILURE = "validation_failure"
-    COMPATIBILITY_FAILURE = "compatibility_failure"
-    COMPATIBILITY_DIFFERENCE = "compatibility_difference"
     POLICY_FAILURE = "policy_failure"
     MISSING_OBSERVATION = "missing_observation"
-    HISTORICAL_CURRENT_CONFUSION = "historical_current_confusion"
-    CORRECTION_REVERSAL_FAILURE = "correction_reversal_failure"
-    CONFLICT_RESOLUTION_FAILURE = "conflict_resolution_failure"
-    THREAT_CLASSIFICATION_FAILURE = "threat_classification_failure"
-    ACCIDENTAL_INTENTIONAL_CONFUSION = "accidental_intentional_confusion"
-    NEGATION_FAILURE = "negation_failure"
-    OBJECT_DIRECTED_INTERPERSONAL_CONFUSION = "object_directed_interpersonal_confusion"
-    SELF_DIRECTED_INTERPERSONAL_CONFUSION = "self_directed_interpersonal_confusion"
     UNSUPPORTED_EVIDENCE = "unsupported_evidence"
     EVIDENCE_OMISSION = "evidence_omission"
-    EVENT_TYPE_DISAGREEMENT = "event_type_disagreement"
-    UNCERTAINTY_NOTE_DIFFERENCE = "uncertainty_note_difference"
-    # Retained so previously generated artifacts remain readable. New comparisons
-    # use the direction-neutral findings above instead.
-    EXCESSIVE_UNCERTAINTY = "excessive_uncertainty"
-    INSUFFICIENT_UNCERTAINTY = "insufficient_uncertainty"
     SEMANTIC_FIELD_MISMATCH = "semantic_field_mismatch"
     VALIDATION_REJECTION = "validation_rejection"
     POLICY_MISMATCH = "policy_mismatch"
@@ -215,10 +199,10 @@ class EvaluationCaseMetadata(EvaluationContract):
 
 class ExpectedEvaluationOutcome(EvaluationContract):
     semantic_outcome: ExpectedSemanticOutcome
-    semantic_facts: Optional[SemanticFacts] = None
+    semantic_envelope: Optional[ViolenceSemanticEnvelope] = None
+    expected_derived: Optional[DerivedSemanticView] = None
     validation_failure_stage: Optional[ValidationFailureStage] = None
     failure_provenance: Optional[PipelineFailureProvenance] = None
-    compatibility_finding: Optional[ViolenceFinding] = None
     policy_decision: Optional[PolicyDecision] = None
     intentionally_not_asserted: List[ExpectedField] = Field(default_factory=list)
 
@@ -230,12 +214,12 @@ class ExpectedEvaluationOutcome(EvaluationContract):
     @model_validator(mode="after")
     def require_consistent_expectation(self) -> "ExpectedEvaluationOutcome":
         if self.semantic_outcome == ExpectedSemanticOutcome.SUCCESS:
-            if self.semantic_facts is None:
-                raise ValueError("expected success requires semantic_facts")
+            if self.semantic_envelope is None or self.expected_derived is None:
+                raise ValueError("expected success requires semantic_envelope and expected_derived")
             if self.validation_failure_stage is not None or self.failure_provenance is not None:
                 raise ValueError("expected success cannot contain failure provenance")
         else:
-            if self.semantic_facts is not None or self.compatibility_finding is not None:
+            if self.semantic_envelope is not None or self.expected_derived is not None:
                 raise ValueError("expected failure cannot contain successful semantic payloads")
             if self.policy_decision is not None and self.policy_decision.failure_provenance is None:
                 raise ValueError("expected failure cannot contain a non-failure policy decision")
@@ -250,7 +234,7 @@ class ExpectedEvaluationOutcome(EvaluationContract):
         asserted_values = {
             ExpectedField.FAILURE_PROVENANCE: self.failure_provenance,
             ExpectedField.VALIDATION_STAGE: self.validation_failure_stage,
-            ExpectedField.COMPATIBILITY_FINDING: self.compatibility_finding,
+            ExpectedField.DERIVED_SEMANTICS: self.expected_derived,
             ExpectedField.POLICY_DECISION: self.policy_decision,
         }
         contradictory = [field.value for field in self.intentionally_not_asserted if asserted_values[field] is not None]
@@ -316,8 +300,8 @@ class ObservedEvaluationResult(EvaluationContract):
     semantic_outcome: ObservedSemanticOutcome
     validation_outcome: ObservedValidationOutcome
     validation_failure_stage: Optional[ValidationFailureStage] = None
-    semantic_facts: Optional[SemanticFacts] = None
-    compatibility_finding: Optional[ViolenceFinding] = None
+    semantic_envelope: Optional[ViolenceSemanticEnvelope] = None
+    derived_semantics: Optional[DerivedSemanticView] = None
     policy_decision: Optional[PolicyDecision] = None
     failure_provenance: Optional[PipelineFailureProvenance] = None
 
@@ -329,13 +313,13 @@ class ObservedEvaluationResult(EvaluationContract):
     @model_validator(mode="after")
     def require_consistent_observation(self) -> "ObservedEvaluationResult":
         if self.semantic_outcome == ObservedSemanticOutcome.SUCCESS:
-            if self.validation_outcome != ObservedValidationOutcome.PASSED or self.semantic_facts is None:
-                raise ValueError("observed success requires passed validation and semantic_facts")
+            if self.validation_outcome != ObservedValidationOutcome.PASSED or self.semantic_envelope is None or self.derived_semantics is None:
+                raise ValueError("observed success requires passed validation, semantic_envelope, and derived_semantics")
             if self.validation_failure_stage is not None or self.failure_provenance is not None:
                 raise ValueError("observed success cannot contain failure provenance")
         else:
-            if self.semantic_facts is not None or self.compatibility_finding is not None:
-                raise ValueError("observed failure cannot expose admissible facts or compatibility findings")
+            if self.semantic_envelope is not None or self.derived_semantics is not None:
+                raise ValueError("observed failure cannot expose admissible successor semantics")
             if self.validation_outcome == ObservedValidationOutcome.PASSED:
                 raise ValueError("observed failure cannot report passed validation")
             if self.validation_outcome == ObservedValidationOutcome.FAILED:

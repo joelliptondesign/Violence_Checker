@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import json
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from pydantic import ValidationError
 
@@ -14,6 +15,7 @@ from src.evaluation.regression_contracts import (
     AcceptedBaselineArtifact,
     BaselineAcceptanceProvenance,
 )
+from src.evaluation.legacy_artifacts import LegacyArtifact, load_legacy_artifact
 from src.evaluation.run_contracts import EvaluationRunArtifact, RunArtifactStatus
 from src.evaluation.serialization import canonical_json
 
@@ -64,22 +66,30 @@ def resolve_baseline_path(path: str) -> Path:
     return _resolve(path, BASELINES_ROOT, BaselineIssueCode.OUTPUT_OUTSIDE_BASELINES)
 
 
-def load_run_artifact(path: str) -> EvaluationRunArtifact:
+def load_run_artifact(path: str) -> Union[EvaluationRunArtifact, LegacyArtifact]:
     source = resolve_run_path(path)
     if not source.is_file():
         raise BaselineError(BaselineIssueCode.SOURCE_RUN_MISSING, f"run artifact not found: {source.name}")
     try:
-        return EvaluationRunArtifact.model_validate_json(source.read_text(encoding="utf-8"))
+        raw = source.read_text(encoding="utf-8")
+        header = json.loads(raw)
+        if header.get("evaluation_schema_version") == "1.0.0":
+            return load_legacy_artifact(source, "run")
+        return EvaluationRunArtifact.model_validate_json(raw)
     except (OSError, ValidationError, ValueError) as error:
         raise BaselineError(BaselineIssueCode.INVALID_ARTIFACT, "run artifact is invalid") from error
 
 
-def load_baseline_artifact(path: str) -> AcceptedBaselineArtifact:
+def load_baseline_artifact(path: str) -> Union[AcceptedBaselineArtifact, LegacyArtifact]:
     source = resolve_baseline_path(path)
     if not source.is_file():
         raise BaselineError(BaselineIssueCode.BASELINE_MISSING, f"baseline not found: {source.name}")
     try:
-        return AcceptedBaselineArtifact.model_validate_json(source.read_text(encoding="utf-8"))
+        raw = source.read_text(encoding="utf-8")
+        header = json.loads(raw)
+        if header.get("evaluation_schema_version") == "1.0.0":
+            return load_legacy_artifact(source, "baseline")
+        return AcceptedBaselineArtifact.model_validate_json(raw)
     except (OSError, ValidationError, ValueError) as error:
         raise BaselineError(BaselineIssueCode.INVALID_ARTIFACT, "baseline artifact is invalid") from error
 
@@ -98,6 +108,8 @@ def accept_baseline(
     source_path = resolve_run_path(run_path)
     output = resolve_baseline_path(output_path)
     run = load_run_artifact(run_path)
+    if isinstance(run, LegacyArtifact):
+        raise BaselineError(BaselineIssueCode.INVALID_ARTIFACT, "legacy runs cannot become successor baselines")
     if run.status != RunArtifactStatus.COMPLETE:
         raise BaselineError(BaselineIssueCode.SOURCE_RUN_INCOMPLETE, "only complete runs can be accepted")
     if output.exists():
@@ -106,6 +118,8 @@ def accept_baseline(
     replaces_id = None
     if replaces_baseline_path is not None:
         replaced = load_baseline_artifact(replaces_baseline_path)
+        if isinstance(replaced, LegacyArtifact):
+            raise BaselineError(BaselineIssueCode.INVALID_ARTIFACT, "legacy baselines cannot be replaced by successor acceptance")
         if replaced.baseline_id == baseline_id:
             raise BaselineError(
                 BaselineIssueCode.REPLACEMENT_ID_REUSED,
@@ -120,6 +134,8 @@ def accept_baseline(
         corpus_identity=run.corpus_identity,
         corpus_version=run.corpus_version,
         evaluation_schema_version=run.evaluation_schema_version,
+        semantic_schema_identity=run.semantic_schema_identity,
+        semantic_schema_version=run.semantic_schema_version,
         execution_mode=run.execution_mode,
         model_identifier=run.model_identifier,
         extraction_configuration_identity=run.extraction_configuration_identity,

@@ -8,7 +8,13 @@ from typing import Dict, Optional, Tuple
 
 from pydantic import ConfigDict, StrictBool, StrictInt, StrictStr, field_validator, model_validator
 
-from src.contracts import PipelineFailureProvenance, PipelineResult
+from src.contracts import (
+    SEMANTIC_SCHEMA_IDENTITY,
+    SEMANTIC_SCHEMA_VERSION,
+    PipelineFailureProvenance,
+    PipelineResult,
+)
+from src.evaluation.corpus import EVALUATION_SCHEMA_VERSION
 from src.evaluation.contracts import CaseEvaluationResult, EvaluationContract
 
 
@@ -105,6 +111,8 @@ class EvaluationExecutionSummary(ImmutableEvaluationContract):
 
 class EvaluationRunArtifact(ImmutableEvaluationContract):
     evaluation_schema_version: StrictStr
+    semantic_schema_identity: StrictStr
+    semantic_schema_version: StrictStr
     corpus_identity: StrictStr
     corpus_version: StrictStr
     run_id: StrictStr
@@ -121,6 +129,13 @@ class EvaluationRunArtifact(ImmutableEvaluationContract):
 
     @model_validator(mode="after")
     def require_ordered_complete_artifact(self) -> "EvaluationRunArtifact":
+        if self.evaluation_schema_version != EVALUATION_SCHEMA_VERSION:
+            raise ValueError("unsupported evaluation schema version")
+        if (self.semantic_schema_identity, self.semantic_schema_version) != (
+            SEMANTIC_SCHEMA_IDENTITY,
+            SEMANTIC_SCHEMA_VERSION,
+        ):
+            raise ValueError("unsupported semantic schema identity or version")
         observed_ids = tuple(item.case_id for item in self.observed_cases)
         evaluation_ids = tuple(item.case_id for item in self.case_evaluations)
         if observed_ids != self.requested_case_ids or evaluation_ids != self.requested_case_ids:

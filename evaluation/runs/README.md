@@ -1,5 +1,5 @@
 # Generated Evaluation Runs
 
-Canonical location for generated immutable observed run artifacts. Stored observations and case comparisons are evidence from a particular execution and must not be used as ground truth or accepted baselines.
+Run artifacts are ordered observed evidence, never ground truth. Current runs use evaluation schema `2.0.0`, identify the successor semantic schema, and distinguish deterministic-test execution from explicit live-provider execution. Existing paths are not overwritten without explicit runner authorization.
 
-Artifacts distinguish `deterministic_test` from `live_provider`, preserve ordered cases and typed failures, and refuse overwrite unless the caller explicitly supplies `--overwrite`. Generated artifacts are not committed by default. This directory contains no committed run result artifact.
+The committed creation-time run uses schema `1.0.0` and is byte-immutable. It is readable only through strict legacy routing and cannot become a successor baseline.
