@@ -8,7 +8,13 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from src.contracts import PolicyDecision, PolicyOutcome, PolicyReasonCode, SemanticFacts
+from src.contracts import (
+    PipelineFailureProvenance,
+    PolicyDecision,
+    PolicyOutcome,
+    PolicyReasonCode,
+    SemanticFacts,
+)
 from src.evaluation.case_comparison import compare_case
 from src.evaluation.contracts import (
     CaseEvaluationStatus,
@@ -32,6 +38,7 @@ from src.evaluation.runner import (
 )
 from src.evaluation.serialization import canonical_json
 from src.models import ViolenceEventType
+from src.policy import failed_policy_decision
 from src.semantic_extractor import SemanticExtractionResult, SemanticExtractionStatus
 
 
@@ -68,6 +75,20 @@ class GroundTruthExecutor:
             status=SemanticExtractionStatus.SUCCESS,
             semantic_candidate=self.cases[incident.incident_id].ground_truth.semantic_facts,
         )
+
+
+def _run_candidate(case_id: str, candidate: SemanticFacts):
+    def executor(_incident):
+        return SemanticExtractionResult(
+            status=SemanticExtractionStatus.SUCCESS,
+            semantic_candidate=candidate,
+        )
+
+    return run_evaluation(
+        configuration(case_ids=(case_id,)),
+        semantic_executor=executor,
+        write_artifact=False,
+    )
 
 
 def test_one_case_executes_complete_governed_pipeline() -> None:
@@ -181,6 +202,123 @@ def test_comparable_semantic_field_mismatch_has_stable_path_and_pattern() -> Non
         "compatibility_finding",
     ]
     assert FailurePattern.SEMANTIC_FIELD_MISMATCH in result.failure_patterns
+    assert FailurePattern.COMPATIBILITY_DIFFERENCE in result.failure_patterns
+    assert FailurePattern.COMPATIBILITY_FAILURE not in result.failure_patterns
+
+
+def test_genuine_compatibility_construction_failure_is_classified_as_failure() -> None:
+    artifact = run_evaluation(
+        configuration(),
+        semantic_executor=GroundTruthExecutor(),
+        write_artifact=False,
+    )
+    case = load_corpus().cases[0]
+    observed = artifact.observed_cases[0]
+    failed_policy = failed_policy_decision(
+        PipelineFailureProvenance.COMPATIBILITY_CONSTRUCTION
+    )
+    failed_pipeline = observed.pipeline_result.model_copy(
+        update={
+            "operational_finding": None,
+            "policy_decision": failed_policy,
+            "salesforce_payload": None,
+        }
+    )
+    failed_observed = observed.model_copy(
+        update={
+            "failure_provenance": PipelineFailureProvenance.COMPATIBILITY_CONSTRUCTION,
+            "pipeline_result": failed_pipeline,
+        }
+    )
+
+    result = compare_case(case, failed_observed)
+
+    assert result.status == CaseEvaluationStatus.FAILURE
+    assert FailurePattern.COMPATIBILITY_FAILURE in result.failure_patterns
+    assert FailurePattern.COMPATIBILITY_DIFFERENCE not in result.failure_patterns
+    assert "compatibility_finding" in {
+        difference.field for difference in result.field_differences
+    }
+
+
+@pytest.mark.parametrize(
+    ("case_id", "evidence"),
+    [
+        ("EVAL_001", ["struck a nurse on the shoulder"]),
+        (
+            "EVAL_001",
+            [
+                "Patient struck a nurse on the shoulder with a closed fist during medication administration."
+            ],
+        ),
+        ("EVAL_023", ["no aggression", "no threats"]),
+    ],
+)
+def test_evidence_equality_containment_and_segmentation_are_equivalent(
+    case_id: str,
+    evidence: list[str],
+) -> None:
+    case = next(case for case in load_corpus().cases if case.case_id == case_id)
+    candidate = case.ground_truth.semantic_facts.model_copy(
+        update={"evidence_text": evidence}
+    )
+    result = _run_candidate(case_id, candidate).case_evaluations[0]
+
+    assert "semantic_facts.evidence_text" not in {
+        difference.field for difference in result.field_differences
+    }
+    assert FailurePattern.UNSUPPORTED_EVIDENCE not in result.failure_patterns
+    assert FailurePattern.EVIDENCE_OMISSION not in result.failure_patterns
+
+
+def test_genuinely_unsupported_evidence_is_detected_without_false_omission() -> None:
+    case = load_corpus().cases[0]
+    candidate = case.ground_truth.semantic_facts.model_copy(
+        update={
+            "evidence_text": [
+                *case.ground_truth.semantic_facts.evidence_text,
+                "text absent from the supplied narrative",
+            ]
+        }
+    )
+    result = _run_candidate(case.case_id, candidate).case_evaluations[0]
+
+    assert FailurePattern.UNSUPPORTED_EVIDENCE in result.failure_patterns
+    assert FailurePattern.EVIDENCE_OMISSION not in result.failure_patterns
+
+
+def test_genuinely_missing_expected_evidence_is_detected_without_unsupported_label() -> None:
+    case = load_corpus().cases[0]
+    candidate = case.ground_truth.semantic_facts.model_copy(
+        update={"evidence_text": []}
+    )
+    result = _run_candidate(case.case_id, candidate).case_evaluations[0]
+
+    assert FailurePattern.EVIDENCE_OMISSION in result.failure_patterns
+    assert FailurePattern.UNSUPPORTED_EVIDENCE not in result.failure_patterns
+
+
+def test_event_type_and_uncertainty_note_disagreements_have_distinct_labels() -> None:
+    case = load_corpus().cases[0]
+    event_candidate = case.ground_truth.semantic_facts.model_copy(
+        update={"event_type": ViolenceEventType.ATTEMPTED_PHYSICAL_VIOLENCE}
+    )
+    event_result = _run_candidate(case.case_id, event_candidate).case_evaluations[0]
+
+    assert FailurePattern.EVENT_TYPE_DISAGREEMENT in event_result.failure_patterns
+    assert FailurePattern.UNCERTAINTY_NOTE_DIFFERENCE not in event_result.failure_patterns
+    assert FailurePattern.EXCESSIVE_UNCERTAINTY not in event_result.failure_patterns
+    assert FailurePattern.INSUFFICIENT_UNCERTAINTY not in event_result.failure_patterns
+
+    note_candidate = case.ground_truth.semantic_facts.model_copy(
+        update={"uncertainty_notes": ["Exact deterministic note disagreement."]}
+    )
+    note_result = _run_candidate(case.case_id, note_candidate).case_evaluations[0]
+
+    assert FailurePattern.UNCERTAINTY_NOTE_DIFFERENCE in note_result.failure_patterns
+    assert FailurePattern.EVENT_TYPE_DISAGREEMENT not in note_result.failure_patterns
+    assert FailurePattern.EXCESSIVE_UNCERTAINTY not in note_result.failure_patterns
+    assert FailurePattern.INSUFFICIENT_UNCERTAINTY not in note_result.failure_patterns
 
 
 def test_expected_success_with_domain_rejection_is_failure_not_provider_failure() -> None:
@@ -203,6 +341,11 @@ def test_expected_success_with_domain_rejection_is_failure_not_provider_failure(
     assert result.status == CaseEvaluationStatus.FAILURE
     assert FailurePattern.VALIDATION_REJECTION in result.failure_patterns
     assert FailurePattern.PROVIDER_FAILURE not in result.failure_patterns
+    assert FailurePattern.COMPATIBILITY_FAILURE not in result.failure_patterns
+    assert FailurePattern.COMPATIBILITY_DIFFERENCE not in result.failure_patterns
+    assert "compatibility_finding" not in {
+        difference.field for difference in result.field_differences
+    }
     assert artifact.summary.validation_rejection_count == 1
     assert artifact.summary.provider_failure_count == 0
 

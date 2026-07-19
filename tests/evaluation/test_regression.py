@@ -267,7 +267,7 @@ def test_engineering_report_has_required_stable_order_and_observed_evidence() ->
         "## 3. Evaluation coverage",
         "## 4. Overall summary",
         "## 5. Regression summary",
-        "## 6. Most frequent failure patterns",
+        "## 6. Evaluation findings by type",
         "## 7. Validation observations",
         "## 8. Policy observations",
         "## 9. Representative difficult cases",
@@ -277,6 +277,12 @@ def test_engineering_report_has_required_stable_order_and_observed_evidence() ->
     assert first == second
     assert [first.index(heading) for heading in headings] == sorted(first.index(heading) for heading in headings)
     assert "`provider_failure`: 1" in first
+    assert "### Runtime failures" in first
+    assert "### Comparison differences" in first
+    assert "### Semantic weakness indicators" in first
+    assert "### Legacy classification artifacts" in first
+    assert "`compatibility_failure`" not in first
+    assert "`compatibility_difference`" in first
     assert "EVAL_003" in first
     assert "prompt" not in first.lower()
 

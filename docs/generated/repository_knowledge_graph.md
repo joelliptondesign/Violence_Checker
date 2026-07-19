@@ -41,12 +41,12 @@ This graph records deterministic repository relationships discoverable from file
 | `src/evaluation/__init__.py` | deterministic | none | 0 |
 | `src/evaluation/artifact_cli.py` | deterministic | none | 3 |
 | `src/evaluation/baseline.py` | deterministic | `BaselineError`, `BaselineIssueCode` | 7 |
-| `src/evaluation/case_comparison.py` | deterministic | none | 4 |
+| `src/evaluation/case_comparison.py` | deterministic | none | 7 |
 | `src/evaluation/contracts.py` | deterministic | `BaselineClassification`, `BaselineComparison`, `BaselineComparisonObservation`, `BaselineObservationCode`, `CaseEvaluationResult`, `CaseEvaluationStatus`, `DifferenceClassification`, `DifferenceReasonCode`, `DocumentationQualityTag`, `EvaluationArtifactProvenance`, `EvaluationCase`, `EvaluationCaseMetadata`, `EvaluationCategory`, `EvaluationContract`, `EvaluationExecutionMode`, `ExpectedEvaluationOutcome`, `ExpectedField`, `ExpectedSemanticOutcome`, `FailurePattern`, `FieldDifference`, `NonComparableReason`, `ObservedEvaluationResult`, `ObservedSemanticOutcome`, `ObservedValidationOutcome` | 18 |
 | `src/evaluation/corpus.py` | deterministic | `CorpusCoverageSummary`, `CorpusDocument`, `CorpusIssueCode`, `CorpusValidationError`, `CorpusValidationIssue`, `_DuplicateKeyError` | 10 |
 | `src/evaluation/regression.py` | deterministic | `RegressionError`, `RegressionIssueCode` | 14 |
 | `src/evaluation/regression_contracts.py` | deterministic | `AcceptedBaselineArtifact`, `BaselineAcceptanceProvenance`, `CaseRegressionResult`, `RegressionArtifact`, `RegressionExecutionSummary`, `RegressionValueChange` | 6 |
-| `src/evaluation/reporting.py` | deterministic | none | 6 |
+| `src/evaluation/reporting.py` | deterministic | none | 8 |
 | `src/evaluation/run_contracts.py` | deterministic | `EvaluationExecutionSummary`, `EvaluationRunArtifact`, `EvaluationRunConfiguration`, `EvaluationRunnerMode`, `ImmutableEvaluationContract`, `ObservedCaseResult`, `ObservedPipelineComparison`, `RunArtifactStatus` | 4 |
 | `src/evaluation/runner.py` | deterministic | `RunnerError`, `RunnerIssueCode` | 13 |
 | `src/evaluation/serialization.py` | deterministic | none | 1 |
@@ -67,7 +67,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/evaluation/test_contracts.py` | deterministic test | none | 30 |
 | `tests/evaluation/test_corpus.py` | deterministic test | none | 26 |
 | `tests/evaluation/test_regression.py` | deterministic test | none | 14 |
-| `tests/evaluation/test_runner.py` | deterministic test | `GroundTruthExecutor` | 22 |
+| `tests/evaluation/test_runner.py` | deterministic test | `GroundTruthExecutor` | 28 |
 | `tests/test_app_logic.py` | deterministic test | none | 9 |
 | `tests/test_comparison.py` | deterministic test | none | 22 |
 | `tests/test_config_and_app.py` | deterministic test | none | 4 |
@@ -134,7 +134,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/evaluation/test_contracts.py` | `__future__`, `datetime`, `openai`, `pydantic`, `pytest`, `src.contracts`, `src.evaluation`, `src.models` |
 | `tests/evaluation/test_corpus.py` | `__future__`, `ast`, `hashlib`, `json`, `openai`, `pathlib`, `pytest`, `src.evaluation.contracts`, `src.evaluation.corpus`, `src.evaluation.serialization` |
 | `tests/evaluation/test_regression.py` | `__future__`, `ast`, `datetime`, `pathlib`, `pydantic`, `pytest`, `src.evaluation.artifact_cli`, `src.evaluation.baseline`, `src.evaluation.contracts`, `src.evaluation.corpus`, `src.evaluation.regression`, `src.evaluation.reporting`, `src.evaluation.run_contracts`, `src.evaluation.runner`, `src.evaluation.serialization`, `src.models`, `src.semantic_extractor` |
-| `tests/evaluation/test_runner.py` | `__future__`, `ast`, `datetime`, `hashlib`, `openai`, `pathlib`, `pydantic`, `pytest`, `src.contracts`, `src.evaluation.case_comparison`, `src.evaluation.contracts`, `src.evaluation.corpus`, `src.evaluation.run_contracts`, `src.evaluation.runner`, `src.evaluation.serialization`, `src.models`, `src.semantic_extractor` |
+| `tests/evaluation/test_runner.py` | `__future__`, `ast`, `datetime`, `hashlib`, `openai`, `pathlib`, `pydantic`, `pytest`, `src.contracts`, `src.evaluation.case_comparison`, `src.evaluation.contracts`, `src.evaluation.corpus`, `src.evaluation.run_contracts`, `src.evaluation.runner`, `src.evaluation.serialization`, `src.models`, `src.policy`, `src.semantic_extractor` |
 | `tests/test_app_logic.py` | `importlib`, `pytest`, `src.app_logic`, `src.contracts`, `src.fixtures`, `src.models`, `src.semantic_extractor` |
 | `tests/test_comparison.py` | `src.comparison`, `src.compatibility_finding`, `src.contracts`, `src.models`, `src.semantic_extractor`, `src.semantic_validation` |
 | `tests/test_config_and_app.py` | `importlib` |

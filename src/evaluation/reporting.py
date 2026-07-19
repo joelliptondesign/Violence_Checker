@@ -6,7 +6,11 @@ from collections import Counter
 from pathlib import Path
 from typing import Iterable, List
 
-from src.evaluation.contracts import BaselineClassification, CaseEvaluationStatus
+from src.evaluation.contracts import (
+    BaselineClassification,
+    CaseEvaluationStatus,
+    FailurePattern,
+)
 from src.evaluation.regression import (
     RegressionError,
     RegressionIssueCode,
@@ -24,6 +28,69 @@ def _lines_for_counts(counts: Counter[str]) -> List[str]:
 
 def _current_pattern_counts(cases: Iterable[CaseRegressionResult]) -> Counter[str]:
     return Counter(pattern.value for case in cases for pattern in case.current_failure_patterns)
+
+
+_RUNTIME_FAILURE_FINDINGS = {
+    FailurePattern.PROVIDER_FAILURE.value,
+    FailurePattern.VALIDATION_FAILURE.value,
+    FailurePattern.COMPATIBILITY_FAILURE.value,
+    FailurePattern.POLICY_FAILURE.value,
+    FailurePattern.MISSING_OBSERVATION.value,
+    FailurePattern.VALIDATION_REJECTION.value,
+    FailurePattern.PIPELINE_FAILURE.value,
+}
+
+_COMPARISON_DIFFERENCE_FINDINGS = {
+    FailurePattern.COMPATIBILITY_DIFFERENCE.value,
+    FailurePattern.UNSUPPORTED_EVIDENCE.value,
+    FailurePattern.EVIDENCE_OMISSION.value,
+    FailurePattern.UNCERTAINTY_NOTE_DIFFERENCE.value,
+    FailurePattern.POLICY_MISMATCH.value,
+}
+
+_LEGACY_CLASSIFICATION_FINDINGS = {
+    FailurePattern.EXCESSIVE_UNCERTAINTY.value,
+    FailurePattern.INSUFFICIENT_UNCERTAINTY.value,
+}
+
+
+def _lines_for_frequency(counts: Counter[str]) -> List[str]:
+    if not counts:
+        return ["- None observed."]
+    return [
+        f"- `{key}`: {count}"
+        for key, count in sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+    ]
+
+
+def _finding_groups(pattern_counts: Counter[str]) -> List[tuple[str, Counter[str]]]:
+    runtime = Counter(
+        {key: value for key, value in pattern_counts.items() if key in _RUNTIME_FAILURE_FINDINGS}
+    )
+    comparison = Counter(
+        {
+            key: value
+            for key, value in pattern_counts.items()
+            if key in _COMPARISON_DIFFERENCE_FINDINGS
+        }
+    )
+    legacy = Counter(
+        {
+            key: value
+            for key, value in pattern_counts.items()
+            if key in _LEGACY_CLASSIFICATION_FINDINGS
+        }
+    )
+    assigned = set(runtime) | set(comparison) | set(legacy)
+    semantic = Counter(
+        {key: value for key, value in pattern_counts.items() if key not in assigned}
+    )
+    return [
+        ("Runtime failures", runtime),
+        ("Comparison differences", comparison),
+        ("Semantic weakness indicators", semantic),
+        ("Legacy classification artifacts", legacy),
+    ]
 
 
 def _difficult_cases(artifact: RegressionArtifact) -> List[CaseRegressionResult]:
@@ -129,12 +196,13 @@ def render_engineering_report(artifact: RegressionArtifact) -> str:
         detail = ", ".join(f"{key}={values[key]}" for key in sorted(values))
         lines.append(f"- `{category}`: {detail}")
 
-    lines.extend(["", "## 6. Most frequent failure patterns", ""])
+    lines.extend(["", "## 6. Evaluation findings by type", ""])
     if pattern_counts:
-        for pattern, count in sorted(pattern_counts.items(), key=lambda item: (-item[1], item[0])):
-            lines.append(f"- `{pattern}`: {count}")
+        for heading, counts in _finding_groups(pattern_counts):
+            lines.extend([f"### {heading}", "", *_lines_for_frequency(counts), ""])
+        lines.pop()
     else:
-        lines.append("- No current failure patterns were observed.")
+        lines.append("- No current evaluation findings were observed.")
 
     lines.extend(["", "## 7. Validation observations", ""])
     lines.extend(_lines_for_counts(validation_counts))

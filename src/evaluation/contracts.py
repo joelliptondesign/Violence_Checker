@@ -103,6 +103,7 @@ class FailurePattern(str, Enum):
     PROVIDER_FAILURE = "provider_failure"
     VALIDATION_FAILURE = "validation_failure"
     COMPATIBILITY_FAILURE = "compatibility_failure"
+    COMPATIBILITY_DIFFERENCE = "compatibility_difference"
     POLICY_FAILURE = "policy_failure"
     MISSING_OBSERVATION = "missing_observation"
     HISTORICAL_CURRENT_CONFUSION = "historical_current_confusion"
@@ -115,6 +116,10 @@ class FailurePattern(str, Enum):
     SELF_DIRECTED_INTERPERSONAL_CONFUSION = "self_directed_interpersonal_confusion"
     UNSUPPORTED_EVIDENCE = "unsupported_evidence"
     EVIDENCE_OMISSION = "evidence_omission"
+    EVENT_TYPE_DISAGREEMENT = "event_type_disagreement"
+    UNCERTAINTY_NOTE_DIFFERENCE = "uncertainty_note_difference"
+    # Retained so previously generated artifacts remain readable. New comparisons
+    # use the direction-neutral findings above instead.
     EXCESSIVE_UNCERTAINTY = "excessive_uncertainty"
     INSUFFICIENT_UNCERTAINTY = "insufficient_uncertainty"
     SEMANTIC_FIELD_MISMATCH = "semantic_field_mismatch"

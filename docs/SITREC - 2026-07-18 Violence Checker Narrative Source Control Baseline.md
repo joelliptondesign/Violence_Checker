@@ -36,8 +36,8 @@ Current repository state for 2026-07-18:
 - `evaluation/corpus/corpus.json` contains 48 ordered synthetic cases and manually authored deterministic ground truth under corpus identity `violence-checker-synthetic-evaluation-corpus` version `1.0.0`.
 - Evaluation ground truth is repository-authored and authoritative; model, provider, regex, app, external-system, and observed output cannot author or repair expectations.
 - `src/evaluation/corpus.py` implements deterministic atomic loading, bounded validation, and coverage calculation without provider execution.
-- `src/evaluation/runner.py` implements explicit deterministic-test and live-provider execution through the complete governed application pipeline, and `src/evaluation/case_comparison.py` performs asserted-field comparison with stable difference paths and bounded failure patterns.
-- Generated immutable run artifacts are observed evidence only and are protected from overwrite by default; no full live-provider corpus execution, accepted baseline, regression comparison, engineering report generation, or measured semantic performance exists.
+- `src/evaluation/runner.py` implements explicit deterministic-test and live-provider execution through the complete governed application pipeline, and `src/evaluation/case_comparison.py` performs asserted-field comparison with stable difference paths and bounded evaluation findings. Compatibility failures require explicit construction-failure provenance; compatibility differences, exact evidence coverage, event-type disagreement, and uncertainty-note disagreement remain separate deterministic classifications.
+- Generated immutable run artifacts are observed evidence only and are protected from overwrite by default. The repository contains its first full live-provider corpus run, explicitly accepted baseline, deterministic self-comparison, and engineering report; these artifacts do not alter ground truth or claim semantic improvement.
 - `Incident` and the transitional compatibility `ViolenceFinding` contract exist in `src/models.py`.
 - OpenAI structured output parses into `ProviderStructuredResponse`; `src/provider_adapter.py` deterministically copies its fields into a provider-independent semantic candidate.
 - Successful `SemanticExtractionResult` objects carry a semantic candidate and do not establish deterministic admissibility.
@@ -200,7 +200,7 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 - Narrative source UI state: unselected initial radio state, `Synthetic fixture`, or `Manual narrative`; the UI state is not a third source value.
 - `EvaluationCase` and `EvaluationCaseMetadata`: strict synthetic case identity, schema version, narrative, categories, documentation-quality tags, and optional engineering notes, with metadata and ground truth structurally separate from narrative input.
 - `ExpectedEvaluationOutcome` and `ObservedEvaluationResult`: independent expected and observed states that reject contradictory success and failure payloads and never infer expectations from observations.
-- `FieldDifference` and `CaseEvaluationResult`: ordered deterministic difference and failure-pattern representation with bounded match, partial mismatch, failure, and non-comparable status.
+- `FieldDifference` and `CaseEvaluationResult`: ordered deterministic difference and evaluation-finding representation with bounded match, partial mismatch, failure, and non-comparable status.
 - `BaselineComparison`: prior and current result identities, ordered observations, and bounded improved, degraded, unchanged, or incomparable classification vocabulary.
 - `EvaluationArtifactProvenance`: evaluation schema, corpus identity, repository commit, optional model and extraction configuration identity, timestamp, and explicit live or test mode.
 - `EvaluationCategory` and `DocumentationQualityTag`: bounded corpus vocabularies for twelve primary semantic categories and eleven documentation-quality conditions.
@@ -223,7 +223,7 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 - Policy outcomes are application representation only and do not determine hospital, clinical, legal, or safety action.
 - No batch processing.
 - No analytics dashboard.
-- Evaluation includes contracts, canonical serialization, an authoritative synthetic corpus, deterministic loading, validation, coverage, documentation, and offline tests; there is no runner, provider corpus execution, comparison executor, accepted baseline, or report generator.
+- Evaluation includes contracts, canonical serialization, an authoritative synthetic corpus, deterministic loading, validation, coverage, explicit runner modes, a completed initial provider corpus execution, immutable baseline acceptance, deterministic comparison and reporting, documentation, and offline tests.
 - No model retry infrastructure.
 - No guarantee of clinical, legal, operational, or safety correctness.
 - No Rochester Regional implementation claim for the regex baseline.
@@ -413,7 +413,7 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 <Defines immutable runner mode, configuration, observed case, summary, and run-artifact contracts with explicit failure provenance.>
 
 `src/evaluation/case_comparison.py`
-<Compares explicitly asserted ground truth to complete observed pipeline evidence with stable field paths, bounded reasons and failure patterns, and non-comparable provider failures.>
+<Compares explicitly asserted ground truth to complete observed pipeline evidence with stable field paths, bounded reasons and findings, exact evidence containment, compatibility failure-versus-difference separation, and non-comparable provider failures.>
 
 `src/evaluation/runner.py`
 <Selects cases deterministically, reuses the complete governed application pipeline in explicit deterministic-test or live-provider mode, and writes overwrite-protected canonical evidence under `evaluation/runs/`.>
@@ -422,16 +422,16 @@ invalid envelope, identifier, narrative type or content, disallowed Unicode cont
 <Stores the ordered 48-case synthetic corpus and manually authored authoritative ground truth separately from generated observations.>
 
 `evaluation/`
-<Separates authoritative corpus truth from placeholder-only generated observed runs, accepted baselines, and generated engineering report locations.>
+<Separates authoritative corpus truth from immutable generated observed runs, accepted baselines, deterministic comparison artifacts, and generated engineering report locations.>
 
 `tests/evaluation/test_contracts.py`
 <Covers evaluation construction, deterministic serialization, malformed and contradictory state rejection, ordered collections, provider-call suppression, and compatibility with authoritative semantic, compatibility, validation, and policy contracts.>
 
 `tests/evaluation/test_corpus.py`
-<Covers corpus loading, versions, bounded coverage, ordering, uniqueness, malformed-record rejection, ground-truth completeness, provider-call suppression, placeholder-only generated locations, and byte-for-byte fixture preservation.>
+<Covers corpus loading, versions, bounded coverage, ordering, uniqueness, malformed-record rejection, ground-truth completeness, provider-call suppression, generated-evidence authority separation, and byte-for-byte fixture preservation.>
 
 `tests/evaluation/test_runner.py`
-<Covers selected and full-corpus execution, stable comparisons and failure taxonomy, authority separation, provider-failure non-comparability, mode separation, artifact immutability, canonical serialization, and overwrite protection without network access.>
+<Covers selected and full-corpus execution, stable comparisons and finding taxonomy, compatibility failure-versus-difference semantics, exact evidence equality, containment, segmentation, omission, unsupported evidence, uncertainty labels, authority separation, provider-failure non-comparability, mode separation, artifact immutability, canonical serialization, and overwrite protection without network access.>
 
 `src/contract_adapters.py`
 <Provides compatibility adapters from existing `AnalysisResult`, regex dictionaries, semantic results, and Salesforce preview dictionaries into the explicit contract model without changing operational pipeline behavior.>

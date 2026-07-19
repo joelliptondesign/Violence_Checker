@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Optional, Sequence, Tuple
 
 from src.contracts import PipelineFailureProvenance, PolicyOutcome, ValidationFailureStage
 from src.evaluation.contracts import (
@@ -83,6 +83,60 @@ def _difference(field: str, expected: object, observed: object, reason: Optional
     )
 
 
+def _expected_evidence_covered(expected: str, observed: Sequence[str]) -> bool:
+    """Return whether exact observed spans cover one expected excerpt."""
+
+    if any(expected in item for item in observed):
+        return True
+    for start in range(len(observed)):
+        joined = ""
+        for item in observed[start:]:
+            joined = item if not joined else f"{joined} {item}"
+            if expected in joined:
+                return True
+    return False
+
+
+def _evidence_findings(
+    expected: Sequence[str],
+    observed: Sequence[str],
+    narrative: str,
+) -> Tuple[Tuple[str, ...], Tuple[str, ...]]:
+    """Find exact missing coverage and excerpts unsupported by the narrative."""
+
+    missing = tuple(
+        item for item in expected if not _expected_evidence_covered(item, observed)
+    )
+    asserted = set(expected)
+    unsupported = tuple(
+        item for item in observed if item not in narrative and item not in asserted
+    )
+    return missing, unsupported
+
+
+def _evidence_difference(
+    expected: Sequence[str],
+    observed: Sequence[str],
+    narrative: str,
+) -> Optional[FieldDifference]:
+    missing, unsupported = _evidence_findings(expected, observed, narrative)
+    if not missing and not unsupported:
+        return None
+    details = []
+    if missing:
+        details.append(f"{len(missing)} expected excerpt(s) lack exact observed coverage")
+    if unsupported:
+        details.append(f"{len(unsupported)} observed excerpt(s) are absent from the narrative")
+    return FieldDifference(
+        field="semantic_facts.evidence_text",
+        expected_value=list(expected),
+        observed_value=list(observed),
+        classification=DifferenceClassification.VALUE_MISMATCH,
+        reason_code=DifferenceReasonCode.COLLECTION_MISMATCH,
+        explanation="; ".join(details) + ".",
+    )
+
+
 def _patterns(
     case: EvaluationCase,
     observed: ObservedCaseResult,
@@ -125,33 +179,28 @@ def _patterns(
     ):
         selected.add(FailurePattern.SELF_DIRECTED_INTERPERSONAL_CONFUSION)
     if "semantic_facts.evidence_text" in paths and expected_facts is not None and observed_facts is not None:
-        expected_evidence = set(expected_facts.evidence_text)
-        observed_evidence = set(observed_facts.evidence_text)
-        if expected_evidence - observed_evidence:
+        missing, unsupported = _evidence_findings(
+            expected_facts.evidence_text,
+            observed_facts.evidence_text,
+            observed.pipeline_result.normalized_incident.normalized_narrative,
+        )
+        if missing:
             selected.add(FailurePattern.EVIDENCE_OMISSION)
-        if observed_evidence - expected_evidence:
+        if unsupported:
             selected.add(FailurePattern.UNSUPPORTED_EVIDENCE)
     if expected_facts is not None and observed_facts is not None:
-        if (
-            observed_facts.event_type.value == "unclear"
-            and expected_facts.event_type.value != "unclear"
-        ) or (
-            observed_facts.uncertainty_notes and not expected_facts.uncertainty_notes
-        ):
-            selected.add(FailurePattern.EXCESSIVE_UNCERTAINTY)
-        if (
-            expected_facts.event_type.value == "unclear"
-            and observed_facts.event_type.value != "unclear"
-        ) or (
-            expected_facts.uncertainty_notes and not observed_facts.uncertainty_notes
-        ):
-            selected.add(FailurePattern.INSUFFICIENT_UNCERTAINTY)
+        if "semantic_facts.event_type" in paths:
+            selected.add(FailurePattern.EVENT_TYPE_DISAGREEMENT)
+        if "semantic_facts.uncertainty_notes" in paths:
+            selected.add(FailurePattern.UNCERTAINTY_NOTE_DIFFERENCE)
     if any(path.startswith("semantic_facts.") for path in paths):
         selected.add(FailurePattern.SEMANTIC_FIELD_MISMATCH)
     if "validation.failure_stage" in paths:
         selected.add(FailurePattern.VALIDATION_REJECTION)
-    if "compatibility_finding" in paths:
+    if observed.failure_provenance == PipelineFailureProvenance.COMPATIBILITY_CONSTRUCTION:
         selected.add(FailurePattern.COMPATIBILITY_FAILURE)
+    elif "compatibility_finding" in paths:
+        selected.add(FailurePattern.COMPATIBILITY_DIFFERENCE)
     if any(path.startswith("policy_decision.") for path in paths):
         selected.add(FailurePattern.POLICY_MISMATCH)
     return [pattern for pattern in FailurePattern if pattern in selected]
@@ -210,6 +259,8 @@ def compare_case(case: EvaluationCase, observed: ObservedCaseResult) -> CaseEval
     if expected_success and validation.passed and truth.semantic_facts is not None:
         observed_facts = observed.pipeline_result.semantic_facts
         for field_name in _SEMANTIC_FIELDS:
+            if field_name == "evidence_text":
+                continue
             expected_value = getattr(truth.semantic_facts, field_name)
             observed_value = getattr(observed_facts, field_name) if observed_facts is not None else None
             difference = _difference(
@@ -220,7 +271,25 @@ def compare_case(case: EvaluationCase, observed: ObservedCaseResult) -> CaseEval
             if difference is not None:
                 differences.append(difference)
 
-    if ExpectedField.COMPATIBILITY_FINDING not in truth.intentionally_not_asserted:
+        observed_facts = observed.pipeline_result.semantic_facts
+        if observed_facts is not None:
+            evidence_difference = _evidence_difference(
+                truth.semantic_facts.evidence_text,
+                observed_facts.evidence_text,
+                observed.pipeline_result.normalized_incident.normalized_narrative,
+            )
+            if evidence_difference is not None:
+                differences.append(evidence_difference)
+
+    compatibility_comparable = (
+        validation.passed
+        or observed.failure_provenance
+        == PipelineFailureProvenance.COMPATIBILITY_CONSTRUCTION
+    )
+    if (
+        ExpectedField.COMPATIBILITY_FINDING not in truth.intentionally_not_asserted
+        and compatibility_comparable
+    ):
         expected_finding = (
             truth.compatibility_finding.model_dump(mode="json")
             if truth.compatibility_finding is not None

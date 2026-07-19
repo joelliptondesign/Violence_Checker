@@ -85,9 +85,9 @@ The corpus covers completed and attempted assault, threats, accidental contact, 
 
 The runner supports explicit `deterministic_test` and `live_provider` modes. Deterministic mode requires a caller-supplied semantic executor and is used by offline tests. Live mode is opt-in and reuses `run_analysis()` exactly once per case, including input validation, normalization, regex, semantic extraction, schema and domain validation, compatibility construction, policy, existing comparison, preview gating, and aggregate pipeline adaptation. Only case identifier and raw narrative enter the governed path; corpus metadata and expectations do not.
 
-Generated JSON artifacts under `evaluation/runs/` contain ordered observed evidence, case comparisons, bounded failure patterns, and deterministic summaries. Provider and infrastructure failures are non-comparable rather than semantic mismatches. Existing run artifacts are never overwritten unless `--overwrite` is explicit.
+Generated JSON artifacts under `evaluation/runs/` contain ordered observed evidence, case comparisons, bounded evaluation findings, and deterministic summaries. Provider and infrastructure failures are non-comparable rather than semantic mismatches. Compatibility construction failures are distinct from ordinary compatibility-object differences. Evidence comparison uses deterministic exact containment across ordered excerpts, reports unsupported evidence only when an observed excerpt is absent from the supplied narrative, and reports omission only when expected evidence lacks observed coverage. Event-type disagreement and uncertainty-note disagreement use separate labels. Legacy uncertainty labels remain readable in prior artifacts but are not emitted by new comparisons. Existing run artifacts are never overwritten unless `--overwrite` is explicit.
 
-`src/evaluation/artifact_cli.py` manages explicit baseline acceptance, deterministic current-run comparison, and evidence-only engineering reports. Accepted baselines under `evaluation/baselines/` are immutable snapshots of ordered observed results, case evaluations, summaries, and provenance. Existing baseline paths are never overwritten; replacement requires a new baseline identifier and `--replaces` reference to the retained prior artifact. Regression artifacts under `evaluation/reports/` classify each case as `improved`, `degraded`, `unchanged`, or `incomparable`, record introduced and resolved differences and failure patterns, and summarize category, policy, validation, and provider evidence. A changed mismatch remains unchanged at the outcome level rather than being assumed improved. Markdown reports are generated deterministically from repository artifacts without a provider or another LLM.
+`src/evaluation/artifact_cli.py` manages explicit baseline acceptance, deterministic current-run comparison, and evidence-only engineering reports. Accepted baselines under `evaluation/baselines/` are immutable snapshots of ordered observed results, case evaluations, summaries, and provenance. Existing baseline paths are never overwritten; replacement requires a new baseline identifier and `--replaces` reference to the retained prior artifact. Regression artifacts under `evaluation/reports/` classify each case as `improved`, `degraded`, `unchanged`, or `incomparable`, record introduced and resolved differences and evaluation findings, and summarize category, policy, validation, and provider evidence. Reports group runtime failures, comparison differences, semantic weakness indicators, and legacy classification artifacts separately so headline evidence does not imply a subsystem failure from an ordinary comparison difference. A changed mismatch remains unchanged at the outcome level rather than being assumed improved. Markdown reports are generated deterministically from repository artifacts without a provider or another LLM.
 
 Validate the corpus, inspect deterministic coverage, and run evaluation tests:
 
@@ -110,7 +110,7 @@ Run one selected case or the complete corpus explicitly in live-provider mode:
 .venv/bin/python -m src.evaluation.runner run --mode live_provider --run-id LIVE_FULL_001 --repository-commit "$(git rev-parse HEAD)" --model gpt-5-mini --config-identity semantic-prompt-current --output evaluation/runs/live-full-001.json
 ```
 
-These live commands are examples only; no full live corpus run has been completed. Re-running against an existing output path requires explicit `--overwrite`.
+These commands remain examples for new immutable runs. The repository contains the first complete live-provider run under `evaluation/runs/`; re-running against any existing output path requires explicit `--overwrite`.
 
 Explicitly accept a complete run, compare a current run, and generate an engineering report:
 
@@ -120,7 +120,7 @@ Explicitly accept a complete run, compare a current run, and generate an enginee
 .venv/bin/python -m src.evaluation.artifact_cli generate-report --regression evaluation/reports/comparison-001.json --output evaluation/reports/comparison-001.md
 ```
 
-To replace a reference baseline, choose a new identifier and output path and add `--replaces evaluation/baselines/baseline-001.json` to `accept-baseline`. No accepted baseline or generated engineering report is committed in the repository at this time, and no semantic improvement is claimed.
+To replace a reference baseline, choose a new identifier and output path and add `--replaces evaluation/baselines/baseline-001.json` to `accept-baseline`. The first accepted baseline and its generated comparison and engineering report are committed as immutable operational evidence; their presence does not claim semantic improvement.
 
 ## Domain Models
 

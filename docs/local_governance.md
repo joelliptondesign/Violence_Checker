@@ -20,6 +20,8 @@ Authorized local functions:
 - Compare a current run to an accepted baseline: `.venv/bin/python -m src.evaluation.artifact_cli compare-run --baseline evaluation/baselines/baseline-001.json --run evaluation/runs/current-run.json --comparison-id COMPARISON_001 --output evaluation/reports/comparison-001.json`
 - Generate an evidence-only engineering report: `.venv/bin/python -m src.evaluation.artifact_cli generate-report --regression evaluation/reports/comparison-001.json --output evaluation/reports/comparison-001.md`
 
+Evaluation classification is deterministic and repository-local. Compatibility construction failures require explicit compatibility failure provenance and remain distinct from compatibility differences. Evidence coverage uses exact substring containment and ordered exact-span segmentation without fuzzy or model-assisted matching. Reports separate runtime failures from comparison differences, semantic weakness indicators, and legacy classification artifacts.
+
 Generated artifact locations:
 
 - `docs/generated/repository_tree.txt`

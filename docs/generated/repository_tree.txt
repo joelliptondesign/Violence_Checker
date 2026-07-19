@@ -19,13 +19,17 @@ evaluation/
 evaluation/README.md
 evaluation/baselines/
 evaluation/baselines/README.md
+evaluation/baselines/initial-evaluation-baseline-001.json
 evaluation/corpus/
 evaluation/corpus/README.md
 evaluation/corpus/corpus.json
 evaluation/reports/
 evaluation/reports/README.md
+evaluation/reports/initial-operational-comparison-001.json
+evaluation/reports/initial-operational-evaluation-001.md
 evaluation/runs/
 evaluation/runs/README.md
+evaluation/runs/initial-operational-evaluation-001.json
 requirements.txt
 scripts/
 scripts/__init__.py
