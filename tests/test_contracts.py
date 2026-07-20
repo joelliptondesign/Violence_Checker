@@ -3,186 +3,102 @@ from pydantic import ValidationError
 
 from src.contracts import (
     AssertionStatus,
-    Completion,
-    ConductKind,
-    Contact,
-    EntityKind,
-    EvidenceSubjectKind,
-    EvidenceSupportRole,
-    EXTRACTION_CONTRACT_IDENTITY,
-    PipelineResult,
-    ProviderEntityCandidate,
-    ProviderEvidenceCandidate,
-    ProviderEvidenceSupportCandidate,
-    ProviderPropositionCandidate,
+    Conduct,
+    FactDirection,
+    Intentionality,
+    MaterialAttribute,
+    ProviderFactCandidate,
+    ProviderFactEvidenceCandidate,
     ProviderStructuredResponse,
-    ProviderTargetCandidate,
-    SEMANTIC_SCHEMA_IDENTITY,
-    SEMANTIC_SCHEMA_VERSION,
-    SemanticIntentionality,
-    TargetKind,
+    ResolutionStatus,
     TemporalScope,
+    TrueNorthSemanticEnvelope,
     UncertaintyDimension,
-    ViolenceSemanticEnvelope,
 )
-from src.provider_adapter import semantic_candidate_from_provider_response
-from src.models import Incident
-from tests.successor_helpers import envelope
 
 
-def test_successor_schema_identity_and_version_are_explicit():
-    value = envelope()
-    assert value.schema_identity == SEMANTIC_SCHEMA_IDENTITY
-    assert value.schema_version == SEMANTIC_SCHEMA_VERSION
-
-
-def test_provider_adapter_terminates_provider_object_with_typed_envelope():
-    provider = envelope(provider=True)
-    adapted = semantic_candidate_from_provider_response(
-        provider,
-        incident=Incident(incident_id="CASE_001", narrative="Patient struck the nurse."),
-    )
-    assert type(adapted) is ViolenceSemanticEnvelope
-    assert adapted.incident_id == "CASE_001"
-    assert "incident_id" not in ProviderStructuredResponse.model_fields
-    assert "schema_identity" not in ProviderStructuredResponse.model_fields
-    assert "extraction_metadata" not in ProviderStructuredResponse.model_fields
-    assert adapted.extraction_metadata.extraction_contract_identity == EXTRACTION_CONTRACT_IDENTITY
-    assert adapted.extraction_metadata.provider_name is None
-    assert adapted.extraction_metadata.model_identifier is None
-    assert adapted.extraction_metadata.request_id is None
-    assert adapted.extraction_metadata.provider_confidence is None
-
-
-def test_provider_cannot_override_repository_extraction_metadata():
-    values = envelope(provider=True).model_dump()
-    values["extraction_metadata"] = {
-        "extraction_contract_identity": "provider-authored@999",
-        "provider_name": "provider-authored",
+def provider_fact(**updates):
+    values = {
+        "local_ref": "contact",
+        "conduct": Conduct.PHYSICAL_CONTACT,
+        "direction": FactDirection.INTERPERSONAL,
+        "intentionality": Intentionality.INTENTIONAL,
+        "temporal_scope": TemporalScope.CURRENT,
+        "assertion_status": AssertionStatus.AFFIRMED,
+        "resolution_status": ResolutionStatus.ACTIVE,
+        "evidence": [ProviderFactEvidenceCandidate(
+            excerpt="He intentionally punched a coworker today.",
+            supports=[
+                MaterialAttribute.CONDUCT,
+                MaterialAttribute.DIRECTION,
+                MaterialAttribute.INTENTIONALITY,
+                MaterialAttribute.TEMPORAL_SCOPE,
+                MaterialAttribute.ASSERTION_STATUS,
+            ],
+        )],
+        "uncertainty": [],
     }
-    provider = ProviderStructuredResponse.model_validate(values)
-    adapted = semantic_candidate_from_provider_response(
-        provider,
-        incident=Incident(incident_id="CASE_001", narrative="Patient struck the nurse."),
-    )
-    assert "extraction_metadata" not in provider.model_dump()
-    assert adapted.extraction_metadata.extraction_contract_identity == EXTRACTION_CONTRACT_IDENTITY
-    assert adapted.extraction_metadata.provider_name is None
+    values.update(updates)
+    return ProviderFactCandidate(**values)
 
 
-def test_contracts_forbid_unknown_fields_and_silent_defaults():
-    values = envelope().model_dump()
-    values["unexpected"] = True
-    with pytest.raises(ValidationError):
-        ViolenceSemanticEnvelope.model_validate(values)
-    values = envelope().model_dump()
-    del values["propositions"]
-    with pytest.raises(ValidationError):
-        ViolenceSemanticEnvelope.model_validate(values)
-
-
-def test_pipeline_contract_has_one_successor_authority_and_no_global_finding():
-    assert "semantic_envelope" in PipelineResult.model_fields
-    assert "derived_semantics" in PipelineResult.model_fields
-    assert "semantic_facts" not in PipelineResult.model_fields
-    assert "operational_finding" not in PipelineResult.model_fields
-
-
-def test_bounded_entity_vocabulary_is_exact():
-    assert {item.value for item in EntityKind} == {"person", "people_collective", "object", "unspecified"}
-
-
-def historical_assault_provider_values():
-    return {
-        "entities": [
-            ProviderEntityCandidate(local_ref="former-partner", entity_kind=EntityKind.PERSON),
-            ProviderEntityCandidate(local_ref="patient", entity_kind=EntityKind.PERSON),
-        ],
-        "propositions": [
-            ProviderPropositionCandidate(
-                local_ref="historical-assault",
-                actor_ref="former-partner",
-                conduct_kind=ConductKind.PHYSICAL_CONDUCT,
-                target=ProviderTargetCandidate(target_kind=TargetKind.ENTITY, target_ref="patient"),
-                completion=Completion.COMPLETED,
-                contact=Contact.OCCURRED,
-                temporal_scope=TemporalScope.HISTORICAL,
-                intentionality=SemanticIntentionality.INTENTIONAL,
-                assertion_status=AssertionStatus.AFFIRMED,
-            )
-        ],
-        "relationships": [],
-        "uncertainties": [],
-        "evidence_excerpts": [ProviderEvidenceCandidate(local_ref="disclosure", text="assaulted her a few yrs ago")],
-        "evidence_supports": [
-            ProviderEvidenceSupportCandidate(
-                evidence_ref="disclosure",
-                subject_kind=EvidenceSubjectKind.PROPOSITION,
-                subject_ref="historical-assault",
-                role=EvidenceSupportRole.SUPPORTS_ASSERTION,
-            )
-        ],
+def test_true_north_vocabularies_are_exact_and_atomic_direction_excludes_multiple():
+    assert {item.value for item in Conduct} == {
+        "verbal_threat", "physical_attempt", "physical_contact", "self_harm", "property_violence",
     }
+    assert {item.value for item in FactDirection} == {
+        "interpersonal", "self_directed", "object_directed", "unknown",
+    }
+    assert {item.value for item in Intentionality} == {"intentional", "accidental", "unresolved"}
+    assert {item.value for item in AssertionStatus} == {"affirmed", "denied", "disputed", "unresolved"}
 
 
-def test_provider_candidate_rejects_invalid_conduct_combinations():
-    with pytest.raises(ValidationError, match="completed physical conduct requires occurred contact"):
-        ProviderPropositionCandidate(
-            local_ref="historical-assault",
-            actor_ref="former-partner",
-            conduct_kind=ConductKind.PHYSICAL_CONDUCT,
-            target=ProviderTargetCandidate(target_kind=TargetKind.ENTITY, target_ref="patient"),
-            completion=Completion.COMPLETED,
-            contact=Contact.DID_NOT_OCCUR,
-            temporal_scope=TemporalScope.HISTORICAL,
-            intentionality=SemanticIntentionality.INTENTIONAL,
-            assertion_status=AssertionStatus.AFFIRMED,
+def test_provider_contract_contains_only_operational_fact_candidates():
+    assert set(ProviderStructuredResponse.model_fields) == {"facts"}
+    fields = set(ProviderFactCandidate.model_fields)
+    assert fields == {
+        "local_ref", "conduct", "direction", "intentionality", "temporal_scope",
+        "assertion_status", "resolution_status", "evidence", "uncertainty",
+        "supersedes_local_ref", "contradiction_group_local_ref",
+    }
+    forbidden = {
+        "incident_id", "schema_identity", "schema_version", "fact_id", "evidence_id",
+        "policy_outcome", "policy_reason", "processing_status", "completeness_status",
+        "entities", "propositions", "relationships",
+    }
+    assert fields.isdisjoint(forbidden)
+
+
+def test_contracts_reject_extra_fields_missing_fields_and_duplicate_local_refs():
+    with pytest.raises(ValidationError):
+        ProviderStructuredResponse(facts=[provider_fact()], schema_identity="provider-authored")
+    values = provider_fact().model_dump()
+    del values["direction"]
+    with pytest.raises(ValidationError):
+        ProviderFactCandidate.model_validate(values)
+    with pytest.raises(ValidationError, match="must be unique"):
+        ProviderStructuredResponse(facts=[provider_fact(), provider_fact()])
+
+
+def test_fact_evidence_is_fact_local_exact_text_with_attribute_supports():
+    evidence_fields = set(ProviderFactEvidenceCandidate.model_fields)
+    assert evidence_fields == {"excerpt", "supports", "start_offset", "end_offset"}
+    with pytest.raises(ValidationError, match="must not be empty"):
+        ProviderFactEvidenceCandidate(excerpt="  ", supports=[MaterialAttribute.CONDUCT])
+    with pytest.raises(ValidationError, match="non-empty and unique"):
+        ProviderFactEvidenceCandidate(excerpt="text", supports=[])
+    with pytest.raises(ValidationError, match="supplied together"):
+        ProviderFactEvidenceCandidate(
+            excerpt="text", supports=[MaterialAttribute.CONDUCT], start_offset=0,
         )
 
 
-def test_provider_target_candidate_rejects_incoherent_reference_shapes():
-    with pytest.raises(ValidationError, match="entity target requires target_ref"):
-        ProviderTargetCandidate(target_kind=TargetKind.ENTITY)
-    with pytest.raises(ValidationError, match="only entity target"):
-        ProviderTargetCandidate(target_kind=TargetKind.UNDETERMINED, target_ref="patient")
-
-
-def test_case_003_historical_assault_provider_shape_is_admissible():
-    candidate = ProviderStructuredResponse.model_validate(historical_assault_provider_values())
-    assert candidate.propositions[0].temporal_scope == TemporalScope.HISTORICAL
-
-
-def test_provider_candidate_rejects_resolved_uncertainty_and_incoherent_support():
-    values = historical_assault_provider_values()
-    values["uncertainties"] = [
-        {"local_ref": "timing", "proposition_ref": "historical-assault", "dimension": UncertaintyDimension.TEMPORAL_SCOPE}
-    ]
-    with pytest.raises(ValidationError, match="unresolved or disputed"):
-        ProviderStructuredResponse.model_validate(values)
-
-    values = historical_assault_provider_values()
-    values["evidence_supports"][0] = ProviderEvidenceSupportCandidate(
-        evidence_ref="disclosure",
-        subject_kind=EvidenceSubjectKind.PROPOSITION,
-        subject_ref="historical-assault",
-        role=EvidenceSupportRole.SUPPORTS_NEGATION,
-    )
-    with pytest.raises(ValidationError, match="incoherent"):
-        ProviderStructuredResponse.model_validate(values)
-
-
-def test_provider_candidate_rejects_semantic_subject_without_evidence_support():
-    values = historical_assault_provider_values()
-    values["evidence_supports"] = []
-    with pytest.raises(ValidationError, match="every provider proposition"):
-        ProviderStructuredResponse.model_validate(values)
-
-
-def test_provider_support_subject_kind_rejects_impossible_role():
-    with pytest.raises(ValidationError, match="not allowed"):
-        ProviderEvidenceSupportCandidate(
-            evidence_ref="disclosure",
-            subject_kind=EvidenceSubjectKind.UNCERTAINTY,
-            subject_ref="timing",
-            role=EvidenceSupportRole.SUPPORTS_ASSERTION,
-        )
+def test_repository_envelope_has_one_fact_collection_and_no_legacy_graph():
+    assert set(TrueNorthSemanticEnvelope.model_fields) == {
+        "schema_identity", "schema_version", "extraction_contract_identity", "incident_id", "facts",
+    }
+    assert "entities" not in TrueNorthSemanticEnvelope.model_fields
+    assert "propositions" not in TrueNorthSemanticEnvelope.model_fields
+    assert "relationships" not in TrueNorthSemanticEnvelope.model_fields
+    assert "multiple" not in {item.value for item in FactDirection}
+    assert UncertaintyDimension.CONDUCT.value == "conduct"

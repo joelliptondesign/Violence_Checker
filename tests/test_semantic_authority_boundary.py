@@ -1,4 +1,3 @@
-import ast
 from pathlib import Path
 
 import pytest
@@ -6,175 +5,172 @@ from pydantic import ValidationError
 
 from src.contracts import (
     AssertionStatus,
-    Completion,
-    ConductKind,
-    Contact,
-    EntityKind,
-    EvidenceSubjectKind,
-    EvidenceSupportRole,
-    ExtractionMetadata,
-    PipelineResult,
-    ProviderEntityCandidate,
-    ProviderEvidenceCandidate,
-    ProviderEvidenceSupportCandidate,
-    ProviderPropositionCandidate,
-    ProviderRelationshipCandidate,
+    Conduct,
+    EXTRACTION_CONTRACT_IDENTITY,
+    FactDirection,
+    Intentionality,
+    MaterialAttribute,
+    ProviderFactCandidate,
+    ProviderFactEvidenceCandidate,
     ProviderStructuredResponse,
-    ProviderTargetCandidate,
-    ProviderUncertaintyCandidate,
-    RelationshipKind,
-    SemanticIntentionality,
-    TargetKind,
+    ResolutionStatus,
+    SEMANTIC_SCHEMA_IDENTITY,
+    SEMANTIC_SCHEMA_VERSION,
     TemporalScope,
+    TrueNorthSemanticEnvelope,
     UncertaintyDimension,
-    ViolenceSemanticEnvelope,
 )
-from src.provider_adapter import semantic_candidate_from_provider_response
 from src.models import Incident
-from src.semantic_validation import validate_semantic_candidate
-from tests.successor_helpers import envelope
+from src.provider_adapter import semantic_candidate_from_provider_response
 
 
-ACTIVE_FILES = [
-    "app.py", "src/app_logic.py", "src/policy.py", "src/comparison.py",
-    "src/salesforce_preview.py", "src/contract_adapters.py", "src/evaluation/runner.py",
+SUPPORTS = [
+    MaterialAttribute.CONDUCT,
+    MaterialAttribute.DIRECTION,
+    MaterialAttribute.INTENTIONALITY,
+    MaterialAttribute.TEMPORAL_SCOPE,
+    MaterialAttribute.ASSERTION_STATUS,
 ]
 
 
-def test_provider_shape_terminates_at_adapter():
-    provider = envelope(provider=True)
-    adapted = semantic_candidate_from_provider_response(
-        provider,
-        incident=Incident(incident_id="CASE_001", narrative="Patient struck the nurse."),
+def candidate(local_ref, excerpt, **updates):
+    values = dict(
+        local_ref=local_ref,
+        conduct=Conduct.PHYSICAL_CONTACT,
+        direction=FactDirection.INTERPERSONAL,
+        intentionality=Intentionality.INTENTIONAL,
+        temporal_scope=TemporalScope.CURRENT,
+        assertion_status=AssertionStatus.AFFIRMED,
+        resolution_status=ResolutionStatus.ACTIVE,
+        evidence=[ProviderFactEvidenceCandidate(excerpt=excerpt, supports=SUPPORTS)],
+        uncertainty=[],
     )
-    assert isinstance(provider, ProviderStructuredResponse)
-    assert type(adapted) is ViolenceSemanticEnvelope
+    values.update(updates)
+    return ProviderFactCandidate(**values)
 
 
-def test_repository_owns_incident_identity_and_all_final_identifiers():
-    provider = envelope(provider=True)
-    assert "incident_id" not in ProviderStructuredResponse.model_fields
-    assert all("_id" not in field for field in ProviderStructuredResponse.model_fields)
+def test_adapter_terminates_provider_object_and_assigns_all_repository_bookkeeping():
+    narrative = "He intentionally punched a coworker today."
     adapted = semantic_candidate_from_provider_response(
-        provider,
-        incident=Incident(incident_id="REPOSITORY_CASE", narrative="Patient struck the nurse."),
+        ProviderStructuredResponse(facts=[candidate("provider-ref", narrative)]),
+        incident=Incident(incident_id="REPOSITORY_CASE", narrative=narrative),
     )
+    assert type(adapted) is TrueNorthSemanticEnvelope
+    assert adapted.schema_identity == SEMANTIC_SCHEMA_IDENTITY
+    assert adapted.schema_version == SEMANTIC_SCHEMA_VERSION
+    assert adapted.extraction_contract_identity == EXTRACTION_CONTRACT_IDENTITY
     assert adapted.incident_id == "REPOSITORY_CASE"
-    assert [item.entity_id for item in adapted.entities] == ["ENT-0001", "ENT-0002"]
-    assert [item.proposition_id for item in adapted.propositions] == ["PROP-0001"]
-    assert [item.evidence_id for item in adapted.evidence_excerpts] == ["EVID-0001"]
-    assert [item.support_id for item in adapted.evidence_supports] == ["SUP-0001"]
+    assert [fact.fact_id for fact in adapted.facts] == ["FACT-0001"]
+    assert [item.evidence_id for item in adapted.facts[0].evidence] == ["EVID-0001"]
+    assert adapted.facts[0].evidence[0].start_offset == 0
+    assert adapted.facts[0].evidence[0].end_offset == len(narrative)
 
 
-def test_equivalent_provider_content_has_equivalent_repository_bookkeeping():
-    original = envelope(provider=True).model_dump()
-    renamed = envelope(provider=True).model_dump()
-    renamed["entities"].reverse()
-    replacements = {"actor": "local-person-a", "target": "local-person-b", "conduct": "local-claim", "evidence": "local-quote"}
-    for entity in renamed["entities"]:
-        entity["local_ref"] = replacements[entity["local_ref"]]
-    proposition = renamed["propositions"][0]
-    proposition["local_ref"] = replacements[proposition["local_ref"]]
-    proposition["actor_ref"] = replacements[proposition["actor_ref"]]
-    proposition["target"]["target_ref"] = replacements[proposition["target"]["target_ref"]]
-    renamed["evidence_excerpts"][0]["local_ref"] = "local-quote"
-    renamed["evidence_supports"][0].update(
-        evidence_ref="local-quote",
-        subject_ref="local-claim",
-    )
-    incident = Incident(incident_id="CASE_001", narrative="Patient struck the nurse.")
-    first = semantic_candidate_from_provider_response(original, incident=incident)
-    second = semantic_candidate_from_provider_response(renamed, incident=incident)
-    assert first == second
-
-
-def test_unresolved_and_duplicate_provider_local_references_fail_closed():
-    incident = Incident(incident_id="CASE_001", narrative="Patient struck the nurse.")
-    unresolved = envelope(provider=True).model_dump()
-    unresolved["propositions"][0]["actor_ref"] = "missing"
-    with pytest.raises(ValueError, match="unresolved provider reference"):
-        semantic_candidate_from_provider_response(unresolved, incident=incident)
-
-    duplicate = envelope(provider=True).model_dump()
-    duplicate["entities"][1]["local_ref"] = duplicate["entities"][0]["local_ref"]
-    with pytest.raises(ValidationError, match="must be unique"):
-        semantic_candidate_from_provider_response(duplicate, incident=incident)
-
-
-def test_relationship_uncertainty_and_support_references_are_canonically_remapped():
-    narrative = "Patient may have hit nurse. Patient denied hitting nurse."
-    provider = ProviderStructuredResponse(
-        entities=[
-            ProviderEntityCandidate(local_ref="nurse", entity_kind=EntityKind.PERSON, label="nurse"),
-            ProviderEntityCandidate(local_ref="patient", entity_kind=EntityKind.PERSON, label="patient"),
-        ],
-        propositions=[
-            ProviderPropositionCandidate(
-                local_ref="denial", actor_ref="patient", conduct_kind=ConductKind.PHYSICAL_CONDUCT,
-                target=ProviderTargetCandidate(target_kind=TargetKind.ENTITY, target_ref="nurse"),
-                completion=Completion.COMPLETED, contact=Contact.OCCURRED,
-                temporal_scope=TemporalScope.CURRENT_INCIDENT,
-                intentionality=SemanticIntentionality.INTENTIONAL,
-                assertion_status=AssertionStatus.NEGATED,
-            ),
-            ProviderPropositionCandidate(
-                local_ref="possible", actor_ref="patient", conduct_kind=ConductKind.PHYSICAL_CONDUCT,
-                target=ProviderTargetCandidate(target_kind=TargetKind.ENTITY, target_ref="nurse"),
-                completion=Completion.COMPLETED, contact=Contact.OCCURRED,
-                temporal_scope=TemporalScope.CURRENT_INCIDENT,
-                intentionality=SemanticIntentionality.INTENTIONAL,
-                assertion_status=AssertionStatus.UNCERTAIN,
-            ),
-        ],
-        relationships=[
-            ProviderRelationshipCandidate(
-                local_ref="denies", relationship_kind=RelationshipKind.NEGATES,
-                source_proposition_ref="denial", target_proposition_ref="possible", disputed_dimensions=[],
+def test_provider_authored_repository_bookkeeping_is_rejected_not_discarded():
+    raw = ProviderStructuredResponse(facts=[]).model_dump()
+    for field in (
+        "incident_id", "schema_identity", "schema_version", "extraction_contract_identity",
+        "processing_status", "completeness_status", "policy_outcome",
+    ):
+        values = dict(raw)
+        values[field] = "provider-authored"
+        with pytest.raises(ValidationError):
+            semantic_candidate_from_provider_response(
+                values,
+                incident=Incident(incident_id="CASE", narrative="text"),
             )
-        ],
-        uncertainties=[
-            ProviderUncertaintyCandidate(
-                local_ref="status", proposition_ref="possible",
-                dimension=UncertaintyDimension.ASSERTION_STATUS, note="Narrative says may have.",
-            )
-        ],
-        evidence_excerpts=[
-            ProviderEvidenceCandidate(local_ref="denial-evidence", text="Patient denied hitting nurse."),
-            ProviderEvidenceCandidate(local_ref="possible-evidence", text="Patient may have hit nurse."),
-        ],
-        evidence_supports=[
-            ProviderEvidenceSupportCandidate(evidence_ref="denial-evidence", subject_kind=EvidenceSubjectKind.PROPOSITION, subject_ref="denial", role=EvidenceSupportRole.SUPPORTS_NEGATION),
-            ProviderEvidenceSupportCandidate(evidence_ref="possible-evidence", subject_kind=EvidenceSubjectKind.PROPOSITION, subject_ref="possible", role=EvidenceSupportRole.SUPPORTS_ASSERTION),
-            ProviderEvidenceSupportCandidate(evidence_ref="denial-evidence", subject_kind=EvidenceSubjectKind.RELATIONSHIP, subject_ref="denies", role=EvidenceSupportRole.SUPPORTS_NEGATION),
-            ProviderEvidenceSupportCandidate(evidence_ref="possible-evidence", subject_kind=EvidenceSubjectKind.UNCERTAINTY, subject_ref="status", role=EvidenceSupportRole.SUPPORTS_UNCERTAINTY),
-        ],
-        extraction_metadata=ExtractionMetadata(extraction_contract_identity="violence-checker.proposition-extraction@1.0.0"),
-    )
+
+
+def test_equivalent_provider_order_and_local_names_produce_equivalent_bookkeeping():
+    first_text = "First, he intentionally punched a coworker today."
+    second_text = "Then he intentionally shoved another coworker today."
+    narrative = f"{first_text} {second_text}"
+    first = ProviderStructuredResponse(facts=[
+        candidate("z", second_text),
+        candidate("a", first_text),
+    ])
+    second = ProviderStructuredResponse(facts=[
+        candidate("renamed-first", first_text),
+        candidate("renamed-second", second_text),
+    ])
+    incident = Incident(incident_id="CASE", narrative=narrative)
+    assert semantic_candidate_from_provider_response(first, incident=incident) == semantic_candidate_from_provider_response(second, incident=incident)
+
+
+def test_correction_and_contradiction_local_references_are_canonically_remapped():
+    first_text = "Witness A reported an intentional punch today."
+    second_text = "Witness B disputed the intentional punch today."
+    narrative = f"{first_text} {second_text}"
+    contradiction_supports = SUPPORTS + [MaterialAttribute.CONTRADICTION]
+    provider = ProviderStructuredResponse(facts=[
+        candidate(
+            "b", second_text,
+            assertion_status=AssertionStatus.DISPUTED,
+            contradiction_group_local_ref="provider-group",
+            uncertainty=[UncertaintyDimension.ASSERTION_STATUS],
+            evidence=[ProviderFactEvidenceCandidate(excerpt=second_text, supports=contradiction_supports)],
+        ),
+        candidate(
+            "a", first_text,
+            assertion_status=AssertionStatus.DISPUTED,
+            contradiction_group_local_ref="provider-group",
+            uncertainty=[UncertaintyDimension.ASSERTION_STATUS],
+            evidence=[ProviderFactEvidenceCandidate(excerpt=first_text, supports=contradiction_supports)],
+        ),
+    ])
     adapted = semantic_candidate_from_provider_response(
         provider,
-        incident=Incident(incident_id="CASE_REFS", narrative=narrative),
+        incident=Incident(incident_id="CASE", narrative=narrative),
     )
-    assert [item.proposition_id for item in adapted.propositions] == ["PROP-0001", "PROP-0002"]
-    assert adapted.relationships[0].source_proposition_ref == "PROP-0002"
-    assert adapted.relationships[0].target_proposition_ref == "PROP-0001"
-    assert adapted.uncertainties[0].proposition_ref == "PROP-0001"
-    assert {item.subject_ref for item in adapted.evidence_supports} == {"PROP-0001", "PROP-0002", "REL-0001", "UNC-0001"}
-    assert validate_semantic_candidate(
-        adapted,
-        incident_id="CASE_REFS",
-        normalized_narrative=narrative,
-    ).passed
+    assert [fact.fact_id for fact in adapted.facts] == ["FACT-0001", "FACT-0002"]
+    assert {fact.contradiction_group for fact in adapted.facts} == {"CGRP-0001"}
+    assert [evidence.evidence_id for fact in adapted.facts for evidence in fact.evidence] == ["EVID-0001", "EVID-0002"]
 
 
-def test_current_pipeline_contains_no_transitional_global_authority():
-    forbidden = {"ViolenceFinding", "SemanticFacts", "ValidatedSemanticFacts", "operational_finding", "compatibility_result"}
-    for path in ACTIVE_FILES:
-        source = Path(path).read_text()
-        assert not forbidden.intersection({node.id for node in ast.walk(ast.parse(source)) if isinstance(node, ast.Name)})
-        assert "operational_finding" not in source
-        assert "compatibility_result" not in source
-    assert "operational_finding" not in PipelineResult.model_fields
+def test_unresolved_provider_correction_reference_fails_closed():
+    narrative = "Later corrected account."
+    provider = ProviderStructuredResponse(facts=[
+        candidate("later", narrative, supersedes_local_ref="missing"),
+    ])
+    with pytest.raises(ValueError, match="unresolved provider reference"):
+        semantic_candidate_from_provider_response(
+            provider,
+            incident=Incident(incident_id="CASE", narrative=narrative),
+        )
 
 
-def test_compatibility_module_is_removed():
-    assert not Path("src/compatibility_finding.py").exists()
+def test_provider_correction_cycle_and_false_offsets_fail_closed():
+    narrative = "First account. Second account."
+    cyclic = ProviderStructuredResponse(facts=[
+        candidate("first", "First account.", supersedes_local_ref="second"),
+        candidate("second", "Second account.", supersedes_local_ref="first"),
+    ])
+    with pytest.raises(ValueError, match="cycle"):
+        semantic_candidate_from_provider_response(
+            cyclic,
+            incident=Incident(incident_id="CASE", narrative=narrative),
+        )
+
+    wrong_offsets = ProviderStructuredResponse(facts=[candidate(
+        "first",
+        "First account.",
+        evidence=[ProviderFactEvidenceCandidate(
+            excerpt="First account.", supports=SUPPORTS, start_offset=1, end_offset=15,
+        )],
+    )])
+    with pytest.raises(ValueError, match="offsets"):
+        semantic_candidate_from_provider_response(
+            wrong_offsets,
+            incident=Incident(incident_id="CASE", narrative=narrative),
+        )
+
+
+def test_successor_boundary_contains_no_legacy_semantic_contract_classes():
+    contracts = Path("src/contracts.py").read_text()
+    for obsolete in (
+        "ViolenceProposition", "EntityReference", "SemanticRelationship",
+        "EvidenceSupport", "PolicyCandidateView", "DerivedSemanticView",
+        "ViolenceSemanticEnvelope",
+    ):
+        assert f"class {obsolete}" not in contracts
+    assert "violence-checker.proposition-semantics" not in contracts

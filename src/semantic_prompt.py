@@ -1,75 +1,70 @@
 SEMANTIC_EXTRACTION_PROMPT = """
-Analyze only the supplied incident narrative.
+Analyze only the supplied normalized incident narrative and return one structured
+semantic candidate response containing only operational incident facts.
 
-Return one structured semantic candidate response. Extract all violence-relevant
-propositions, relationships, bounded uncertainties, exact evidence excerpts, and
-evidence-support links in one response.
-Do not use information outside the narrative or infer absent facts.
+For each separately supportable fact, provide:
+- a short temporary local_ref;
+- conduct: verbal_threat, physical_attempt, physical_contact, self_harm,
+  property_violence, or null only when conduct is explicitly unresolved;
+- direction: interpersonal, self_directed, object_directed, or unknown;
+- intentionality: intentional, accidental, or unresolved;
+- temporal_scope: current, historical, or unresolved;
+- assertion_status: affirmed, denied, disputed, or unresolved;
+- resolution_status: active or superseded;
+- exact fact-specific evidence excerpts with the material attributes each excerpt
+  supports;
+- every explicit material uncertainty; and
+- only when required, a temporary supersedes_local_ref or
+  contradiction_group_local_ref.
 
-Do not make operational recommendations, hospital workflow decisions,
-Salesforce write decisions, or legal, clinical, or safety recommendations.
-Do not decide whether extracted data should be written or what action a person
-or system should take.
+Return facts only. Do not return entities, propositions, relationships, graphs,
+document-level conclusions, provider metadata, confidence, explanations, or
+compatibility payloads. Do not return incident identity, schema identity or
+version, extraction contract identity, final fact/evidence/group identifiers,
+canonical ordering, processing status, or completeness status. Those values are
+repository-owned bookkeeping.
 
-Required boundaries:
-- Use short, unique local_ref values to identify entities, propositions,
-  relationships, uncertainties, and evidence excerpts within this response.
-  Use those local references for every cross-reference. They are temporary and
-  must not use final ENT-, PROP-, REL-, UNC-, EVID-, or SUP- identifiers.
-- Do not return an incident identifier, extraction metadata, extraction contract
-  identity or version, semantic schema identity or version, final repository
-  identifiers, or final repository ordering fields.
-- Scope actor, conduct, target, completion, contact, temporal scope,
-  intentionality, assertion status, and attribution to each proposition.
-- Represent current and historical claims as separate propositions.
-- A disclosed assault from years ago is one affirmed historical physical-conduct
-  proposition with completed completion and occurred contact. The disclosed
-  assailant is the actor and the person reporting the assault is the entity
-  target. For this historical-disclosure shape, return exactly that one violence
-  proposition unless the narrative states another distinct violent event.
-- Phrases such as "nothing happened today", "calm and cooperative", "no threats",
-  or "no aggressive behavior" are contextual clarifiers, not separate conduct.
-  Do not create current, negated, threatening-movement, or threat-expression
-  propositions for those phrases when they only clarify that a historical
-  disclosure has no current incident.
-- A target_kind of entity requires target_ref to name a local entity. A
-  target_kind of self or undetermined requires target_ref to be null. Never attach
-  an entity reference to a self or undetermined target.
-- Threat expression requires threatened or undetermined completion and
-  not_applicable contact. Attempted physical conduct requires did_not_occur
-  contact; completed physical conduct and contact_only require occurred contact.
-  Contact_only always requires completed completion. Threatening movement must
-  use not_applicable or undetermined completion, never attempted or completed.
-- Represent a denial on its proposition and add a negates relationship only
-  when it explicitly opposes another represented proposition.
-- Preserve corrected content and its replacement as separate propositions with
-  a directed supersedes relationship. Do not delete or rewrite the earlier text.
-- Preserve competing accounts as separate propositions with one canonical
-  conflicts_with relationship and bounded disputed dimensions. Do not rank or
-  adjudicate sources.
-- Use undetermined and not_applicable exactly as defined by the structured
-  contract. Never use a silent default to replace missing semantics.
-- Distinguish interpersonal, self-directed, object-directed, accidental,
-  threatening, attempted, completed, negated, and uncertain content through the
-  proposition fields. Do not author a direction or document-level outcome.
-- Treat explicit striking language such as one person hitting, punching, or
-  striking another person with a closed fist as intentional physical conduct
-  unless the narrative identifies the contact as accidental or explicitly leaves
-  intent unresolved. Do not add intentionality uncertainty merely because the
-  narrative does not separately state a motive.
-- Copy every evidence excerpt exactly from the supplied normalized narrative.
-  Every proposition, relationship, and uncertainty must have at least one
-  evidence_support entry; never return an unsupported semantic subject. A
-  conflicts_with relationship specifically requires supports_conflict evidence,
-  a negates relationship requires supports_negation evidence, and a supersedes
-  relationship requires supports_supersession evidence.
-- Add uncertainty only for a proposition dimension whose value is undetermined
-  or that is explicitly disputed by a conflicts_with relationship. Historical
-  timing such as "a few yrs ago" is resolved as historical, not uncertain.
-- Proposition evidence uses supports_negation only for a negated proposition and
-  supports_assertion for affirmed or uncertain propositions. Relationship evidence
-  uses the role matching negates, supersedes, or conflicts_with. Uncertainty
-  evidence always uses supports_uncertainty.
-- Free-form uncertainty notes do not author semantic truth, admissibility,
-  policy, workflow, or recommendations.
+Do not make or imply a policy decision, violence classification, negative conclusion,
+recommendation, operational action, clinical conclusion, legal
+conclusion, safety action, communication prose, or presentation output. An
+empty facts list is not a conclusion that violence did not occur.
+
+Evidence rules:
+- Copy every excerpt exactly from the supplied narrative.
+- Link evidence directly to the single fact it supports. Do not use a
+  subject-oriented support graph and do not treat the full narrative as blanket
+  support for multiple facts.
+- Each evidence supports list may contain only conduct, direction,
+  intentionality, temporal_scope, assertion_status, resolution_status,
+  supersession, or contradiction.
+- Together a fact's evidence must support conduct when resolved, every settled
+  material attribute, and every explicit correction or contradiction link.
+- Do not produce unsupported semantic facts or inferred outcomes. Do not infer
+  intentionality from contact or severity, current scope from document placement,
+  or interpersonal direction from property evidence.
+- Evidence containing a denial cannot support an affirmed fact unless that same
+  excerpt contains a later explicit correction affirming it. Accidental evidence
+  cannot support intentionality. Historical evidence cannot support current
+  scope. No-contact evidence cannot support physical_contact.
+
+Fact integrity rules:
+- self_harm requires self_directed direction.
+- property_violence requires intentional intentionality and object_directed
+  direction.
+- null conduct requires conduct uncertainty; a resolved conduct value must not
+  carry conduct uncertainty.
+- unresolved intentionality, temporal scope, or assertion status requires the
+  matching uncertainty dimension. Direction unknown may carry direction
+  uncertainty.
+- Preserve a supported correction as a later fact that references the earlier
+  fact through supersedes_local_ref. Keep the earlier fact as superseded and the
+  controlling later fact as active. Include supersession evidence on the later
+  fact.
+- Use a shared contradiction_group_local_ref only for unresolved materially conflicting active facts.
+  Mark every member disputed, include the disputed
+  uncertainty dimension, and include contradiction evidence for every member.
+- Do not settle a denial, correction, or conflicting account unless the narrative
+  explicitly establishes the controlling account.
+- Use the smallest independently evidenced facts. Do not invent actor identity,
+  target identity, motive, injury, weapon use, property damage, or causal links.
 """.strip()

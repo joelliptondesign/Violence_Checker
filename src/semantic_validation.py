@@ -1,4 +1,4 @@
-"""Ordered successor schema, domain, and deterministic derivation boundary."""
+"""Ordered true-north schema and domain validation boundary."""
 
 from collections.abc import Callable
 
@@ -7,13 +7,11 @@ from src.contracts import (
     DomainValidationStatus,
     SchemaValidationResult,
     SchemaValidationStatus,
-    ValidatedSemanticEnvelope,
     ValidationFailureStage,
     ValidationResult,
 )
 from src.domain_validation import validate_semantic_domain
 from src.schema_validation import validate_semantic_schema
-from src.semantic_derivation import derive_semantic_views
 
 
 def validation_not_run() -> ValidationResult:
@@ -50,14 +48,9 @@ def validate_semantic_candidate(
             failure_stage=ValidationFailureStage.DOMAIN,
         )
 
-    derived, policy_candidate = derive_semantic_views(envelope)
     return ValidationResult(
         schema_validation=schema_result,
         domain_validation=domain_result,
         failure_stage=ValidationFailureStage.NONE,
-        validated_envelope=ValidatedSemanticEnvelope(
-            envelope=envelope,
-            derived=derived,
-            policy_candidate=policy_candidate,
-        ),
+        validated_envelope=envelope,
     )
