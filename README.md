@@ -23,6 +23,14 @@ raw Incident narrative
 
 Raw narrative remains authoritative evidence. Provider SDK objects stop at the provider adapter. Invalid output fails closed; no stage repairs missing semantics or supplies silent defaults. The former document-level facts, compatibility finding, and operational finding are not current contracts and have no compatibility layer.
 
+## Governing successor design
+
+The following documents govern the planned true-north successor design; they do not claim that the current runtime has been migrated:
+
+- [Workplace Violence Doctrine](docs/workplace_violence_doctrine.md)
+- [True North Semantic Contract Specification](docs/true_north_semantic_contract_specification.md)
+- [True North Migration Strategy](docs/true_north_migration_strategy.md)
+
 ## Completed recovery baseline
 
 The provider returns semantic candidate content with temporary local references only. Repository code assigns incident identity, semantic and extraction contract identity, canonical identifiers and ordering, and final reference remapping before strict schema and domain validation. Provider metadata cannot override those deterministic values.

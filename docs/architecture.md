@@ -65,6 +65,14 @@ Configuration precedence is Streamlit secrets, conventional environment variable
 
 The approved design basis, successor specification, and migration strategy remain under `docs/`. They describe why this architecture is bounded and how creation-time evidence is isolated.
 
+## Planned true-north target state
+
+The current runtime architecture described above remains the repository's active implementation. The approved [Workplace Violence Doctrine](workplace_violence_doctrine.md) is authoritative for a planned successor implementation, and the [True North Semantic Contract Specification](true_north_semantic_contract_specification.md) defines its target incident-fact design. Neither document is implemented runtime truth. The [True North Migration Strategy](true_north_migration_strategy.md) defines the replacement boundary and verification gates without authorizing implementation.
+
+The planned target replaces the proposition-oriented envelope with minimal fact-level conduct, direction, intentionality, temporal scope, assertion, resolution, evidence, and uncertainty semantics. It deterministically derives active facts, incident direction, material uncertainty, and the four doctrinal outcomes. It also broadens qualifying doctrine to include self-directed and intentional property-directed violence and requires affirmed intentionality for qualifying completed contact. Those statements describe successor requirements, not current policy behavior.
+
+No dual current semantic authority is permitted. A future implementation must replace or retire superseded provider contracts, semantic contracts, derived views, policy inputs, communication projections, and evaluation contracts before declaring the target contract active. Historical artifacts remain in their creation-time schema families, and temporary adapters must terminate before the sole current semantic boundary and be removed at cutover.
+
 ## SITREC governance boundary
 
 SITREC governance is repository support and does not participate in application execution. `tools/repo_governance/sitrec_router.py` resolves the operational date with `America/Los_Angeles` and reports a deterministic route without filesystem mutation. Only top-level `docs/*.md` SITRECs are active candidates. Every mutating generation routes first, leaves one current-date active record, moves stale records to `docs/archive/sitrecs/`, updates rather than duplicates the same date, and rejects duplicate dates or filename/document Operational Date disagreement. Archived SITRECs remain historical provenance and are excluded from current authority selection.

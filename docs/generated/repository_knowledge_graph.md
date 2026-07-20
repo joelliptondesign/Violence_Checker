@@ -361,7 +361,7 @@ This graph records deterministic repository relationships discoverable from file
 | Documentation group | Artifacts |
 | --- | --- |
 | current SITREC | `docs/SITREC - 2026-07-20 Violence Checker Successor Semantic Baseline.md` |
-| documentation | `docs/architecture.md`, `docs/demo_runbook.md`, `docs/local_governance.md`, `docs/opord_004_repository_assessment.md`, `docs/opord_004_verification_authority.md`, `docs/semantic_design_basis.md`, `docs/semantic_migration_and_legacy_strategy.md`, `docs/successor_semantic_contract_specification.md` |
+| documentation | `docs/architecture.md`, `docs/demo_runbook.md`, `docs/local_governance.md`, `docs/opord_004_repository_assessment.md`, `docs/opord_004_verification_authority.md`, `docs/semantic_design_basis.md`, `docs/semantic_migration_and_legacy_strategy.md`, `docs/successor_semantic_contract_specification.md`, `docs/true_north_migration_strategy.md`, `docs/true_north_semantic_contract_specification.md`, `docs/workplace_violence_doctrine.md` |
 | generated | `docs/generated/repository_knowledge_graph.md` |
 | historical SITREC | `docs/archive/sitrecs/SITREC - 2026-07-17 Violence Checker Phase 0 Demonstration Baseline.md`, `docs/archive/sitrecs/SITREC - 2026-07-18 Violence Checker Narrative Source Control Baseline.md`, `docs/archive/sitrecs/SITREC - 2026-07-19 Violence Checker Successor Semantic Baseline.md` |
 

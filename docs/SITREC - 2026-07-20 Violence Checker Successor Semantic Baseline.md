@@ -13,6 +13,8 @@ Repository: `Violence_Checker`. This is a local Python and Streamlit demonstrati
 
 Current repository facts: the approved successor architecture is active across provider extraction, deterministic adaptation, validation, derivation, policy, application orchestration, executive presentation, and evaluation. `ViolenceSemanticEnvelope` is the sole current semantic authority. The accepted Executive Demonstration UX presents an incident-first information architecture, executive regex and AI comparison, single-instance Operator Communication, dual card-owned Technical Details, and a downstream illustrative Salesforce record. Live provider execution is restored: CASE_003, all eight stakeholder fixtures, and representative free-form manual narratives have completed their authorized workflows. Mobile usability is verified, and local plus Streamlit Community Cloud configuration is deployment-ready. The repository-authored `violence-checker-synthetic-proposition-evaluation-corpus` contains 48 synthetic cases under evaluation schema `2.0.0`. Creation-time artifacts remain immutable and readable only through their creation-time schema family.
 
+Approved documentation establishes the workplace violence doctrine as authoritative for successor implementation and establishes the true-north semantic contract and migration strategy as approved design authority. These documents do not alter current runtime truth: the runtime remains proposition-oriented and unchanged. Target runtime implementation, evaluation reconstruction, local acceptance, live-provider validation, baseline acceptance, deployment, and hosted acceptance remain pending separately authorized work.
+
 ## C. CORE INVARIANTS
 
 - Raw free-form narrative is the evidence authority; normalization is formatting-only.
@@ -59,7 +61,7 @@ The app accepts fixtures or unrestricted free-form manual narratives within dete
 
 ## I. KNOWN LIMITATIONS
 
-The lexical baseline is intentionally shallow. Provider quality is not guaranteed. The ontology is bounded to repository-demonstrated distinctions. Live-provider evaluation is external and non-deterministic even though its surrounding contracts are deterministic. Streamlit Community Cloud deployment and hosted acceptance have not occurred. Creation-time and successor artifact families are intentionally incomparable. The static knowledge graph uses repository naming and AST evidence and leaves unresolved relationships explicit.
+The lexical baseline is intentionally shallow. Provider quality is not guaranteed. The ontology is bounded to repository-demonstrated distinctions. Live-provider evaluation is external and non-deterministic even though its surrounding contracts are deterministic. Streamlit Community Cloud deployment and hosted acceptance have not occurred. Creation-time and successor artifact families are intentionally incomparable. The static knowledge graph uses repository naming and AST evidence and leaves unresolved relationships explicit. The true-north doctrine and semantic contract are approved documentation only; no true-north runtime contract, evaluation family, live validation, accepted baseline, deployment, or hosted acceptance exists in this repository state.
 
 ## J. INTERACTION MODEL
 
@@ -83,6 +85,9 @@ The repository does not guarantee model accuracy, exhaustive violence ontology c
 | `docs/opord_004_verification_authority.md` | Permanent successor verification gates and test authority. |
 | `docs/semantic_design_basis.md` | Approved proposition-oriented semantic design authority. |
 | `docs/successor_semantic_contract_specification.md` | Approved successor contract and admissibility specification. |
+| `docs/workplace_violence_doctrine.md` | Authoritative doctrine for the planned true-north successor implementation. |
+| `docs/true_north_semantic_contract_specification.md` | Approved planned incident-fact contract and evidence-integrity design authority; not current runtime truth. |
+| `docs/true_north_migration_strategy.md` | Approved planned replacement order, component dispositions, and verification gates. |
 | `src/contracts.py` | Provider-independent semantic and pipeline contracts. |
 | `src/provider_adapter.py` | Provider boundary and conversion into repository contracts. |
 | `src/semantic_validation.py` | Schema admissibility enforcement. |
@@ -106,13 +111,14 @@ Repository state is authoritative. If this SITREC conflicts with code, contracts
 
 ## O. REHYDRATION INSTRUCTIONS
 
-1. Read `README.md`, `docs/architecture.md`, this SITREC, `docs/local_governance.md`, and `docs/opord_004_verification_authority.md`.
+1. Read `README.md`, `docs/architecture.md`, this SITREC, `docs/local_governance.md`, `docs/opord_004_verification_authority.md`, `docs/workplace_violence_doctrine.md`, `docs/true_north_semantic_contract_specification.md`, and `docs/true_north_migration_strategy.md`.
 2. Inspect `src/contracts.py`, `src/provider_adapter.py`, the validation/derivation/policy chain, `src/app_logic.py`, `src/config.py`, `src/operator_communication.py`, `src/operator_communication_provider.py`, `src/operator_communication_prompt.py`, `src/presentation.py`, `app.py`, `src/evaluation/`, and `evaluation/corpus/successor_corpus.json`.
 3. Inspect `git status --short` before mutation and preserve unrelated work.
 4. Run `python3 -m tools.repo_governance validate-all`; for baseline decisions run `python3 -m tools.repo_governance baseline-readiness`.
 5. Preserve provider semantic-only authority, repository bookkeeping, the semantic and communication request boundaries, fail-closed validation, deterministic policy, sole successor authority, and historical artifact immutability.
-6. Treat Streamlit Community Cloud deployment and hosted acceptance as manual follow-on actions.
-7. Regenerate this artifact with the governed `sitrec` command whenever current repository truth changes.
+6. Treat the true-north doctrine, contract, and migration strategy as approved successor design authority, not implemented runtime truth.
+7. Treat implementation, evaluation reconstruction, live validation, baseline acceptance, deployment, and hosted acceptance as separately authorized follow-on actions.
+8. Regenerate this artifact with the governed `sitrec` command whenever current repository truth changes.
 
 ## P. SITREC LIFECYCLE
 

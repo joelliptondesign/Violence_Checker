@@ -24,6 +24,9 @@ docs/opord_004_verification_authority.md
 docs/semantic_design_basis.md
 docs/semantic_migration_and_legacy_strategy.md
 docs/successor_semantic_contract_specification.md
+docs/true_north_migration_strategy.md
+docs/true_north_semantic_contract_specification.md
+docs/workplace_violence_doctrine.md
 evaluation/
 evaluation/README.md
 evaluation/baselines/
