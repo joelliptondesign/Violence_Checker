@@ -830,6 +830,118 @@ class ValidationResult(BaseModel):
         return self.failure_stage == ValidationFailureStage.NONE
 
 
+class CommunicationPropositionFact(BaseModel):
+    """Narrative-free projection of one validated proposition."""
+
+    model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
+
+    actor_label: Optional[StrictStr] = Field(default=None, min_length=1, max_length=80)
+    target_label: Optional[StrictStr] = Field(default=None, min_length=1, max_length=80)
+    conduct_kind: ConductKind
+    direction: Direction
+    completion: Completion
+    contact: Contact
+    temporal_scope: TemporalScope
+    intentionality: SemanticIntentionality
+    assertion_status: AssertionStatus
+    active: StrictBool
+
+
+class CommunicationRegexProjection(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
+
+    detected: StrictBool
+    match_count: int = Field(ge=0)
+
+
+class CommunicationComparisonProjection(BaseModel):
+    """Narrow comparison facts that cannot retain an Incident."""
+
+    model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
+
+    semantic_validation_status: StrictStr = Field(min_length=1, max_length=80)
+    classification_alignment: StrictStr = Field(min_length=1, max_length=80)
+    material_difference_detected: StrictBool
+    display_status: StrictStr = Field(min_length=1, max_length=120)
+    observations: tuple[StrictStr, ...]
+
+
+class OperatorCommunicationInput(BaseModel):
+    """Immutable, presentation-only facts created after validation and policy."""
+
+    model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
+
+    policy_outcome: PolicyOutcome
+    policy_reason_codes: tuple[PolicyReasonCode, ...]
+    validation_status: ValidationFailureStage
+    failure_provenance: Optional[PipelineFailureProvenance] = None
+    proposition_facts: tuple[CommunicationPropositionFact, ...]
+    uncertainty_dimensions: tuple[UncertaintyDimension, ...]
+    relationship_kinds: tuple[RelationshipKind, ...]
+    regex: CommunicationRegexProjection
+    comparison: CommunicationComparisonProjection
+    salesforce_preview_eligible: StrictBool
+
+    @model_validator(mode="after")
+    def require_validated_nonfailure_authority(self) -> "OperatorCommunicationInput":
+        if self.validation_status != ValidationFailureStage.NONE:
+            raise ValueError("communication input requires successful deterministic validation")
+        if self.policy_outcome == PolicyOutcome.WRITE_FAILED or self.failure_provenance is not None:
+            raise ValueError("communication input requires a completed non-failure policy decision")
+        if not self.policy_reason_codes:
+            raise ValueError("communication input requires policy reason codes")
+        return self
+
+
+class OperatorCommunication(BaseModel):
+    """The complete presentation-only communication payload."""
+
+    model_config = ConfigDict(strict=True, extra="forbid", frozen=True, str_strip_whitespace=True)
+
+    incident_summary: StrictStr = Field(min_length=1, max_length=500)
+    key_findings: tuple[StrictStr, ...] = Field(min_length=1, max_length=8)
+    why_this_result: StrictStr = Field(min_length=1, max_length=500)
+
+    @field_validator("key_findings")
+    @classmethod
+    def require_concise_findings(cls, findings: tuple[str, ...]) -> tuple[str, ...]:
+        for finding in findings:
+            word_count = len(finding.split())
+            if not 2 <= word_count <= 5:
+                raise ValueError("each key finding must contain 2 to 5 words")
+        if len({finding.casefold() for finding in findings}) != len(findings):
+            raise ValueError("key findings must not contain duplicates")
+        return findings
+
+    @model_validator(mode="after")
+    def prohibit_implementation_language(self) -> "OperatorCommunication":
+        text = " ".join((self.incident_summary, *self.key_findings, self.why_this_result)).casefold()
+        forbidden = (
+            "active proposition",
+            "classification metadata",
+            "deterministic policy",
+            "entity ent-",
+            "entity id",
+            "implementation detail",
+            "policy identifier",
+            "policy matched",
+            "proposition",
+            "proposition id",
+            "reason code",
+            "repository",
+            "schema",
+            "schema validated",
+            "semantic contract",
+            "semantic graph",
+            "validation",
+            "validation passed",
+            "validation stage",
+        )
+        if any(term in text for term in forbidden):
+            raise ValueError("operator communication cannot expose implementation language")
+        return self
+
+
 class SalesforcePayload(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid")
 

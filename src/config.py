@@ -7,12 +7,14 @@ from pydantic import BaseModel
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_OPENAI_MODEL = "gpt-5-mini"
-STREAMLIT_SECRET_KEYS = ("OPENAI_API_KEY", "OPENAI_MODEL")
+DEFAULT_OPENAI_COMMUNICATION_MODEL = "gpt-5-mini"
+STREAMLIT_SECRET_KEYS = ("OPENAI_API_KEY", "OPENAI_MODEL", "OPENAI_COMMUNICATION_MODEL")
 
 
 class AppConfig(BaseModel):
     openai_api_key: Optional[str] = None
     openai_model: str = DEFAULT_OPENAI_MODEL
+    openai_communication_model: str = DEFAULT_OPENAI_COMMUNICATION_MODEL
 
 
 def _load_streamlit_secrets() -> Mapping[str, object]:
@@ -41,11 +43,17 @@ def load_config(*, streamlit_secrets: Optional[Mapping[str, object]] = None) -> 
     secrets = _load_streamlit_secrets() if streamlit_secrets is None else streamlit_secrets
     environment_key = _non_empty_text(getenv("OPENAI_API_KEY"))
     environment_model = _non_empty_text(getenv("OPENAI_MODEL"))
+    environment_communication_model = _non_empty_text(getenv("OPENAI_COMMUNICATION_MODEL"))
     return AppConfig(
         openai_api_key=_non_empty_text(secrets.get("OPENAI_API_KEY")) or environment_key,
         openai_model=(
             _non_empty_text(secrets.get("OPENAI_MODEL"))
             or environment_model
             or DEFAULT_OPENAI_MODEL
+        ),
+        openai_communication_model=(
+            _non_empty_text(secrets.get("OPENAI_COMMUNICATION_MODEL"))
+            or environment_communication_model
+            or DEFAULT_OPENAI_COMMUNICATION_MODEL
         ),
     )

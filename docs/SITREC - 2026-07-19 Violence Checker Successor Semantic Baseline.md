@@ -11,22 +11,23 @@ Repository: `Violence_Checker`. This is a local Python and Streamlit demonstrati
 
 ## B. CURRENT STATE
 
-Current repository facts: the approved successor architecture is active across provider extraction, deterministic adaptation, validation, derivation, policy, application orchestration, downstream presentation, and evaluation. `ViolenceSemanticEnvelope` is the sole current semantic authority. Live provider execution is restored: CASE_003, all eight stakeholder fixtures, and representative free-form manual narratives have completed their authorized workflows. Mobile usability is verified, and local plus Streamlit Community Cloud configuration is deployment-ready. The repository-authored `violence-checker-synthetic-proposition-evaluation-corpus` contains 48 synthetic cases under evaluation schema `2.0.0`. Creation-time artifacts remain immutable and readable only through their creation-time schema family.
+Current repository facts: the approved successor architecture is active across provider extraction, deterministic adaptation, validation, derivation, policy, application orchestration, executive presentation, and evaluation. `ViolenceSemanticEnvelope` is the sole current semantic authority. The accepted Executive Demonstration UX presents an incident-first information architecture, executive regex and AI comparison, single-instance Operator Communication, dual card-owned Technical Details, and a downstream illustrative Salesforce record. Live provider execution is restored: CASE_003, all eight stakeholder fixtures, and representative free-form manual narratives have completed their authorized workflows. Mobile usability is verified, and local plus Streamlit Community Cloud configuration is deployment-ready. The repository-authored `violence-checker-synthetic-proposition-evaluation-corpus` contains 48 synthetic cases under evaluation schema `2.0.0`. Creation-time artifacts remain immutable and readable only through their creation-time schema family.
 
 ## C. CORE INVARIANTS
 
 - Raw free-form narrative is the evidence authority; normalization is formatting-only.
-- Exactly one provider request is permitted per valid explicit analysis or selected live evaluation case; non-analysis interactions and invalid input issue zero.
+- Exactly one semantic extraction request is permitted per valid explicit analysis or selected live evaluation case; non-analysis interactions and invalid input issue zero provider requests.
 - Provider authority is limited to semantic candidates with temporary local references; provider SDK objects terminate at the adapter boundary.
 - Repository code owns incident identity, extraction metadata, semantic schema identity/version, canonical identifiers, ordering, final references, validation, derivation, policy, and downstream representation.
 - Schema validation and violence-domain validation fail closed before policy.
-- Derivation, policy, presentation, comparison, serialization, and reporting are deterministic.
+- Derivation, policy, comparison, Salesforce eligibility and payload generation, communication input projection, serialization, and reporting are deterministic.
+- Operator Communication is presentation-only, accepts a narrative-free bounded projection after successful validation and policy, and cannot change authoritative results; provider failure preserves deterministic fallback communication.
 - No retries, semantic repair, silent semantic defaults, output-derived ground truth, compatibility reconstruction, or dual current semantic authority is permitted.
 - Historical evaluation artifacts remain byte-immutable and cannot be promoted into the successor baseline family.
 
 ## D. SYSTEM MODEL
 
-`incident narrative` → formatting-only normalization → lexical baseline plus one structured extraction → provider-independent semantic envelope → schema validation → violence-domain validation → deterministic derived view → deterministic policy decision → aggregate pipeline result → deterministic presentation, preview, and evaluation consumers.
+`incident narrative` → formatting-only normalization → lexical baseline plus one structured extraction → provider-independent semantic envelope → schema validation → violence-domain validation → deterministic derived view → deterministic policy decision → aggregate pipeline result → deterministic comparison and illustrative preview → bounded executive communication and presentation.
 
 ## E. AUTHORITY MODEL
 
@@ -39,12 +40,14 @@ Current repository facts: the approved successor architecture is active across p
 | Schema/domain validators | Admissibility and fail-closed rejection |
 | Semantic derivation | Typed active-set and direction views |
 | Deterministic policy | Sole illustrative disposition authority |
+| Operator Communication input | Narrative-free, presentation-only projection of validated facts and deterministic results |
+| Operator Communication output | Bounded executive prose with no validation, policy, comparison, or Salesforce authority |
 | Tests | Permanent deterministic behavioral verification |
 | Governance tooling | Supporting generation, freshness, and readiness checks; never application truth |
 
 ## F. DATA / CONTRACT MODEL
 
-Semantic schema `violence-checker.proposition-semantics` version `1.0.0` defines typed entities, propositions, relationships, uncertainties, evidence excerpts, evidence supports, and repository-assigned extraction metadata. The extraction contract identity is deterministic and cannot be overridden by provider output. `PipelineResult` carries the semantic envelope, derived view, validation outcome, and policy result without a compatibility or operational-finding authority. Current evaluation artifacts use schema `2.0.0`; recognized creation-time artifacts use schema `1.0.0` and remain intentionally incomparable with successor artifacts.
+Semantic schema `violence-checker.proposition-semantics` version `1.0.0` defines typed entities, propositions, relationships, uncertainties, evidence excerpts, evidence supports, and repository-assigned extraction metadata. The extraction contract identity is deterministic and cannot be overridden by provider output. `PipelineResult` carries the semantic envelope, derived view, validation outcome, and policy result without a compatibility or operational-finding authority. `OperatorCommunicationInput` is an immutable narrative-free projection available only after successful validation and non-failure policy. `OperatorCommunication` contains only Incident Summary, Key Findings, and Why This Result for presentation. Current evaluation artifacts use schema `2.0.0`; recognized creation-time artifacts use schema `1.0.0` and remain intentionally incomparable with successor artifacts.
 
 ## G. SYSTEM BOUNDARIES
 
@@ -52,7 +55,7 @@ The repository does not provide a real Salesforce connection or write, clinical 
 
 ## H. CURRENT CAPABILITIES
 
-The app accepts fixtures or unrestricted free-form manual narratives within deterministic input limits, shows lexical and proposition results, applies total deterministic policy, and builds a policy-gated illustrative Salesforce preview. Affirmed completed interpersonal physical conduct with occurred contact remains detected when intentionality alone is undetermined; accidental contact, historical-only conduct, conflicts, and material uncertainty retain distinct outcomes. Stakeholder result language is operational while internal diagnostics remain under collapsed Technical Details. Desktop places Regex Baseline left and Semantic Analysis right; mobile widths 390, 360, and 320 CSS pixels use semantic-first stacking without duplicate content or page-level overflow. Offline evaluation validates 48 successor cases and supports explicit case selection, run creation, separately authorized baseline acceptance, within-family regression comparison, and evidence-only reports. Permanent Gate A–F tests and composed repository baseline-readiness governance protect the successor authority.
+The app accepts fixtures or unrestricted free-form manual narratives within deterministic input limits, applies total deterministic policy, and builds a policy-gated illustrative Salesforce preview. Affirmed completed interpersonal physical conduct with occurred contact remains detected when intentionality alone is undetermined; accidental contact, historical-only conduct, conflicts, and material uncertainty retain distinct outcomes. The accepted executive information architecture places the incident narrative first, Regex Keyword Detection left and AI-Powered Semantic Analysis right as the executive comparison, and the illustrative Salesforce record after both cards. Operator Communication appears once in the AI card. Regex and AI each own one collapsed Technical Details expander, while Salesforce owns its payload-details expander. Mobile widths 390, 360, and 320 CSS pixels use AI-first stacking without duplicate content or page-level overflow. Offline evaluation validates 48 successor cases and supports explicit case selection, run creation, separately authorized baseline acceptance, within-family regression comparison, and evidence-only reports. Permanent Gate A–F tests and composed repository baseline-readiness governance protect the successor authority.
 
 ## I. KNOWN LIMITATIONS
 
@@ -60,11 +63,11 @@ The lexical baseline is intentionally shallow. Provider quality is not guarantee
 
 ## J. INTERACTION MODEL
 
-Analysis begins only after explicit `Run Analysis`. Import, startup, source and fixture selection, manual typing, and invalid input issue zero provider requests. Narrative changes invalidate stale output. A valid analysis performs lexical matching and exactly one provider request with SDK retries disabled, then all downstream steps are local and deterministic. Streamlit secrets override environment variables, which override ignored local `.env`; missing configuration fails safely. Desktop rendering places Regex Baseline left of Semantic Analysis; mobile rendering places Semantic Analysis before Regex Baseline. Live corpus execution is explicit and performs one request per valid selected case. Baseline acceptance and hosted deployment are separate operator actions and never occur during evaluation or governance validation.
+Analysis begins only after explicit `Run Analysis`. Import, startup, source and fixture selection, manual typing, and invalid input issue zero provider requests. Narrative changes invalidate stale output. A valid analysis performs lexical matching and exactly one semantic extraction request with SDK retries disabled. After successful validation and a non-failure policy result, the Streamlit application attempts one presentation-only communication request with SDK retries disabled; communication failure preserves deterministic fallback copy, and extraction failure issues no communication request. Streamlit secrets override environment variables, which override ignored local `.env`; missing configuration fails safely. Desktop rendering places Regex Keyword Detection left of AI-Powered Semantic Analysis; mobile rendering places AI analysis before regex. Live corpus execution is explicit and performs one semantic request per valid selected case without the Streamlit communication provider. Baseline acceptance and hosted deployment are separate operator actions and never occur during evaluation or governance validation.
 
 ## K. GUARANTEES
 
-Strict contracts reject malformed or inadmissible semantics before policy. Provider metadata cannot override deterministic repository bookkeeping. Policy is total over admissible states. Collections and serialized current artifacts have canonical ordering. Successor baseline acceptance rejects legacy runs. Existing governed artifact paths are protected from implicit overwrite. Repository generation is deterministic for the same operational date and repository state.
+Strict contracts reject malformed or inadmissible semantics before policy. Provider metadata cannot override deterministic repository bookkeeping. Policy is total over admissible states. Operator Communication cannot alter validation, policy, comparison, Salesforce eligibility, or Salesforce payload content, and deterministic fallback remains available when communication generation fails. Collections and serialized current artifacts have canonical ordering. Successor baseline acceptance rejects legacy runs. Existing governed artifact paths are protected from implicit overwrite. Repository generation is deterministic for the same operational date and repository state.
 
 ## L. NON-GUARANTEES
 
@@ -87,6 +90,11 @@ The repository does not guarantee model accuracy, exhaustive violence ontology c
 | `src/semantic_derivation.py` | Deterministic derived semantic views. |
 | `src/policy.py` | Sole deterministic illustrative disposition authority. |
 | `src/app_logic.py` | Application orchestration and request boundary. |
+| `src/operator_communication.py` | Narrative-free communication projection and deterministic fallback. |
+| `src/operator_communication_provider.py` | Presentation-only structured communication request boundary. |
+| `src/operator_communication_prompt.py` | Executive communication instructions. |
+| `src/presentation.py` | Executive comparison and Salesforce presentation projections. |
+| `app.py` | Executive information architecture and component ownership. |
 | `src/evaluation/` | Current evaluation contracts, execution, comparison, and reporting. |
 | `evaluation/corpus/successor_corpus.json` | Repository-authored successor ground truth. |
 | `tests/` | Permanent deterministic behavioral verification authority. |
@@ -99,10 +107,10 @@ Repository state is authoritative. If this SITREC conflicts with code, contracts
 ## O. REHYDRATION INSTRUCTIONS
 
 1. Read `README.md`, `docs/architecture.md`, this SITREC, `docs/local_governance.md`, and `docs/opord_004_verification_authority.md`.
-2. Inspect `src/contracts.py`, `src/provider_adapter.py`, the validation/derivation/policy chain, `src/app_logic.py`, `src/config.py`, `app.py`, `src/evaluation/`, and `evaluation/corpus/successor_corpus.json`.
+2. Inspect `src/contracts.py`, `src/provider_adapter.py`, the validation/derivation/policy chain, `src/app_logic.py`, `src/config.py`, `src/operator_communication.py`, `src/operator_communication_provider.py`, `src/operator_communication_prompt.py`, `src/presentation.py`, `app.py`, `src/evaluation/`, and `evaluation/corpus/successor_corpus.json`.
 3. Inspect `git status --short` before mutation and preserve unrelated work.
 4. Run `python3 -m tools.repo_governance validate-all`; for baseline decisions run `python3 -m tools.repo_governance baseline-readiness`.
-5. Preserve provider semantic-only authority, repository bookkeeping, the one-request/zero-request boundaries, fail-closed validation, deterministic policy, sole successor authority, and historical artifact immutability.
+5. Preserve provider semantic-only authority, repository bookkeeping, the semantic and communication request boundaries, fail-closed validation, deterministic policy, sole successor authority, and historical artifact immutability.
 6. Treat Streamlit Community Cloud deployment and hosted acceptance as manual follow-on actions.
 7. Regenerate this artifact with the governed `sitrec` command whenever current repository truth changes.
 

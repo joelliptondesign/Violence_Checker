@@ -1,6 +1,6 @@
 # Violence Checker
 
-Violence Checker is a local Python and Streamlit demonstration of proposition-oriented violence semantics. It is non-production software: it performs no clinical, legal, safety, hospital-workflow, or Salesforce action.
+Violence Checker is a local Python and Streamlit executive demonstration of proposition-oriented violence semantics for workplace-safety incident review. It is non-production software: it performs no clinical, legal, safety, hospital-workflow, or Salesforce action.
 
 ## Current architecture
 
@@ -17,7 +17,8 @@ raw Incident narrative
   -> violence-domain validation
   -> deterministic semantic derivation
   -> deterministic policy
-  -> deterministic comparison, presentation, and illustrative preview
+  -> deterministic comparison and illustrative preview
+  -> bounded executive communication and presentation
 ```
 
 Raw narrative remains authoritative evidence. Provider SDK objects stop at the provider adapter. Invalid output fails closed; no stage repairs missing semantics or supplies silent defaults. The former document-level facts, compatibility finding, and operational finding are not current contracts and have no compatibility layer.
@@ -26,11 +27,13 @@ Raw narrative remains authoritative evidence. Provider SDK objects stop at the p
 
 The provider returns semantic candidate content with temporary local references only. Repository code assigns incident identity, semantic and extraction contract identity, canonical identifiers and ordering, and final reference remapping before strict schema and domain validation. Provider metadata cannot override those deterministic values.
 
-The current stakeholder workflow has been verified across all eight synthetic fixtures. CASE_003 completes as a historical disclosure with no active current interpersonal violence. Representative free-form manual narratives, including supported violence, non-violence, and bounded ambiguity, traverse the same one-request pipeline; narrative wording remains user-authored and unrestricted except for deterministic input-boundary limits. Invalid input and non-analysis interactions make zero provider requests.
+The current stakeholder workflow has been verified across all eight synthetic fixtures. CASE_003 completes as a historical disclosure with no active current interpersonal violence. Representative free-form manual narratives, including supported violence, non-violence, and bounded ambiguity, traverse the same one-request semantic pipeline; narrative wording remains user-authored and unrestricted except for deterministic input-boundary limits. Invalid input and non-analysis interactions make zero provider requests.
 
 The deterministic policy distinguishes uncertainty that could change whether current interpersonal violence occurred from uncertainty that cannot negate an already explicit act. An affirmed, completed physical strike with contact is detected even if intentionality alone remains undetermined. Accidental contact, historical-only conduct, conflicting accounts, and materially unresolved conduct retain their separate outcomes.
 
-At desktop widths, the Streamlit interface places Regex Baseline on the left and Semantic Analysis on the right. At 390, 360, and 320 CSS pixels, it has no page-level horizontal overflow, preserves technical-detail access, and stacks Semantic Analysis before Regex Baseline without duplicating either result. Deployment preparation supports Streamlit secrets, environment variables, and ignored local `.env` configuration.
+The accepted executive information architecture presents the incident narrative first, Regex Keyword Detection and AI-Powered Semantic Analysis as the comparison, and the illustrative Salesforce record after both result cards. The AI card presents the final classification with Operator Communication fields for Incident Summary, Key Findings, and Why This Result. Each comparison card owns one collapsed Technical Details expander: regex details remain with keyword detection, while extracted entities, supporting evidence, and decision logic remain with AI analysis. At 390, 360, and 320 CSS pixels, the interface has no page-level horizontal overflow and stacks AI analysis before regex detail without duplicating either result. Deployment preparation supports Streamlit secrets, environment variables, and ignored local `.env` configuration.
+
+After successful semantic validation and a non-failure policy result, the application constructs an immutable, narrative-free `OperatorCommunicationInput` from validated facts and deterministic downstream results. The Streamlit application may make one strict structured communication request and accepts only the bounded `OperatorCommunication` contract. A missing configuration, failed request, or invalid communication response leaves all authoritative results unchanged and uses deterministic repository-authored communication instead. Failed semantic analysis uses explicit deterministic failure communication and makes no communication request.
 
 ## Demonstration-use boundary
 
@@ -47,11 +50,11 @@ cp .env.example .env
 .venv/bin/streamlit run app.py
 ```
 
-For local development, copy `.env.example` to the ignored `.env` file and set `OPENAI_API_KEY`. `OPENAI_MODEL` is optional and defaults to the repository demonstration model. Conventional environment variables are also supported and take precedence over values loaded from `.env`. Do not commit `.env` or `.streamlit/secrets.toml`.
+For local development, copy `.env.example` to the ignored `.env` file and set `OPENAI_API_KEY`. `OPENAI_MODEL` and `OPENAI_COMMUNICATION_MODEL` are optional and default to the repository demonstration models. Conventional environment variables are also supported and take precedence over values loaded from `.env`. Do not commit `.env` or `.streamlit/secrets.toml`.
 
 The app starts and renders without credentials. Pressing **Run Analysis** with valid input and no provider credential produces a bounded configuration-failure result; it does not crash the application or issue a provider request.
 
-Choose a synthetic fixture or enter a manual narrative, then press **Run Analysis**. One provider request occurs for each valid analysis action. The interface displays the original narrative, lexical baseline, proposition result, deterministic policy disposition, comparison, and policy-gated illustrative Salesforce preview.
+Choose a synthetic fixture or enter a manual narrative, then press **Run Analysis**. Each valid analysis action makes exactly one semantic extraction request. A successfully validated non-failure result also attempts exactly one presentation-only communication request in the Streamlit application. The interface displays the original narrative, the executive regex and AI comparison, the deterministic policy classification, bounded Operator Communication, card-owned technical details, and the policy-gated illustrative Salesforce record.
 
 The optional smoke test makes at most one provider request:
 
@@ -65,10 +68,10 @@ No hosted deployment or hosted URL is represented by this repository state. To c
 
 1. Select repository `joelliptondesign/Violence_Checker`, branch `main`, and entrypoint `app.py`.
 2. In **Advanced settings**, select Python 3.12. Community Cloud selects Python there; this repository therefore does not use `runtime.txt` as a deployment control.
-3. In the Advanced settings **Secrets** field, enter `OPENAI_API_KEY` and optionally `OPENAI_MODEL` as top-level TOML keys. Enter values only in the Cloud secret manager, never in Git.
+3. In the Advanced settings **Secrets** field, enter `OPENAI_API_KEY` and optionally `OPENAI_MODEL` and `OPENAI_COMMUNICATION_MODEL` as top-level TOML keys. Enter values only in the Cloud secret manager, never in Git.
 4. Deploy only after the intended operator has reviewed the synthetic-only and no-PHI boundary.
 
-Configuration precedence is deterministic: Streamlit secrets, then conventional environment variables, then the ignored local `.env`, then the default model where applicable. Cold starts may take a few minutes while the hosted environment installs the pinned dependencies. Startup, source selection, fixture selection, and manual typing make zero provider requests. Each valid explicit analysis action makes exactly one request with SDK retries disabled.
+Configuration precedence is deterministic: Streamlit secrets, then conventional environment variables, then the ignored local `.env`, then the default model where applicable. Cold starts may take a few minutes while the hosted environment installs the pinned dependencies. Startup, source selection, fixture selection, and manual typing make zero provider requests. Each valid explicit analysis action makes exactly one semantic request with SDK retries disabled; a successfully validated non-failure result then makes at most one communication request, also with SDK retries disabled.
 
 ## Evaluation
 
@@ -108,6 +111,10 @@ See `docs/architecture.md`, `docs/demo_runbook.md`, `docs/local_governance.md`, 
 - `src/schema_validation.py`, `src/domain_validation.py`: independent admissibility gates
 - `src/semantic_derivation.py`: deterministic active-set and policy-view derivation
 - `src/policy.py`: total deterministic policy
+- `src/operator_communication.py`: deterministic communication input projection and fallback
+- `src/operator_communication_provider.py`: presentation-only structured communication boundary
+- `src/operator_communication_prompt.py`: executive communication instructions
+- `src/presentation.py`: executive comparison and Salesforce presentation projections
 - `src/evaluation/`: current evaluation and strict legacy readers
 - `evaluation/corpus/successor_corpus.json`: authoritative current synthetic ground truth
 - `evaluation/runs/`, `evaluation/baselines/`, `evaluation/reports/`: evidence artifacts

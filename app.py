@@ -9,26 +9,25 @@ from src.app_logic import (
     run_analysis,
     should_display_analysis_result,
 )
-from src.contracts import InputValidationResult
+from src.contracts import InputValidationResult, PolicyOutcome
 from src.fixtures import SYNTHETIC_INCIDENTS
 from src.models import Incident
+from src.operator_communication_provider import generate_operator_communication
 from src.presentation import (
-    policy_explanation,
+    extracted_entity_rows,
     policy_outcome_label,
     policy_reason_explanations,
-    semantic_summary,
-    validation_summary,
+    salesforce_operator_rows,
+    salesforce_payload_rows,
+    validated_evidence_excerpts,
 )
-from src.semantic_extractor import SemanticExtractionStatus
 
 
-ALIGNMENT_LABELS = {
-    "aligned_positive": "Classification aligned: regex and semantic extraction both indicate violence-related content.",
-    "aligned_negative": "Classification aligned: neither output indicates violence-related content.",
-    "regex_positive_semantic_negative": "Classification divergence: regex positive, semantic negative.",
-    "regex_negative_semantic_positive": "Classification divergence: regex negative, semantic positive.",
-    "semantic_failure": "Semantic comparison unavailable.",
-}
+DECISION_LOGIC_EXPLANATION = (
+    "The application reviewed who was involved, what happened, whether the conduct was "
+    "intentional, and whether it occurred during the current incident. It then applied the "
+    "workplace violence criteria to those confirmed details."
+)
 
 
 def _fixture_label(item: dict) -> str:
@@ -38,7 +37,7 @@ def _fixture_label(item: dict) -> str:
 
 
 def _selected_incident() -> Tuple[Optional[Incident], Optional[str]]:
-    st.header("Narrative source")
+    st.header("Incident Narrative")
     st.caption("Select a fixture or enter a manual narrative, then press Run Analysis.")
     mode = st.radio(
         "Narrative source",
@@ -67,108 +66,188 @@ def _selected_incident() -> Tuple[Optional[Incident], Optional[str]]:
     manual_text = st.text_area(
         "Manual narrative",
         height=140,
-        placeholder="Enter a local demonstration narrative...",
+        placeholder="Enter an incident narrative...",
     )
     if not manual_text.strip():
         return None, None
     return create_manual_incident(manual_text), "manual narrative"
 
 
-def _display_regex_details(regex_result: dict) -> None:
-    st.markdown("**Regex baseline**")
-    st.caption("Illustrative lexical-only baseline; not Rochester Regional logic.")
-    st.write(f"Detected: {regex_result['detected']}")
-    st.write("Matched terms")
-    st.write(regex_result["matched_terms"] or [])
-    st.write("Matched patterns")
-    st.code("\n".join(regex_result["matched_patterns"]) or "No patterns matched")
+def _display_operator_communication(communication) -> None:
+    st.markdown("### Incident Summary")
+    st.write(communication.incident_summary)
+    st.markdown("### Key Findings")
+    for finding in communication.key_findings:
+        st.write(f"- {finding}")
+    st.markdown("### Why This Result")
+    st.write(communication.why_this_result)
 
 
-def _display_semantic_details(semantic_result, validation_result) -> None:
-    st.markdown("**Semantic extraction and validation**")
-    st.write(f"Result category: {semantic_result.status.value}")
-    st.write(f"Validation stage: {validation_result.failure_stage.value}")
-    st.write(f"Schema validation status: {validation_result.schema_validation.status.value}")
-    st.write(f"Domain validation status: {validation_result.domain_validation.status.value}")
-
-    if semantic_result.status != SemanticExtractionStatus.SUCCESS:
-        st.write(f"Failure detail: {semantic_result.failure_message or 'Semantic extraction failed.'}")
-        return
-
-    if not validation_result.passed or validation_result.validated_envelope is None:
-        stage = validation_result.failure_stage.value
-        issues = (
-            validation_result.schema_validation.issues
-            if stage == "schema"
-            else validation_result.domain_validation.issues
-        )
-        st.write(f"Semantic {stage} validation failed.")
-        for issue in issues:
-            st.write(f"- {issue.code.value}: {issue.message}")
-        return
-
-    validated = validation_result.validated_envelope
-    envelope = validated.envelope
-    st.write(f"Semantic schema: {envelope.schema_identity}@{envelope.schema_version}")
-    st.write(f"Entities: {len(envelope.entities)}")
-    st.write(f"Propositions: {len(envelope.propositions)}")
-    st.write(f"Active propositions: {validated.derived.active_proposition_ids}")
-    st.write("Proposition details")
-    st.write([item.model_dump(mode="json") for item in envelope.propositions])
-    st.write("Relationships")
-    st.write([item.model_dump(mode="json") for item in envelope.relationships])
-    st.write("Bounded uncertainties")
-    st.write([item.model_dump(mode="json") for item in envelope.uncertainties])
-    st.write("Evidence excerpts and supports")
-    st.write([item.model_dump(mode="json") for item in envelope.evidence_excerpts])
-    st.write([item.model_dump(mode="json") for item in envelope.evidence_supports])
-
-
-def _display_validation(validation_result) -> None:
-    st.header("Validation")
-    summary = validation_summary(validation_result)
-    if validation_result.passed:
-        st.success(summary)
+def _display_regex_operator_view(regex_result: dict) -> None:
+    st.header("Regex Keyword Detection")
+    st.caption(
+        "Traditional regular expression (regex) matching scans the incident narrative for predefined words and phrases."
+    )
+    detected = bool(regex_result.get("detected"))
+    st.subheader("Potential Match" if detected else "No Match")
+    st.markdown("**Evidence**")
+    matched_terms = regex_result.get("matched_terms", [])
+    if matched_terms:
+        for term in matched_terms:
+            st.write(f"- “{term}”")
     else:
-        st.error(summary)
+        st.write("No configured keyword or phrase was detected.")
+    st.markdown("**Limitations**")
+    st.write("- Searches for matching words rather than the overall meaning.")
+    st.write("- May miss important context or flag words used in a different way.")
 
 
-def _display_policy_details(decision) -> None:
-    st.markdown("**Policy**")
-    st.write(f"Policy identifier: {decision.policy_id}")
-    st.write(f"Policy version: {decision.policy_version}")
-    st.write(f"Internal outcome: {decision.outcome.value}")
-    st.write(f"Reason codes: {[reason.value for reason in decision.reason_codes]}")
-    st.write(f"Internal explanation: {decision.explanation}")
-    if decision.failure_provenance is not None:
-        st.write(f"Failure provenance: {decision.failure_provenance.value}")
-
-
-def _display_policy(decision, *, include_technical_details: bool = True) -> None:
-    st.header("AI Assessment")
-    st.subheader(policy_outcome_label(decision))
-    st.write(policy_explanation(decision))
-    st.markdown("**Why this result**")
-    for explanation in policy_reason_explanations(decision):
-        st.write(f"- {explanation}")
-
-    if include_technical_details:
-        with st.expander("Technical Details", expanded=False):
-            _display_policy_details(decision)
-
-
-def _display_technical_details(result) -> None:
+def _display_regex_technical_details(regex_result: dict) -> None:
     with st.expander("Technical Details", expanded=False):
-        _display_semantic_details(result.semantic_result, result.validation_result)
-        _display_policy_details(result.policy_decision)
+        st.html('<span class="regex-technical-details-marker" hidden></span>')
+        st.markdown("**Keyword Matching**")
+        st.write("The detector compares the narrative against predefined regular-expression patterns.")
+        st.markdown("**Detected**")
+        st.write("Yes" if regex_result.get("detected") else "No")
+        st.markdown("**Matched Terms**")
+        if regex_result.get("matched_terms"):
+            for term in regex_result["matched_terms"]:
+                st.write(f"- {term}")
+        else:
+            st.write("None")
+        st.markdown("**Matched Patterns**")
+        if regex_result.get("matched_patterns"):
+            for pattern in regex_result["matched_patterns"]:
+                st.write(f"- `{pattern}`")
+        else:
+            st.write("None")
+
+
+def _display_ai_operator_view(result) -> None:
+    st.header("AI-Powered Semantic Analysis")
+    st.caption(
+        "Reviews the incident as a whole, including who was involved, what occurred, and whether the reported conduct meets the workplace violence criteria."
+    )
+    st.subheader(policy_outcome_label(result.policy_decision))
+    if result.policy_decision.outcome == PolicyOutcome.WRITE_FAILED:
+        st.error(policy_reason_explanations(result.policy_decision)[0])
+    elif result.communication is not None:
+        _display_operator_communication(result.communication)
+
+
+def _display_ai_technical_details(result) -> None:
+    with st.expander("Technical Details", expanded=False):
+        st.html('<span class="ai-technical-details-marker" hidden></span>')
+        st.markdown("**Extracted Entities**")
+        rows = extracted_entity_rows(result.validation_result)
+        if rows:
+            st.table(rows)
+        else:
+            st.write("No validated entities are available.")
+
+        st.markdown("**Supporting Evidence**")
+        evidence = validated_evidence_excerpts(result.validation_result)
+        if evidence:
+            for excerpt in evidence:
+                st.write(f"- “{excerpt}”")
+        else:
+            st.write("No validated supporting evidence is available.")
+
+        st.markdown("**Decision Logic**")
+        st.write(DECISION_LOGIC_EXPLANATION)
+        validated = result.validation_result.validated_envelope
+        summary_lines = ["incident_facts:"]
+        if validated is None:
+            summary_lines.append("  confirmed_details_available: false")
+        else:
+            active_ids = set(validated.derived.active_proposition_ids)
+            active_facts = [
+                item for item in validated.envelope.propositions
+                if item.proposition_id in active_ids
+            ]
+            direction_values = {
+                item.direction.value
+                for item in validated.derived.propositions
+                if item.active
+            }
+            temporal_values = {item.temporal_scope.value for item in active_facts}
+            intentionality_values = {item.intentionality.value for item in active_facts}
+            contact_values = {item.contact.value for item in active_facts}
+            assertion_values = {item.assertion_status.value for item in active_facts}
+
+            current_incident = "not_applicable"
+            if temporal_values:
+                current_incident = "uncertain" if "undetermined" in temporal_values else "false"
+                if "current_incident" in temporal_values:
+                    current_incident = "uncertain" if "historical" in temporal_values else "true"
+
+            interpersonal_conduct = "not_applicable"
+            if direction_values:
+                interpersonal_conduct = "uncertain" if "undetermined" in direction_values else "false"
+                if "interpersonal" in direction_values:
+                    interpersonal_conduct = "true"
+
+            intentional_conduct = "not_applicable"
+            if intentionality_values != {"not_applicable"}:
+                intentional_conduct = "uncertain" if "undetermined" in intentionality_values else "false"
+                if "intentional" in intentionality_values:
+                    intentional_conduct = "true"
+
+            physical_contact = "not_applicable"
+            if contact_values != {"not_applicable"}:
+                physical_contact = "uncertain" if "undetermined" in contact_values else "false"
+                if "occurred" in contact_values:
+                    physical_contact = (
+                        "uncertain" if "did_not_occur" in contact_values else "true"
+                    )
+
+            assertion_confirmed = "not_applicable"
+            if assertion_values:
+                assertion_confirmed = "uncertain" if "uncertain" in assertion_values else "false"
+                if "affirmed" in assertion_values:
+                    assertion_confirmed = "uncertain" if "negated" in assertion_values else "true"
+
+            entity_kinds = {item.entity_kind.value for item in validated.envelope.entities}
+            summary_lines.extend(
+                (
+                    f"  participants_identified: {'true' if bool(entity_kinds & {'person', 'people_collective'}) else 'false'}",
+                    f"  occurred_during_current_incident: {current_incident}",
+                    f"  involved_another_person: {interpersonal_conduct}",
+                    f"  conduct_was_intentional: {intentional_conduct}",
+                    f"  physical_contact_occurred: {physical_contact}",
+                    f"  reported_conduct_supported: {assertion_confirmed}",
+                    "  conflicting_accounts: "
+                    f"{'true' if validated.policy_candidate.active_conflict_relationships else 'false'}",
+                )
+            )
+        summary_lines.extend(
+            (
+                "result:",
+                f"  workplace_violence_assessment: {policy_outcome_label(result.policy_decision)}",
+            )
+        )
+        st.code("\n".join(summary_lines), language="yaml")
+
+
+def _display_salesforce_record(payload: dict[str, object]) -> None:
+    st.header("Illustrative Salesforce Record")
+    st.table(salesforce_operator_rows(payload))
+    with st.expander("Salesforce Payload Details", expanded=False):
+        st.html('<span class="salesforce-payload-details-marker" hidden></span>')
+        st.table(salesforce_payload_rows(payload))
+
+
+def _display_salesforce_empty_state() -> None:
+    st.header("Illustrative Salesforce Record")
+    st.write("No record generated for this result.")
 
 
 def _display_results(result) -> None:
-    _display_validation(result.validation_result)
-
     st.html(
         """
         <style>
+        .stApp { overflow-x: hidden; }
+        [data-testid="stCode"] pre { white-space: pre-wrap; overflow-wrap: anywhere; }
         @media (max-width: 640px) {
           div[data-testid="stHorizontalBlock"]:has(.result-order-marker)
             > div[data-testid="stColumn"]:has(.semantic-result-marker) { order: 1; }
@@ -181,92 +260,34 @@ def _display_results(result) -> None:
     regex_column, semantic_column = st.columns(2)
     with regex_column:
         st.html('<span class="result-order-marker regex-result-marker" hidden></span>')
-        st.header("Regex Baseline")
-        st.subheader("Detected" if result.regex_result["detected"] else "Not Detected")
-        st.write("Matched terms")
-        st.write(result.regex_result["matched_terms"] or [])
-        st.write("Matched patterns")
-        st.code("\n".join(result.regex_result["matched_patterns"]) or "No patterns matched")
-        st.caption("Illustrative lexical baseline based only on matching terms and patterns.")
+        _display_regex_operator_view(result.regex_result)
+        _display_regex_technical_details(result.regex_result)
 
     with semantic_column:
         st.html('<span class="result-order-marker semantic-result-marker" hidden></span>')
-        st.header("Semantic Analysis")
-        st.subheader(policy_outcome_label(result.policy_decision))
-        st.write(
-            semantic_summary(
-                result.validation_result.validated_envelope,
-                result.policy_decision,
-            )
-        )
-        st.write(policy_explanation(result.policy_decision))
-        st.markdown("**Why this result**")
-        for explanation in policy_reason_explanations(result.policy_decision):
-            st.write(f"- {explanation}")
-        st.caption("The result is based on the reported event details shown above.")
-        _display_technical_details(result)
+        _display_ai_operator_view(result)
+        _display_ai_technical_details(result)
 
-    st.header("Comparison")
-    if result.comparison.display_status == "Material Difference Detected":
-        st.warning(result.comparison.display_status)
-    elif result.comparison.display_status == "Semantic Comparison Unavailable":
-        st.error(result.comparison.display_status)
-    elif result.comparison.display_status == "Classification Aligned, Semantic Context Added":
-        st.info(result.comparison.display_status)
-    else:
-        st.success(result.comparison.display_status)
-
-    st.write(
-        ALIGNMENT_LABELS.get(
-            result.comparison.classification_alignment,
-            result.comparison.classification_alignment,
-        )
-    )
-
-    if result.comparison.divergence_observations:
-        st.markdown("**Classification divergence**")
-        for observation in result.comparison.divergence_observations:
-            st.write(f"- {observation}")
-
-    if result.comparison.semantic_enrichment_observations:
-        st.markdown("**Semantic enrichment**")
-        for observation in result.comparison.semantic_enrichment_observations:
-            st.write(f"- {observation}")
-
-    if not result.comparison.material_difference_detected:
-        for observation in result.comparison.observations:
-            st.write(f"- {observation}")
-
-    st.header("Salesforce Preview")
-    st.caption("Deterministic preview only. No Salesforce integration is performed.")
     if result.salesforce_preview is None:
-        st.info("Preview is available only after successful validated semantic extraction.")
+        _display_salesforce_empty_state()
     else:
-        st.json(result.salesforce_preview)
-
+        _display_salesforce_record(result.salesforce_preview)
 
 
 def main() -> None:
-    st.title("Phase 0 Semantic Violence Detection Pre-PoC")
+    st.title("Workplace Safety Intelligence")
     st.write(
-        "Synthetic local pre-PoC for comparing an illustrative regex baseline with validated semantic extraction."
-    )
-    st.info(
-        "Synthetic demonstration only, including manual narratives. Do not submit real patient, hospital, PHI, "
-        "confidential, or production incident data. This is not a production hospital system."
+        "AI reviews incident narratives to identify potential workplace violence, explain the reasoning, and support more consistent safety reporting."
     )
 
     incident, scenario_label = _selected_incident()
 
     if incident is None:
-        st.header("Incident Narrative")
         st.write("No active incident selected.")
-        st.info("Choose a synthetic fixture or enter a non-empty manual narrative before running analysis.")
         st.session_state.pop("analysis_result", None)
         st.session_state.pop("analysis_signature", None)
         return
 
-    st.header("Incident Narrative")
     meta_left, meta_right = st.columns(2)
     with meta_left:
         st.write(f"Case: {incident.incident_id}")
@@ -280,12 +301,13 @@ def main() -> None:
         st.session_state.pop("analysis_signature", None)
 
     if st.button("Run Analysis", type="primary"):
-        with st.spinner("Running regex baseline and semantic extraction..."):
-            analysis_outcome = run_analysis(incident)
+        with st.spinner("Analyzing the incident narrative..."):
+            analysis_outcome = run_analysis(
+                incident,
+                communicator=generate_operator_communication,
+            )
         if isinstance(analysis_outcome, InputValidationResult):
             st.error(analysis_outcome.failure_message or "Incident input is invalid.")
-            if analysis_outcome.policy_decision is not None:
-                _display_policy(analysis_outcome.policy_decision)
             st.session_state.pop("analysis_result", None)
             st.session_state.pop("analysis_signature", None)
         else:

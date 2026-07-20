@@ -33,19 +33,21 @@ Policy `violence_checker_write_disposition` version `2.0.0` is a total determini
 - all other admissible states produce `WRITE_NOT_DETECTED`;
 - failures before admissibility produce `WRITE_FAILED` through typed failure provenance.
 
-Provider confidence and free-form prose never decide policy. Presentation, regex comparison, reporting, and the illustrative Salesforce payload consume typed results and remain deterministic.
+Provider confidence and free-form prose never decide policy. Regex comparison, reporting, the illustrative Salesforce payload, and the facts supplied to executive communication consume typed results and remain deterministic.
+
+After successful validation and a non-failure policy decision, `construct_communication_input()` creates an immutable, narrative-free `OperatorCommunicationInput`. It contains only bounded proposition facts plus narrow regex, comparison, policy, and Salesforce-eligibility projections. `generate_operator_communication()` may make one strict structured-output request with SDK retries disabled and accepts only `OperatorCommunication`: an incident summary, concise key findings, and a result explanation. Generated prose is presentation-only and cannot change validation, derivation, policy, comparison, Salesforce eligibility, or payload content. Missing configuration, request failure, malformed output, or an exception preserves deterministic repository-authored communication. Failed authoritative analysis uses explicit deterministic failure communication without making a communication request.
 
 ## Aggregate contract
 
-`PipelineResult` carries the original incident, normalized narrative, regex result, validation statuses, the optional validated `semantic_envelope`, optional `derived_semantics`, policy decision, and typed failure provenance. Success requires all current successor stages. No ad hoc semantic dictionary connects major stages.
+`PipelineResult` carries the original incident, normalized narrative, regex result, validation statuses, the optional validated `semantic_envelope`, optional `derived_semantics`, policy decision, and typed failure provenance. `AnalysisResult` additionally carries deterministic comparison, policy-gated Salesforce preview, and bounded Operator Communication for presentation. Success requires all current successor stages. No ad hoc semantic dictionary connects major stages.
 
 ## Interaction and verification boundary
 
 Narrative wording is user-authored free-form evidence. Deterministic input rules reject malformed, empty, whitespace-only, non-substantive, invalid-code-point, or over-20,000-character input before extraction; they do not constrain narrative semantics or vocabulary.
 
-Import, startup, source selection, fixture selection, and manual typing issue zero provider requests. Invalid submission also issues zero. Each valid explicit **Run Analysis** action issues exactly one request. There is no automatic analysis, retry, critic, repair, fallback, batch, or unattended inference path.
+Import, startup, source selection, fixture selection, and manual typing issue zero provider requests. Invalid submission also issues zero. Each valid explicit **Run Analysis** action issues exactly one semantic extraction request. After successful validation and a non-failure policy decision, the Streamlit application attempts one separate presentation-only communication request. Extraction failure issues no communication request. Both provider clients disable SDK retries; there is no automatic analysis, semantic repair, critic, batch, or unattended inference path.
 
-Repository verification covers all eight stakeholder fixtures, CASE_003 historical-disclosure behavior, explicit completed strikes with unresolved intentionality, accidental contact, and representative free-form manual narratives. Desktop uses Regex Baseline on the left and Semantic Analysis on the right. Mobile inspection at 390, 360, and 320 CSS pixels confirms responsive semantic-first stacking without duplicate content or page-level overflow.
+Repository verification covers all eight stakeholder fixtures, CASE_003 historical-disclosure behavior, explicit completed strikes with unresolved intentionality, accidental contact, and representative free-form manual narratives. The accepted executive information architecture presents the incident narrative, then a two-card comparison with Regex Keyword Detection on the left and AI-Powered Semantic Analysis on the right, followed by the illustrative Salesforce record. Incident Summary, Key Findings, and Why This Result appear once in the AI card. Regex and AI each own one collapsed Technical Details expander; Salesforce payload details remain owned by the Salesforce section. Mobile inspection at 390, 360, and 320 CSS pixels confirms responsive AI-first stacking without duplicate content or page-level overflow.
 
 ## Evaluation boundary
 
@@ -59,6 +61,6 @@ Creation-time corpus, runs, accepted baseline, comparison, and engineering repor
 
 The application is a synthetic demonstration. Salesforce output is an illustrative dictionary only. Real patient, hospital, PHI, confidential, and production incident data must not be submitted. There are no committed credentials, Salesforce identifiers, connections, writes, automated interventions, or claims that the policy constitutes clinical, legal, or safety judgment.
 
-Configuration precedence is Streamlit secrets, conventional environment variables, ignored local `.env`, and then the default model where applicable. `app.py` is prepared as the sole Streamlit Community Cloud entrypoint with pinned dependencies and bounded missing-configuration behavior. Hosted deployment and hosted acceptance have not occurred; deployment remains a manual operator action.
+Configuration precedence is Streamlit secrets, conventional environment variables, ignored local `.env`, and then the default model where applicable. Semantic extraction and Operator Communication have independently selectable model settings and share the configured provider credential. `app.py` is prepared as the sole Streamlit Community Cloud entrypoint with pinned dependencies and bounded missing-configuration behavior. Hosted deployment and hosted acceptance have not occurred; deployment remains a manual operator action.
 
 The approved design basis, successor specification, and migration strategy remain under `docs/`. They describe why this architecture is bounded and how creation-time evidence is isolated.

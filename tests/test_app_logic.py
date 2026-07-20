@@ -23,6 +23,7 @@ def test_run_analysis_uses_one_successor_extraction_and_aggregate():
     assert result.validation_result.validated_envelope is not None
     assert result.policy_decision.outcome == PolicyOutcome.WRITE_DETECTED
     assert result.salesforce_preview is not None
+    assert result.communication is not None
 
 
 def test_invalid_input_stops_before_extraction():

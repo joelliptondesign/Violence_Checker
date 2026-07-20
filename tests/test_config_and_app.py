@@ -38,16 +38,19 @@ def test_streamlit_secrets_take_precedence_over_environment(monkeypatch):
     _disable_local_env(monkeypatch, config)
     monkeypatch.setenv("OPENAI_API_KEY", "environment-key")
     monkeypatch.setenv("OPENAI_MODEL", "environment-model")
+    monkeypatch.setenv("OPENAI_COMMUNICATION_MODEL", "environment-communication-model")
 
     loaded = config.load_config(
         streamlit_secrets={
             "OPENAI_API_KEY": "streamlit-key",
             "OPENAI_MODEL": "streamlit-model",
+            "OPENAI_COMMUNICATION_MODEL": "streamlit-communication-model",
         }
     )
 
     assert loaded.openai_api_key == "streamlit-key"
     assert loaded.openai_model == "streamlit-model"
+    assert loaded.openai_communication_model == "streamlit-communication-model"
 
 
 def test_environment_fallback_is_used_when_streamlit_secrets_are_absent(monkeypatch):
@@ -55,21 +58,25 @@ def test_environment_fallback_is_used_when_streamlit_secrets_are_absent(monkeypa
     _disable_local_env(monkeypatch, config)
     monkeypatch.setenv("OPENAI_API_KEY", "environment-key")
     monkeypatch.setenv("OPENAI_MODEL", "environment-model")
+    monkeypatch.setenv("OPENAI_COMMUNICATION_MODEL", "environment-communication-model")
 
     loaded = config.load_config(streamlit_secrets={})
 
     assert loaded.openai_api_key == "environment-key"
     assert loaded.openai_model == "environment-model"
+    assert loaded.openai_communication_model == "environment-communication-model"
 
 
 def test_local_dotenv_is_lowest_precedence_fallback(monkeypatch):
     config = importlib.import_module("src.config")
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("OPENAI_MODEL", raising=False)
+    monkeypatch.delenv("OPENAI_COMMUNICATION_MODEL", raising=False)
 
     def simulated_local_dotenv(path):
         monkeypatch.setenv("OPENAI_API_KEY", "local-development-key")
         monkeypatch.setenv("OPENAI_MODEL", "local-development-model")
+        monkeypatch.setenv("OPENAI_COMMUNICATION_MODEL", "local-communication-model")
         return True
 
     monkeypatch.setattr(config, "load_dotenv", simulated_local_dotenv)
@@ -77,6 +84,20 @@ def test_local_dotenv_is_lowest_precedence_fallback(monkeypatch):
 
     assert loaded.openai_api_key == "local-development-key"
     assert loaded.openai_model == "local-development-model"
+    assert loaded.openai_communication_model == "local-communication-model"
+
+
+def test_communication_model_has_separate_deterministic_default(monkeypatch):
+    config = importlib.import_module("src.config")
+    _disable_local_env(monkeypatch, config)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_MODEL", raising=False)
+    monkeypatch.delenv("OPENAI_COMMUNICATION_MODEL", raising=False)
+
+    loaded = config.load_config(streamlit_secrets={})
+
+    assert loaded.openai_model == config.DEFAULT_OPENAI_MODEL
+    assert loaded.openai_communication_model == config.DEFAULT_OPENAI_COMMUNICATION_MODEL
 
 
 def test_guarded_streamlit_secret_loader_is_used_without_exposing_values(monkeypatch):

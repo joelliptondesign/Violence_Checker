@@ -66,6 +66,9 @@ src/fixtures.py
 src/input_validation.py
 src/models.py
 src/narrative_normalizer.py
+src/operator_communication.py
+src/operator_communication_prompt.py
+src/operator_communication_provider.py
 src/policy.py
 src/presentation.py
 src/provider_adapter.py
@@ -96,6 +99,8 @@ tests/test_fixture_policy_regression.py
 tests/test_fixtures.py
 tests/test_input_boundary.py
 tests/test_models.py
+tests/test_operator_communication.py
+tests/test_operator_communication_provider.py
 tests/test_policy.py
 tests/test_presentation.py
 tests/test_regex_baseline.py

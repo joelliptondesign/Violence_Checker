@@ -7,6 +7,8 @@ from src.comparison import ComparisonResult, build_comparison_result
 from src.contracts import (
     InputValidationResult,
     NormalizedIncident,
+    OperatorCommunication,
+    OperatorCommunicationInput,
     PipelineFailureProvenance,
     PolicyDecision,
     PolicyOutcome,
@@ -16,6 +18,12 @@ from src.contracts import (
 from src.input_validation import validate_incident
 from src.models import Incident
 from src.narrative_normalizer import normalize_incident
+from src.operator_communication import (
+    build_deterministic_communication,
+    build_failure_communication,
+    construct_communication_input,
+)
+from src.operator_communication_provider import OperatorCommunicationResult
 from src.policy import evaluate_policy, failed_policy_decision
 from src.regex_baseline import detect_violence_terms
 from src.salesforce_preview import build_salesforce_preview
@@ -32,6 +40,7 @@ class AnalysisResult:
     policy_decision: PolicyDecision
     comparison: ComparisonResult
     salesforce_preview: Optional[Dict[str, object]]
+    communication: Optional[OperatorCommunication]
     signature: str
     normalized_incident: Optional[NormalizedIncident] = None
 
@@ -62,6 +71,7 @@ def run_analysis(
     incident: object,
     *,
     extractor: Callable[[Incident], SemanticExtractionResult] = extract_semantic_envelope,
+    communicator: Optional[Callable[["OperatorCommunicationInput"], OperatorCommunicationResult]] = None,
 ) -> Union[AnalysisResult, InputValidationResult]:
     input_validation = validate_incident(incident)
     if not input_validation.succeeded:
@@ -118,6 +128,25 @@ def run_analysis(
             policy_decision,
             validation_status=semantic_result.status.value,
         )
+    if policy_decision.outcome == PolicyOutcome.WRITE_FAILED:
+        communication = build_failure_communication(validation_result, policy_decision)
+    else:
+        communication_input = construct_communication_input(
+            validation_result,
+            policy_decision,
+            regex_result,
+            comparison,
+            salesforce_preview_eligible=preview is not None,
+        )
+        communication = build_deterministic_communication(communication_input)
+        if communicator is not None:
+            try:
+                generated = communicator(communication_input)
+                if generated.succeeded and generated.communication is not None:
+                    communication = generated.communication
+            except Exception:
+                # Communication provider failure cannot change completed authority.
+                pass
     return AnalysisResult(
         incident=validated_incident,
         regex_result=regex_result,
@@ -126,6 +155,7 @@ def run_analysis(
         policy_decision=policy_decision,
         comparison=comparison,
         salesforce_preview=preview,
+        communication=communication,
         signature=active_narrative_signature(validated_incident),
         normalized_incident=normalized_incident,
     )
