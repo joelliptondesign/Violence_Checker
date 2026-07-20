@@ -2,9 +2,9 @@
 
 ## Current implementation state
 
-The true-north semantic boundary is implemented. It replaces the former proposition-oriented semantic representation with `TrueNorthSemanticEnvelope`, schema identity `violence-checker.true-north-incident-facts`, version `1.0.0`.
+The true-north semantic and deterministic-policy boundary is implemented. It uses `TrueNorthSemanticEnvelope`, schema identity `violence-checker.true-north-incident-facts`, version `1.0.0`, repository-owned analysis status, deterministic semantic views, and direct policy evaluation over validated facts.
 
-This execution intentionally stops at the semantic boundary. Deterministic policy, communication, presentation, evaluation, corpus, application orchestration, and Streamlit acceptance still reference the retired proposition runtime and are not currently compatible with the new contract. A fully working application is not claimed. No compatibility wrapper or dual semantic authority is present.
+This execution intentionally stops before downstream integration. Communication, presentation, evaluation, corpus, application orchestration, Salesforce preview, and Streamlit acceptance still reference the retired proposition runtime and are not currently compatible with the new contract. A fully working application is not claimed. No compatibility wrapper, proposition policy candidate, or dual semantic authority is present.
 
 ## Semantic authority
 
@@ -23,7 +23,7 @@ Raw `Incident.narrative` remains the evidence authority. Normalization may chang
 - an optional narrow supersession reference; and
 - an optional narrow contradiction-group identifier.
 
-The semantic contract does not contain entities, propositions, general relationships, graph structures, policy outcomes or reasons, processing or completeness status, communication prose, or presentation fields. Atomic fact direction excludes `multiple`; that value belongs to later deterministic incident-level derivation.
+The semantic contract does not contain entities, propositions, general relationships, graph structures, policy outcomes or reasons, processing or completeness status, communication prose, or presentation fields. Atomic fact direction excludes `multiple`; repository derivation computes it only as an incident-level direction.
 
 ## Provider boundary
 
@@ -46,17 +46,32 @@ Schema validation enforces strict shape, exact identities and versions, bounded 
 
 Validation is deterministic and fail-closed. It does not repair candidates, apply silent semantic defaults, or attempt unrestricted natural-language entailment.
 
+## Repository interpretation and policy
+
+Repository processing status is outside semantic facts and has exactly five states: successful analysis, provider failure, schema failure, validation failure, and pipeline failure. Completeness status is also outside facts and distinguishes complete admissible analysis, incomplete analysis, and unresolved semantic content. Neither status concludes that violence is absent.
+
+After successful validation, `semantic_derivation.py` deterministically projects only active fact IDs, superseded fact IDs, narrow contradiction-group membership, and incident direction. Incident direction is `interpersonal`, `self_directed`, `object_directed`, `multiple`, or `unknown`. Derivation does not create facts or a generalized graph.
+
+`policy.py` evaluates validated operational facts directly with repository processing/completeness status and the reproducible deterministic view. It does not consume a policy-candidate aggregate, provider confidence, provider outcomes, recommendations, communication, or presentation fields. The policy returns:
+
+- `Violence Detected` for at least one active, affirmed, intentional, current qualifying fact;
+- `Uncertain` for admissible active semantic uncertainty capable of changing classification;
+- `No Violence Detected` only for complete admissible analysis without qualifying current violence or material classification uncertainty; and
+- `Unable to Determine` for failed, incomplete, malformed, or inadmissible processing.
+
+All five conduct values qualify when the other doctrinal conditions hold. Self-directed violence and intentional object-directed property violence qualify. Accidental, historical, denied, and superseded facts do not qualify. Direction describes the incident and never independently suppresses violence; unknown direction alone is non-material.
+
 ## Current execution sequence
 
 The implemented boundary is:
 
-`normalized incident narrative` → one structured provider fact response → deterministic repository adapter → strict schema validation → deterministic domain/evidence validation → validated true-north envelope
+`normalized incident narrative` → one structured provider fact response → deterministic repository adapter → strict schema validation → deterministic domain/evidence validation → validated true-north envelope → repository status and deterministic semantic views → direct deterministic policy
 
-Successful validation exposes the envelope directly. It does not call semantic derivation or create a policy-candidate aggregate. Repository-owned processing/completeness bookkeeping, active-set derivation, incident direction, material uncertainty, policy, communication, presentation, and evaluation remain later migration work.
+Successful validation exposes the envelope, repository processing/completeness status, and deterministic views. Policy reads the facts directly and verifies that the supplied view and completeness state match them. Communication, presentation, evaluation, application integration, and acceptance remain later migration work.
 
 ## Preserved boundaries
 
-Input validation, narrative normalization, regex result, and existing downstream policy-result contracts remain available. This semantic execution made no provider request, live evaluation run, corpus or baseline regeneration, deployment, push, external write, or Streamlit change.
+Input validation, narrative normalization, and regex result contracts remain available. This policy execution made no provider request, live evaluation run, corpus or baseline regeneration, deployment, push, external write, or Streamlit change.
 
 Historical evaluation artifacts retain their creation-time schema families and were not rewritten or promoted. The proposition contract is no longer a current runtime semantic authority; legacy downstream consumers fail until separately authorized migration packages replace them.
 
@@ -66,4 +81,4 @@ The repository remains a synthetic demonstration. It does not provide clinical, 
 
 ## Governing authority
 
-The approved [Workplace Violence Doctrine](workplace_violence_doctrine.md), [True North Semantic Contract Specification](true_north_semantic_contract_specification.md), and [True North Migration Strategy](true_north_migration_strategy.md) govern this boundary. Later packages must migrate deterministic derivation and policy, communication and presentation, evaluation and corpus authority, application orchestration, local and live-provider acceptance, baseline acceptance, deployment, and hosted acceptance without restoring dual semantic authority.
+The approved [Workplace Violence Doctrine](workplace_violence_doctrine.md), [True North Semantic Contract Specification](true_north_semantic_contract_specification.md), and [True North Migration Strategy](true_north_migration_strategy.md) govern this boundary. Later packages must migrate communication and presentation, evaluation and corpus authority, application orchestration, local and live-provider acceptance, baseline acceptance, deployment, and hosted acceptance without restoring dual semantic authority.

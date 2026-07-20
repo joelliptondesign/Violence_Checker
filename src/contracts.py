@@ -49,40 +49,41 @@ class ValidationIssueCode(str, Enum):
 
 
 class PolicyOutcome(str, Enum):
-    WRITE_DETECTED = "WRITE_DETECTED"
-    WRITE_UNCERTAIN = "WRITE_UNCERTAIN"
-    WRITE_NOT_DETECTED = "WRITE_NOT_DETECTED"
-    WRITE_FAILED = "WRITE_FAILED"
+    VIOLENCE_DETECTED = "Violence Detected"
+    NO_VIOLENCE_DETECTED = "No Violence Detected"
+    UNCERTAIN = "Uncertain"
+    UNABLE_TO_DETERMINE = "Unable to Determine"
 
 
 class PolicyReasonCode(str, Enum):
-    INPUT_VALIDATION_FAILED = "input_validation_failed"
-    PROVIDER_CONFIGURATION_FAILED = "provider_configuration_failed"
-    PROVIDER_REQUEST_FAILED = "provider_request_failed"
-    PROVIDER_STRUCTURED_RESPONSE_FAILED = "provider_structured_response_failed"
-    PROVIDER_VALIDATION_FAILED = "provider_validation_failed"
-    SCHEMA_VALIDATION_FAILED = "schema_validation_failed"
-    DOMAIN_VALIDATION_FAILED = "domain_validation_failed"
-    UNSUPPORTED_POLICY_INPUT = "unsupported_policy_input"
-    CONFLICTING_INFORMATION = "conflicting_information"
-    SCOPED_SEMANTIC_UNCERTAINTY = "scoped_semantic_uncertainty"
-    AFFIRMED_CURRENT_INTERPERSONAL_VIOLENCE = "affirmed_current_interpersonal_violence"
-    NO_ACTIVE_CURRENT_INTERPERSONAL_VIOLENCE = "no_active_current_interpersonal_violence"
+    QUALIFYING_CURRENT_VIOLENCE = "qualifying_current_violence"
+    NO_QUALIFYING_CURRENT_VIOLENCE = "no_qualifying_current_violence"
+    MATERIAL_SEMANTIC_UNCERTAINTY = "material_semantic_uncertainty"
+    UNRESOLVED_CONTRADICTION = "unresolved_contradiction"
+    INCOMPLETE_ANALYSIS = "incomplete_analysis"
+    PROVIDER_FAILURE = "provider_failure"
+    SCHEMA_FAILURE = "schema_failure"
+    VALIDATION_FAILURE = "validation_failure"
+    PIPELINE_FAILURE = "pipeline_failure"
+    MALFORMED_SEMANTIC_INPUT = "malformed_semantic_input"
 
 
-class PipelineFailureProvenance(str, Enum):
-    INPUT_VALIDATION = "input_validation"
-    PROVIDER_CONFIGURATION = "provider_configuration"
-    PROVIDER_REQUEST = "provider_request"
-    PROVIDER_STRUCTURED_RESPONSE = "provider_structured_response"
-    PROVIDER_VALIDATION = "provider_validation"
-    SCHEMA_VALIDATION = "schema_validation"
-    DOMAIN_VALIDATION = "domain_validation"
-    UNSUPPORTED_POLICY_INPUT = "unsupported_policy_input"
+class ProcessingStatus(str, Enum):
+    SUCCESSFUL_ANALYSIS = "successful_analysis"
+    PROVIDER_FAILURE = "provider_failure"
+    SCHEMA_FAILURE = "schema_failure"
+    VALIDATION_FAILURE = "validation_failure"
+    PIPELINE_FAILURE = "pipeline_failure"
+
+
+class CompletenessStatus(str, Enum):
+    COMPLETE_ADMISSIBLE_ANALYSIS = "complete_admissible_analysis"
+    INCOMPLETE_ANALYSIS = "incomplete_analysis"
+    UNRESOLVED_SEMANTIC_CONTENT = "unresolved_semantic_content"
 
 
 class PolicyDecision(BaseModel):
-    """Unchanged downstream policy contract retained for later migration."""
+    """Repository-authored doctrinal outcome over validated incident facts."""
 
     model_config = ConfigDict(strict=True, extra="forbid")
 
@@ -91,16 +92,31 @@ class PolicyDecision(BaseModel):
     outcome: PolicyOutcome
     reason_codes: list[PolicyReasonCode]
     explanation: StrictStr
-    failure_provenance: Optional[PipelineFailureProvenance] = None
 
     @model_validator(mode="after")
     def require_consistent_decision(self) -> "PolicyDecision":
-        if not self.reason_codes or not self.explanation:
+        if not self.reason_codes or not self.explanation.strip():
             raise ValueError("policy decision requires reason codes and an explanation")
-        if self.outcome == PolicyOutcome.WRITE_FAILED and self.failure_provenance is None:
-            raise ValueError("WRITE_FAILED requires failure provenance")
-        if self.outcome != PolicyOutcome.WRITE_FAILED and self.failure_provenance is not None:
-            raise ValueError("non-failure policy outcomes cannot contain failure provenance")
+        if len(self.reason_codes) != len(set(self.reason_codes)):
+            raise ValueError("policy decision reason codes must be unique")
+        allowed = {
+            PolicyOutcome.VIOLENCE_DETECTED: {PolicyReasonCode.QUALIFYING_CURRENT_VIOLENCE},
+            PolicyOutcome.NO_VIOLENCE_DETECTED: {PolicyReasonCode.NO_QUALIFYING_CURRENT_VIOLENCE},
+            PolicyOutcome.UNCERTAIN: {
+                PolicyReasonCode.MATERIAL_SEMANTIC_UNCERTAINTY,
+                PolicyReasonCode.UNRESOLVED_CONTRADICTION,
+            },
+            PolicyOutcome.UNABLE_TO_DETERMINE: {
+                PolicyReasonCode.INCOMPLETE_ANALYSIS,
+                PolicyReasonCode.PROVIDER_FAILURE,
+                PolicyReasonCode.SCHEMA_FAILURE,
+                PolicyReasonCode.VALIDATION_FAILURE,
+                PolicyReasonCode.PIPELINE_FAILURE,
+                PolicyReasonCode.MALFORMED_SEMANTIC_INPUT,
+            },
+        }[self.outcome]
+        if not set(self.reason_codes).issubset(allowed):
+            raise ValueError("policy decision reason codes are incoherent with its outcome")
         return self
 
 
@@ -225,6 +241,14 @@ class FactDirection(str, Enum):
     UNKNOWN = "unknown"
 
 
+class IncidentDirection(str, Enum):
+    INTERPERSONAL = "interpersonal"
+    SELF_DIRECTED = "self_directed"
+    OBJECT_DIRECTED = "object_directed"
+    MULTIPLE = "multiple"
+    UNKNOWN = "unknown"
+
+
 class Intentionality(str, Enum):
     INTENTIONAL = "intentional"
     ACCIDENTAL = "accidental"
@@ -344,6 +368,34 @@ class TrueNorthSemanticEnvelope(BaseModel):
     extraction_contract_identity: StrictStr
     incident_id: StrictStr
     facts: list[IncidentFact]
+
+
+class DerivedContradictionGroup(BaseModel):
+    """Deterministic membership view for one narrow contradiction group."""
+
+    model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
+
+    contradiction_group: StrictStr
+    fact_ids: tuple[StrictStr, ...]
+
+    @field_validator("fact_ids")
+    @classmethod
+    def require_canonical_members(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        if len(value) < 2 or len(value) != len(set(value)) or value != tuple(sorted(value)):
+            raise ValueError("contradiction-group fact identifiers must be unique and canonical")
+        return value
+
+
+class DerivedSemanticView(BaseModel):
+    """Repository-owned views derived without creating or rewriting semantic facts."""
+
+    model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
+
+    incident_id: StrictStr
+    active_fact_ids: tuple[StrictStr, ...]
+    superseded_fact_ids: tuple[StrictStr, ...]
+    contradiction_groups: tuple[DerivedContradictionGroup, ...]
+    incident_direction: IncidentDirection
 
 
 class ProviderFactEvidenceCandidate(BaseModel):
@@ -486,7 +538,10 @@ class ValidationResult(BaseModel):
     schema_validation: SchemaValidationResult
     domain_validation: DomainValidationResult
     failure_stage: ValidationFailureStage
+    processing_status: ProcessingStatus
+    completeness_status: CompletenessStatus
     validated_envelope: Optional[TrueNorthSemanticEnvelope] = None
+    derived_semantics: Optional[DerivedSemanticView] = None
 
     @model_validator(mode="after")
     def require_stage_consistency(self) -> "ValidationResult":
@@ -495,20 +550,47 @@ class ValidationResult(BaseModel):
                 self.schema_validation.status == SchemaValidationStatus.NOT_RUN
                 and self.domain_validation.status == DomainValidationStatus.NOT_RUN
                 and self.validated_envelope is None
+                and self.derived_semantics is None
+                and self.processing_status == ProcessingStatus.PIPELINE_FAILURE
+                and self.completeness_status == CompletenessStatus.INCOMPLETE_ANALYSIS
             )
         elif self.failure_stage == ValidationFailureStage.NONE:
-            valid = self.schema_validation.passed and self.domain_validation.passed and self.validated_envelope is not None
+            valid = (
+                self.schema_validation.passed
+                and self.domain_validation.passed
+                and self.validated_envelope is not None
+                and self.derived_semantics is not None
+                and self.processing_status == ProcessingStatus.SUCCESSFUL_ANALYSIS
+                and self.completeness_status in {
+                    CompletenessStatus.COMPLETE_ADMISSIBLE_ANALYSIS,
+                    CompletenessStatus.UNRESOLVED_SEMANTIC_CONTENT,
+                }
+            )
         elif self.failure_stage == ValidationFailureStage.SCHEMA:
             valid = (
                 self.schema_validation.status == SchemaValidationStatus.FAILED
                 and self.domain_validation.status == DomainValidationStatus.NOT_RUN
                 and self.validated_envelope is None
+                and self.derived_semantics is None
+                and self.processing_status == ProcessingStatus.SCHEMA_FAILURE
+                and self.completeness_status == CompletenessStatus.INCOMPLETE_ANALYSIS
             )
         else:
             valid = (
                 self.schema_validation.passed
                 and self.domain_validation.status == DomainValidationStatus.FAILED
                 and self.validated_envelope is None
+                and self.derived_semantics is None
+                and self.processing_status == ProcessingStatus.VALIDATION_FAILURE
+                and self.completeness_status == CompletenessStatus.INCOMPLETE_ANALYSIS
+            )
+        if valid and self.failure_stage == ValidationFailureStage.NONE:
+            fact_ids = tuple(fact.fact_id for fact in self.validated_envelope.facts)
+            derived_ids = self.derived_semantics.active_fact_ids + self.derived_semantics.superseded_fact_ids
+            valid = (
+                self.derived_semantics.incident_id == self.validated_envelope.incident_id
+                and len(derived_ids) == len(set(derived_ids))
+                and set(derived_ids) == set(fact_ids)
             )
         if not valid:
             raise ValueError("validation stage and results are inconsistent")

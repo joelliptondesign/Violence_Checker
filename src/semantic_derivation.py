@@ -1,109 +1,88 @@
-"""Deterministic views derived only from an admissible semantic envelope."""
+"""Deterministic views derived only from validated true-north incident facts."""
+
+from collections import defaultdict
 
 from src.contracts import (
-    AssertionStatus,
-    ConductKind,
-    Direction,
-    DerivedProposition,
+    DerivedContradictionGroup,
     DerivedSemanticView,
-    EntityKind,
-    POLICY_CANDIDATE_SCHEMA_IDENTITY,
-    POLICY_CANDIDATE_SCHEMA_VERSION,
-    PolicyCandidateView,
-    RelationshipKind,
-    SEMANTIC_SCHEMA_IDENTITY,
-    SEMANTIC_SCHEMA_VERSION,
-    SemanticIntentionality,
-    TargetKind,
-    TemporalScope,
-    ViolenceSemanticEnvelope,
+    FactDirection,
+    IncidentDirection,
+    ResolutionStatus,
+    TrueNorthSemanticEnvelope,
+    UncertaintyDimension,
 )
 
 
-def derive_direction(proposition, entities) -> Direction:
-    if proposition.target.target_kind == TargetKind.SELF:
-        return Direction.SELF_DIRECTED
-    if proposition.target.target_kind != TargetKind.ENTITY or proposition.target.target_ref is None:
-        return Direction.UNDETERMINED
-    actor = entities[proposition.actor_ref]
-    target = entities[proposition.target.target_ref]
-    if target.entity_kind == EntityKind.OBJECT:
-        return Direction.OBJECT_DIRECTED
-    if target.entity_kind in {EntityKind.PERSON, EntityKind.PEOPLE_COLLECTIVE}:
-        if actor.entity_kind == EntityKind.UNSPECIFIED or proposition.actor_ref == proposition.target.target_ref:
-            return Direction.UNDETERMINED
-        return Direction.INTERPERSONAL
-    return Direction.UNDETERMINED
+_MATERIAL_UNCERTAINTY = {
+    UncertaintyDimension.CONDUCT,
+    UncertaintyDimension.INTENTIONALITY,
+    UncertaintyDimension.TEMPORAL_SCOPE,
+    UncertaintyDimension.ASSERTION_STATUS,
+}
 
 
-def derive_semantic_views(envelope: ViolenceSemanticEnvelope) -> tuple[DerivedSemanticView, PolicyCandidateView]:
-    entities = {item.entity_id: item for item in envelope.entities}
-    superseded = {
-        relationship.target_proposition_ref
-        for relationship in envelope.relationships
-        if relationship.relationship_kind == RelationshipKind.SUPERSEDES
-    }
-    derived_propositions = [
-        DerivedProposition(
-            proposition_id=proposition.proposition_id,
-            direction=derive_direction(proposition, entities),
-            active=proposition.proposition_id not in superseded,
+def derive_semantic_views(envelope: TrueNorthSemanticEnvelope) -> DerivedSemanticView:
+    """Project fact state and incident direction without creating semantic facts."""
+    if not isinstance(envelope, TrueNorthSemanticEnvelope):
+        raise TypeError("semantic derivation requires a validated TrueNorthSemanticEnvelope")
+
+    active_fact_ids = tuple(
+        fact.fact_id
+        for fact in envelope.facts
+        if fact.resolution_status == ResolutionStatus.ACTIVE
+    )
+    superseded_fact_ids = tuple(
+        fact.fact_id
+        for fact in envelope.facts
+        if fact.resolution_status == ResolutionStatus.SUPERSEDED
+    )
+    active_id_set = set(active_fact_ids)
+
+    group_members: dict[str, list[str]] = defaultdict(list)
+    for fact in envelope.facts:
+        if fact.fact_id in active_id_set and fact.contradiction_group is not None:
+            group_members[fact.contradiction_group].append(fact.fact_id)
+    contradiction_groups = tuple(
+        DerivedContradictionGroup(
+            contradiction_group=group_id,
+            fact_ids=tuple(sorted(group_members[group_id])),
         )
-        for proposition in envelope.propositions
-    ]
-    active_ids = [item.proposition_id for item in derived_propositions if item.active]
-    derived = DerivedSemanticView(
-        schema_identity=SEMANTIC_SCHEMA_IDENTITY,
-        schema_version=SEMANTIC_SCHEMA_VERSION,
-        incident_id=envelope.incident_id,
-        propositions=derived_propositions,
-        active_proposition_ids=active_ids,
+        for group_id in sorted(group_members)
     )
 
-    direction_by_id = {item.proposition_id: item.direction for item in derived_propositions}
-    active = [item for item in envelope.propositions if item.proposition_id in active_ids]
-    current_interpersonal = [
-        item
-        for item in active
-        if item.temporal_scope == TemporalScope.CURRENT_INCIDENT
-        and direction_by_id[item.proposition_id] == Direction.INTERPERSONAL
-    ]
-    current_interpersonal_ids = {item.proposition_id for item in current_interpersonal}
-    active_set = set(active_ids)
-    policy_candidate = PolicyCandidateView(
-        schema_identity=POLICY_CANDIDATE_SCHEMA_IDENTITY,
-        schema_version=POLICY_CANDIDATE_SCHEMA_VERSION,
+    known_directions = {
+        fact.direction
+        for fact in envelope.facts
+        if fact.fact_id in active_id_set
+        and fact.conduct is not None
+        and fact.direction != FactDirection.UNKNOWN
+    }
+    if not known_directions:
+        incident_direction = IncidentDirection.UNKNOWN
+    elif len(known_directions) > 1:
+        incident_direction = IncidentDirection.MULTIPLE
+    else:
+        incident_direction = IncidentDirection(next(iter(known_directions)).value)
+
+    return DerivedSemanticView(
         incident_id=envelope.incident_id,
-        active_current_interpersonal_affirmed=[item.proposition_id for item in current_interpersonal if item.assertion_status == AssertionStatus.AFFIRMED],
-        active_current_interpersonal_uncertain=[item.proposition_id for item in current_interpersonal if item.assertion_status == AssertionStatus.UNCERTAIN],
-        active_current_interpersonal_negated=[item.proposition_id for item in current_interpersonal if item.assertion_status == AssertionStatus.NEGATED],
-        active_current_interpersonal_accidental=[item.proposition_id for item in current_interpersonal if item.intentionality == SemanticIntentionality.ACCIDENTAL],
-        active_current_interpersonal_violence=[
-            item.proposition_id
-            for item in current_interpersonal
-            if item.assertion_status == AssertionStatus.AFFIRMED
-            and item.intentionality != SemanticIntentionality.ACCIDENTAL
-            and item.conduct_kind in {ConductKind.PHYSICAL_CONDUCT, ConductKind.THREAT_EXPRESSION}
-        ],
-        active_potential_interpersonal_uncertain=[
-            item.proposition_id
-            for item in active
-            if item.assertion_status != AssertionStatus.NEGATED
-            and item.temporal_scope in {TemporalScope.CURRENT_INCIDENT, TemporalScope.UNDETERMINED}
-            and direction_by_id[item.proposition_id] == Direction.UNDETERMINED
-        ],
-        active_conflict_relationships=[
-            item.relationship_id
-            for item in envelope.relationships
-            if item.relationship_kind == RelationshipKind.CONFLICTS_WITH
-            and item.source_proposition_ref in current_interpersonal_ids
-            and item.target_proposition_ref in current_interpersonal_ids
-        ],
-        active_uncertainties=[item.uncertainty_id for item in envelope.uncertainties if item.proposition_ref in active_set],
-        active_current_interpersonal_uncertainties=[
-            item.uncertainty_id
-            for item in envelope.uncertainties
-            if item.proposition_ref in current_interpersonal_ids
-        ],
+        active_fact_ids=active_fact_ids,
+        superseded_fact_ids=superseded_fact_ids,
+        contradiction_groups=contradiction_groups,
+        incident_direction=incident_direction,
     )
-    return derived, policy_candidate
+
+
+def has_unresolved_semantic_content(
+    envelope: TrueNorthSemanticEnvelope,
+    derived: DerivedSemanticView,
+) -> bool:
+    """Return whether active facts preserve unresolved material semantic content."""
+    active_ids = set(derived.active_fact_ids)
+    if derived.contradiction_groups:
+        return True
+    return any(
+        fact.fact_id in active_ids
+        and bool(_MATERIAL_UNCERTAINTY.intersection(fact.uncertainty))
+        for fact in envelope.facts
+    )

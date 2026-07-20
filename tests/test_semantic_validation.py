@@ -2,10 +2,13 @@ import pytest
 
 from src.contracts import (
     AssertionStatus,
+    CompletenessStatus,
     Conduct,
     FactDirection,
+    IncidentDirection,
     Intentionality,
     MaterialAttribute,
+    ProcessingStatus,
     ProviderFactCandidate,
     ProviderFactEvidenceCandidate,
     ProviderStructuredResponse,
@@ -17,7 +20,7 @@ from src.contracts import (
 )
 from src.models import Incident
 from src.provider_adapter import semantic_candidate_from_provider_response
-from src.semantic_validation import validate_semantic_candidate
+from src.semantic_validation import validate_semantic_candidate, validation_not_run
 
 
 BASE_SUPPORTS = [
@@ -60,13 +63,17 @@ def validate(envelope, narrative):
     )
 
 
-def test_valid_true_north_envelope_passes_schema_and_domain_without_derivation_or_policy():
+def test_valid_true_north_envelope_passes_with_repository_status_and_deterministic_derivation():
     narrative = "He intentionally punched a coworker today."
     result = validate(adapt(narrative, [fact(narrative)]), narrative)
     assert result.passed
     assert result.validated_envelope.facts[0].fact_id == "FACT-0001"
-    assert not hasattr(result.validated_envelope, "derived")
-    assert not hasattr(result.validated_envelope, "policy_candidate")
+    assert result.processing_status == ProcessingStatus.SUCCESSFUL_ANALYSIS
+    assert result.completeness_status == CompletenessStatus.COMPLETE_ADMISSIBLE_ANALYSIS
+    assert result.derived_semantics.active_fact_ids == ("FACT-0001",)
+    assert result.derived_semantics.superseded_fact_ids == ()
+    assert result.derived_semantics.incident_direction == IncidentDirection.INTERPERSONAL
+    assert "policy_candidate" not in type(result.derived_semantics).model_fields
 
 
 def test_empty_fact_collection_is_semantically_admissible_but_carries_no_negative_conclusion():
@@ -74,6 +81,9 @@ def test_empty_fact_collection_is_semantically_admissible_but_carries_no_negativ
     result = validate(envelope, "No qualifying fact was proposed.")
     assert result.passed
     assert result.validated_envelope.facts == []
+    assert result.processing_status == ProcessingStatus.SUCCESSFUL_ANALYSIS
+    assert result.completeness_status == CompletenessStatus.COMPLETE_ADMISSIBLE_ANALYSIS
+    assert result.derived_semantics.incident_direction == IncidentDirection.UNKNOWN
     assert set(type(result.validated_envelope).model_fields).isdisjoint({"policy_outcome", "completeness_status"})
 
 
@@ -85,7 +95,37 @@ def test_provider_object_is_rejected_before_domain_validation():
         normalized_narrative=narrative,
     )
     assert result.failure_stage == ValidationFailureStage.SCHEMA
+    assert result.processing_status == ProcessingStatus.SCHEMA_FAILURE
+    assert result.completeness_status == CompletenessStatus.INCOMPLETE_ANALYSIS
+    assert result.derived_semantics is None
     assert result.schema_validation.issues[0].code == ValidationIssueCode.PROVIDER_OBJECT_NOT_ALLOWED
+
+
+def test_not_run_and_domain_failure_receive_repository_owned_failure_status():
+    not_run = validation_not_run()
+    assert not_run.processing_status == ProcessingStatus.PIPELINE_FAILURE
+    assert not_run.completeness_status == CompletenessStatus.INCOMPLETE_ANALYSIS
+
+    narrative = "He intentionally punched a coworker today."
+    envelope = adapt(narrative, [fact(narrative)])
+    failed = validate(envelope, "Different narrative")
+    assert failed.failure_stage == ValidationFailureStage.DOMAIN
+    assert failed.processing_status == ProcessingStatus.VALIDATION_FAILURE
+    assert failed.completeness_status == CompletenessStatus.INCOMPLETE_ANALYSIS
+    assert failed.derived_semantics is None
+
+
+def test_repository_status_vocabularies_are_exact_and_absent_from_provider_contract():
+    assert {item.value for item in ProcessingStatus} == {
+        "successful_analysis", "provider_failure", "schema_failure",
+        "validation_failure", "pipeline_failure",
+    }
+    assert {item.value for item in CompletenessStatus} == {
+        "complete_admissible_analysis", "incomplete_analysis", "unresolved_semantic_content",
+    }
+    assert set(ProviderStructuredResponse.model_fields).isdisjoint({
+        "processing_status", "completeness_status",
+    })
 
 
 @pytest.mark.parametrize("field,value,code", [
@@ -98,6 +138,7 @@ def test_repository_identity_failures_are_typed(field, value, code):
     envelope = adapt(narrative, [fact(narrative)]).model_copy(update={field: value})
     result = validate(envelope, narrative)
     assert result.failure_stage == ValidationFailureStage.SCHEMA
+    assert result.processing_status == ProcessingStatus.SCHEMA_FAILURE
     assert code in {issue.code for issue in result.schema_validation.issues}
 
 
@@ -148,7 +189,9 @@ def test_unresolved_values_require_matching_uncertainty_and_support():
         intentionality=Intentionality.UNRESOLVED,
         uncertainty=[UncertaintyDimension.INTENTIONALITY],
     )
-    assert validate(adapt(narrative, [unresolved]), narrative).passed
+    valid = validate(adapt(narrative, [unresolved]), narrative)
+    assert valid.passed
+    assert valid.completeness_status == CompletenessStatus.UNRESOLVED_SEMANTIC_CONTENT
 
     envelope = adapt(narrative, [unresolved])
     changed = envelope.facts[0].model_copy(update={"uncertainty": []})
