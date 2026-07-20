@@ -14,7 +14,7 @@ from src.fixtures import SYNTHETIC_INCIDENTS
 from src.models import Incident
 from src.operator_communication_provider import generate_operator_communication
 from src.presentation import (
-    extracted_entity_rows,
+    operational_fact_rows,
     policy_outcome_label,
     policy_reason_explanations,
     salesforce_operator_rows,
@@ -24,9 +24,9 @@ from src.presentation import (
 
 
 DECISION_LOGIC_EXPLANATION = (
-    "The application reviewed who was involved, what happened, whether the conduct was "
-    "intentional, and whether it occurred during the current incident. It then applied the "
-    "workplace violence criteria to those confirmed details."
+    "The application reviewed supported operational facts, including conduct, direction, "
+    "intent, timing, assertion state, corrections, and unresolved information. It then applied "
+    "the workplace violence criteria deterministically."
 )
 
 
@@ -126,24 +126,23 @@ def _display_regex_technical_details(regex_result: dict) -> None:
 def _display_ai_operator_view(result) -> None:
     st.header("AI-Powered Semantic Analysis")
     st.caption(
-        "Reviews the incident as a whole, including who was involved, what occurred, and whether the reported conduct meets the workplace violence criteria."
+        "Reviews supported incident facts as a whole and applies the workplace violence criteria deterministically."
     )
     st.subheader(policy_outcome_label(result.policy_decision))
-    if result.policy_decision.outcome == PolicyOutcome.WRITE_FAILED:
+    if result.policy_decision.outcome == PolicyOutcome.UNABLE_TO_DETERMINE:
         st.error(policy_reason_explanations(result.policy_decision)[0])
-    elif result.communication is not None:
-        _display_operator_communication(result.communication)
+    _display_operator_communication(result.communication)
 
 
 def _display_ai_technical_details(result) -> None:
     with st.expander("Technical Details", expanded=False):
         st.html('<span class="ai-technical-details-marker" hidden></span>')
-        st.markdown("**Extracted Entities**")
-        rows = extracted_entity_rows(result.validation_result)
+        st.markdown("**Operational Facts**")
+        rows = operational_fact_rows(result.validation_result)
         if rows:
             st.table(rows)
         else:
-            st.write("No validated entities are available.")
+            st.write("No validated operational facts are available.")
 
         st.markdown("**Supporting Evidence**")
         evidence = validated_evidence_excerpts(result.validation_result)
@@ -156,68 +155,23 @@ def _display_ai_technical_details(result) -> None:
         st.markdown("**Decision Logic**")
         st.write(DECISION_LOGIC_EXPLANATION)
         validated = result.validation_result.validated_envelope
+        derived = result.validation_result.derived_semantics
         summary_lines = ["incident_facts:"]
-        if validated is None:
-            summary_lines.append("  confirmed_details_available: false")
+        if validated is None or derived is None:
+            summary_lines.append("  operational_facts_available: false")
         else:
-            active_ids = set(validated.derived.active_proposition_ids)
-            active_facts = [
-                item for item in validated.envelope.propositions
-                if item.proposition_id in active_ids
-            ]
-            direction_values = {
-                item.direction.value
-                for item in validated.derived.propositions
-                if item.active
-            }
-            temporal_values = {item.temporal_scope.value for item in active_facts}
-            intentionality_values = {item.intentionality.value for item in active_facts}
-            contact_values = {item.contact.value for item in active_facts}
-            assertion_values = {item.assertion_status.value for item in active_facts}
-
-            current_incident = "not_applicable"
-            if temporal_values:
-                current_incident = "uncertain" if "undetermined" in temporal_values else "false"
-                if "current_incident" in temporal_values:
-                    current_incident = "uncertain" if "historical" in temporal_values else "true"
-
-            interpersonal_conduct = "not_applicable"
-            if direction_values:
-                interpersonal_conduct = "uncertain" if "undetermined" in direction_values else "false"
-                if "interpersonal" in direction_values:
-                    interpersonal_conduct = "true"
-
-            intentional_conduct = "not_applicable"
-            if intentionality_values != {"not_applicable"}:
-                intentional_conduct = "uncertain" if "undetermined" in intentionality_values else "false"
-                if "intentional" in intentionality_values:
-                    intentional_conduct = "true"
-
-            physical_contact = "not_applicable"
-            if contact_values != {"not_applicable"}:
-                physical_contact = "uncertain" if "undetermined" in contact_values else "false"
-                if "occurred" in contact_values:
-                    physical_contact = (
-                        "uncertain" if "did_not_occur" in contact_values else "true"
-                    )
-
-            assertion_confirmed = "not_applicable"
-            if assertion_values:
-                assertion_confirmed = "uncertain" if "uncertain" in assertion_values else "false"
-                if "affirmed" in assertion_values:
-                    assertion_confirmed = "uncertain" if "negated" in assertion_values else "true"
-
-            entity_kinds = {item.entity_kind.value for item in validated.envelope.entities}
+            active_ids = set(derived.active_fact_ids)
+            active_facts = [fact for fact in validated.facts if fact.fact_id in active_ids]
+            values = lambda attribute: sorted({getattr(fact, attribute).value for fact in active_facts})
             summary_lines.extend(
                 (
-                    f"  participants_identified: {'true' if bool(entity_kinds & {'person', 'people_collective'}) else 'false'}",
-                    f"  occurred_during_current_incident: {current_incident}",
-                    f"  involved_another_person: {interpersonal_conduct}",
-                    f"  conduct_was_intentional: {intentional_conduct}",
-                    f"  physical_contact_occurred: {physical_contact}",
-                    f"  reported_conduct_supported: {assertion_confirmed}",
-                    "  conflicting_accounts: "
-                    f"{'true' if validated.policy_candidate.active_conflict_relationships else 'false'}",
+                    f"  conduct: {[fact.conduct.value if fact.conduct else 'unresolved' for fact in active_facts]}",
+                    f"  incident_direction: {derived.incident_direction.value}",
+                    f"  intentionality: {values('intentionality')}",
+                    f"  temporal_scope: {values('temporal_scope')}",
+                    f"  assertion_status: {values('assertion_status')}",
+                    f"  resolution_status: {values('resolution_status')}",
+                    f"  unresolved_content: {str(bool(derived.contradiction_groups) or any(fact.uncertainty for fact in active_facts)).lower()}",
                 )
             )
         summary_lines.extend(

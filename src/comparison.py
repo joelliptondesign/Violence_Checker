@@ -1,15 +1,14 @@
-"""Deterministic regex-versus-successor comparison without semantic inference."""
+"""Deterministic regex-versus-True-North-outcome comparison."""
 
 from dataclasses import dataclass
 from typing import Dict, List
 
 from src.contracts import (
-    Direction,
+    FactDirection,
     PolicyDecision,
     PolicyOutcome,
-    RelationshipKind,
+    ResolutionStatus,
     TemporalScope,
-    ValidationFailureStage,
     ValidationResult,
 )
 from src.models import Incident
@@ -22,6 +21,7 @@ class ComparisonResult:
     regex_result: Dict[str, object]
     semantic_result: SemanticExtractionResult
     validation_result: ValidationResult
+    true_north_outcome: PolicyOutcome
     semantic_validation_status: str
     classification_alignment: str
     material_difference_detected: bool
@@ -38,79 +38,71 @@ def build_comparison_result(
     validation_result: ValidationResult,
     policy_decision: PolicyDecision,
 ) -> ComparisonResult:
-    if semantic_result.status != SemanticExtractionStatus.SUCCESS or not validation_result.passed:
+    regex_detected = bool(regex_result.get("detected"))
+    outcome = policy_decision.outcome
+    if outcome == PolicyOutcome.UNABLE_TO_DETERMINE:
         alignment = "semantic_failure"
+    elif outcome == PolicyOutcome.UNCERTAIN:
+        alignment = "semantic_uncertain"
+    elif regex_detected and outcome == PolicyOutcome.VIOLENCE_DETECTED:
+        alignment = "aligned_positive"
+    elif not regex_detected and outcome == PolicyOutcome.NO_VIOLENCE_DETECTED:
+        alignment = "aligned_negative"
+    elif regex_detected:
+        alignment = "regex_positive_semantic_negative"
     else:
-        regex_detected = bool(regex_result.get("detected"))
-        semantic_detected = policy_decision.outcome == PolicyOutcome.WRITE_DETECTED
-        if regex_detected and semantic_detected:
-            alignment = "aligned_positive"
-        elif not regex_detected and not semantic_detected:
-            alignment = "aligned_negative"
-        elif regex_detected:
-            alignment = "regex_positive_semantic_negative"
-        else:
-            alignment = "regex_negative_semantic_positive"
+        alignment = "regex_negative_semantic_positive"
 
     divergence: list[str] = []
     if alignment == "semantic_failure":
-        if validation_result.failure_stage == ValidationFailureStage.SCHEMA:
-            divergence.append("Semantic schema validation failed and comparison is unavailable.")
-        elif validation_result.failure_stage == ValidationFailureStage.DOMAIN:
-            divergence.append("Semantic domain validation failed and comparison is unavailable.")
-        else:
-            divergence.append("Semantic extraction failed and no validated comparison is available.")
+        divergence.append("True North analysis could not produce a deterministic outcome.")
+    elif alignment == "semantic_uncertain":
+        divergence.append("True North analysis preserved material uncertainty instead of forcing a result.")
     elif alignment == "regex_positive_semantic_negative":
-        divergence.append("Regex detected violence-related language, but deterministic policy found no affirmed current interpersonal violence.")
+        divergence.append("Regex detected violence-related language, but validated incident facts did not satisfy the violence criteria.")
     elif alignment == "regex_negative_semantic_positive":
-        divergence.append("Regex did not detect violence-related language, but validated propositions support current interpersonal violence.")
+        divergence.append("Regex found no configured match, but validated incident facts satisfied the violence criteria.")
 
     enrichment: list[str] = []
-    validated = validation_result.validated_envelope
-    if validated is not None:
-        envelope = validated.envelope
-        derived = {item.proposition_id: item for item in validated.derived.propositions}
-        if any(item.temporal_scope == TemporalScope.HISTORICAL for item in envelope.propositions):
-            enrichment.append("Semantic extraction preserves historical conduct as proposition-scoped context.")
-        directions = {item.direction for item in derived.values()}
-        if Direction.OBJECT_DIRECTED in directions:
-            enrichment.append("Semantic extraction distinguishes object-directed conduct.")
-        if Direction.SELF_DIRECTED in directions:
-            enrichment.append("Semantic extraction distinguishes self-directed conduct.")
-        if any(item.relationship_kind == RelationshipKind.SUPERSEDES for item in envelope.relationships):
-            enrichment.append("Semantic extraction preserves an explicit correction and supersession relationship.")
-        if any(item.relationship_kind == RelationshipKind.CONFLICTS_WITH for item in envelope.relationships):
-            enrichment.append("Semantic extraction preserves competing assertions without selecting a winner.")
-        if envelope.uncertainties:
-            enrichment.append("Semantic extraction provides proposition-scoped bounded uncertainty.")
-        if envelope.evidence_supports:
-            enrichment.append("Semantic extraction links exact narrative evidence to semantic subjects.")
+    envelope = validation_result.validated_envelope
+    derived = validation_result.derived_semantics
+    if envelope is not None and derived is not None:
+        active_ids = set(derived.active_fact_ids)
+        active = [fact for fact in envelope.facts if fact.fact_id in active_ids]
+        if any(fact.temporal_scope == TemporalScope.HISTORICAL for fact in envelope.facts):
+            enrichment.append("True North preserves historical conduct without treating it as current.")
+        if any(fact.direction == FactDirection.OBJECT_DIRECTED for fact in active):
+            enrichment.append("True North identifies object-directed conduct.")
+        if any(fact.direction == FactDirection.SELF_DIRECTED for fact in active):
+            enrichment.append("True North identifies self-directed conduct.")
+        if any(fact.resolution_status == ResolutionStatus.SUPERSEDED for fact in envelope.facts):
+            enrichment.append("True North preserves supported corrections and excludes superseded facts.")
+        if derived.contradiction_groups:
+            enrichment.append("True North preserves unresolved contradictory accounts.")
+        if any(fact.uncertainty for fact in active):
+            enrichment.append("True North preserves explicitly unresolved operational facts.")
+        if any(fact.evidence for fact in envelope.facts):
+            enrichment.append("True North links exact narrative evidence to each operational fact.")
 
-    observations = divergence + enrichment
-    if not observations:
-        observations = ["No material difference identified."]
+    observations = divergence + enrichment or ["No material difference identified."]
     if alignment == "semantic_failure":
         display = "Semantic Comparison Unavailable"
     elif divergence:
         display = "Material Difference Detected"
     elif enrichment:
-        display = "Classification Aligned, Semantic Context Added"
+        display = "Classification Aligned, Operational Context Added"
     else:
         display = "No Material Difference Identified"
 
     status = semantic_result.status.value
     if semantic_result.status == SemanticExtractionStatus.SUCCESS:
-        if validation_result.failure_stage == ValidationFailureStage.SCHEMA:
-            status = "schema_validation_failure"
-        elif validation_result.failure_stage == ValidationFailureStage.DOMAIN:
-            status = "domain_validation_failure"
-        else:
-            status = "success"
+        status = "success" if validation_result.passed else validation_result.processing_status.value
     return ComparisonResult(
         incident=incident,
         regex_result=regex_result,
         semantic_result=semantic_result,
         validation_result=validation_result,
+        true_north_outcome=outcome,
         semantic_validation_status=status,
         classification_alignment=alignment,
         material_difference_detected=bool(divergence or enrichment),

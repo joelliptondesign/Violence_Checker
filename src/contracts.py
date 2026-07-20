@@ -1,7 +1,7 @@
 """Strict contracts for the true-north incident-fact semantic boundary."""
 
 from enum import Enum
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr, field_validator, model_validator
 
@@ -599,3 +599,96 @@ class ValidationResult(BaseModel):
     @property
     def passed(self) -> bool:
         return self.failure_stage == ValidationFailureStage.NONE
+
+
+class CommunicationFact(BaseModel):
+    """Narrative-free operational fact projected from validated repository truth."""
+
+    model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
+
+    conduct: Optional[Conduct]
+    direction: FactDirection
+    intentionality: Intentionality
+    temporal_scope: TemporalScope
+    assertion_status: AssertionStatus
+    resolution_status: ResolutionStatus
+    uncertainty: tuple[UncertaintyDimension, ...]
+
+
+class OperatorCommunicationInput(BaseModel):
+    """Minimal presentation-only projection with no provider or bookkeeping fields."""
+
+    model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
+
+    outcome: PolicyOutcome
+    incident_direction: IncidentDirection
+    active_facts: tuple[CommunicationFact, ...]
+    superseded_facts: tuple[CommunicationFact, ...]
+    has_unresolved_contradiction: StrictBool
+
+
+class OperatorCommunication(BaseModel):
+    """Complete presentation-only communication surface."""
+
+    model_config = ConfigDict(
+        strict=True,
+        extra="forbid",
+        frozen=True,
+        str_strip_whitespace=True,
+    )
+
+    incident_summary: StrictStr = Field(min_length=1, max_length=500)
+    key_findings: tuple[StrictStr, ...] = Field(min_length=1, max_length=8)
+    why_this_result: StrictStr = Field(min_length=1, max_length=500)
+
+    @field_validator("key_findings")
+    @classmethod
+    def require_concise_findings(cls, findings: tuple[str, ...]) -> tuple[str, ...]:
+        if len({finding.casefold() for finding in findings}) != len(findings):
+            raise ValueError("key findings must not contain duplicates")
+        if any(not 2 <= len(finding.split()) <= 5 for finding in findings):
+            raise ValueError("each key finding must contain 2 to 5 words")
+        return findings
+
+    @model_validator(mode="after")
+    def prohibit_implementation_language(self) -> "OperatorCommunication":
+        rendered = " ".join((self.incident_summary, *self.key_findings, self.why_this_result)).casefold()
+        forbidden = (
+            "canonical id",
+            "policy candidate",
+            "provider output",
+            "reason code",
+            "repository bookkeeping",
+            "schema version",
+            "semantic graph",
+            "validation stage",
+        )
+        if any(term in rendered for term in forbidden):
+            raise ValueError("operator communication cannot expose implementation language")
+        return self
+
+
+class PipelineResult(BaseModel):
+    """True North application pipeline authority before presentation-only communication."""
+
+    model_config = ConfigDict(strict=True, extra="forbid", arbitrary_types_allowed=True)
+
+    incident: Incident
+    normalized_incident: NormalizedIncident
+    regex_result: Dict[str, Any]
+    validation_result: ValidationResult
+    policy_decision: PolicyDecision
+    salesforce_payload: Optional[Dict[str, Any]] = None
+    signature: StrictStr
+
+    @model_validator(mode="after")
+    def require_pipeline_consistency(self) -> "PipelineResult":
+        if self.incident.incident_id != self.normalized_incident.incident_id:
+            raise ValueError("pipeline incident identities must match")
+        if self.validation_result.passed:
+            envelope = self.validation_result.validated_envelope
+            if envelope is None or envelope.incident_id != self.incident.incident_id:
+                raise ValueError("validated semantic identity must match the pipeline incident")
+        if self.policy_decision.outcome == PolicyOutcome.UNABLE_TO_DETERMINE and self.salesforce_payload is not None:
+            raise ValueError("unable-to-determine analysis cannot produce a Salesforce payload")
+        return self

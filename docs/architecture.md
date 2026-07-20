@@ -2,9 +2,9 @@
 
 ## Current implementation state
 
-The true-north semantic and deterministic-policy boundary is implemented. It uses `TrueNorthSemanticEnvelope`, schema identity `violence-checker.true-north-incident-facts`, version `1.0.0`, repository-owned analysis status, deterministic semantic views, and direct policy evaluation over validated facts.
+The true-north semantic, deterministic-policy, and downstream application runtime are implemented. They use `TrueNorthSemanticEnvelope`, schema identity `violence-checker.true-north-incident-facts`, version `1.0.0`, repository-owned analysis status, deterministic semantic views, and direct policy evaluation over validated facts.
 
-This execution intentionally stops before downstream integration. Communication, presentation, evaluation, corpus, application orchestration, Salesforce preview, and Streamlit acceptance still reference the retired proposition runtime and are not currently compatible with the new contract. A fully working application is not claimed. No compatibility wrapper, proposition policy candidate, or dual semantic authority is present.
+Application orchestration, regex comparison, illustrative Salesforce projection, bounded operator communication, presentation, and Streamlit now consume the true-north fact contract. Evaluation, corpus reconstruction, baseline acceptance, live-provider validation, deployment, and hosted acceptance remain pending. No compatibility wrapper, proposition policy candidate, or dual semantic authority is present.
 
 ## Semantic authority
 
@@ -63,17 +63,17 @@ All five conduct values qualify when the other doctrinal conditions hold. Self-d
 
 ## Current execution sequence
 
-The implemented boundary is:
+The implemented runtime is:
 
-`normalized incident narrative` → one structured provider fact response → deterministic repository adapter → strict schema validation → deterministic domain/evidence validation → validated true-north envelope → repository status and deterministic semantic views → direct deterministic policy
+`input validation` → `normalization` → one structured provider fact response → deterministic repository adapter → strict schema validation → deterministic domain/evidence validation → validated true-north envelope → repository status and deterministic semantic views → direct deterministic policy → regex comparison → illustrative Salesforce projection → bounded operator communication → presentation
 
-Successful validation exposes the envelope, repository processing/completeness status, and deterministic views. Policy reads the facts directly and verifies that the supplied view and completeness state match them. Communication, presentation, evaluation, application integration, and acceptance remain later migration work.
+Successful validation exposes the envelope, repository processing/completeness status, and deterministic views. Policy reads the facts directly and verifies that the supplied view and completeness state match them. Downstream components project this authority without reinterpreting it. Evaluation reconstruction and acceptance remain later migration work.
 
 ## Preserved boundaries
 
-Input validation, narrative normalization, and regex result contracts remain available. This policy execution made no provider request, live evaluation run, corpus or baseline regeneration, deployment, push, external write, or Streamlit change.
+Input validation, narrative normalization, and regex result contracts remain available. The application makes one semantic request for a valid explicit analysis, disables provider retries, and makes no request for invalid input. This integration made no live evaluation run, corpus or baseline regeneration, deployment, push, or external write.
 
-Historical evaluation artifacts retain their creation-time schema families and were not rewritten or promoted. The proposition contract is no longer a current runtime semantic authority; legacy downstream consumers fail until separately authorized migration packages replace them.
+Historical evaluation artifacts retain their creation-time schema families and were not rewritten or promoted. The proposition contract is no longer a current runtime semantic authority; evaluation and corpus consumers remain for a separately authorized migration package.
 
 ## Operational limitations
 
@@ -81,4 +81,4 @@ The repository remains a synthetic demonstration. It does not provide clinical, 
 
 ## Governing authority
 
-The approved [Workplace Violence Doctrine](workplace_violence_doctrine.md), [True North Semantic Contract Specification](true_north_semantic_contract_specification.md), and [True North Migration Strategy](true_north_migration_strategy.md) govern this boundary. Later packages must migrate communication and presentation, evaluation and corpus authority, application orchestration, local and live-provider acceptance, baseline acceptance, deployment, and hosted acceptance without restoring dual semantic authority.
+The approved [Workplace Violence Doctrine](workplace_violence_doctrine.md), [True North Semantic Contract Specification](true_north_semantic_contract_specification.md), and [True North Migration Strategy](true_north_migration_strategy.md) govern this boundary. Later packages must migrate evaluation and corpus authority and complete local and live-provider acceptance, baseline acceptance, deployment, and hosted acceptance without restoring dual semantic authority.
