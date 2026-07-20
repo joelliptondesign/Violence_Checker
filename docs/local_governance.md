@@ -9,30 +9,39 @@ FoxCommand Runtime was inspected through its `tools/sitrec_router.py`, `tools/re
 ```sh
 python3 -m tools.repo_governance repo-tree
 python3 -m tools.repo_governance knowledge-graph
-python3 -m tools.repo_governance sitrec --date 2026-07-19 --replace
+python3 -m tools.repo_governance route-sitrec
+python3 -m tools.repo_governance sitrec
 python3 -m tools.repo_governance validate-heartbeat
-python3 -m tools.repo_governance validate-sitrec --path "docs/SITREC - 2026-07-19 Violence Checker Successor Semantic Baseline.md"
+python3 -m tools.repo_governance validate-sitrec --path "docs/SITREC - 2026-07-20 Violence Checker Successor Semantic Baseline.md"
 python3 -m tools.repo_governance validate-all
 python3 -m tools.repo_governance baseline-readiness
 ```
 
-## Deterministic SITREC generation
+## Deterministic SITREC routing and generation
 
-`sitrec` is the repository-appropriate execution stage of the SITREC methodology. It is implemented in `tools/repo_governance/sitrec.py`, separate from the generic validators in `tools/repo_governance/governance.py`. For a supplied ISO operational date it:
+`route-sitrec` is the required non-mutating preflight. `tools/repo_governance/sitrec_router.py` resolves the operational date with the `America/Los_Angeles` IANA timezone, inventories only top-level Markdown SITRECs directly under `docs/`, extracts dashed `YYYY-MM-DD` and compact `YYYYMMDD` filename dates, and reports one canonical decision: `UPDATE_CURRENT`, `CREATE_TODAY`, `ARCHIVE_AND_CREATE_TODAY`, or `NORMALIZE_ACTIVE_SET`. Its structured output explicitly confirms that the router did not mutate the filesystem.
+
+`sitrec` is the repository-appropriate lifecycle mutation and generation stage. It is implemented in `tools/repo_governance/sitrec.py`, separate from routing and from the generic validators in `tools/repo_governance/governance.py`. It resolves the Pacific date once, routes before writing, and then:
 
 - verifies every declared grounding anchor exists;
 - reads corpus identity, schema versions, and case count from `evaluation/corpus/successor_corpus.json` without importing application code;
-- inventories prior top-level SITRECs as historical provenance;
+- updates the existing current-date active record rather than creating a duplicate;
+- creates a current-date record when no active record exists;
+- archives every stale active record under `docs/archive/sitrecs/` before creating the current-date record;
+- normalizes multiple active records deterministically while preserving at most one current-date record;
+- refuses duplicate operational dates, archive overwrites, malformed dates, and filename/document Operational Date disagreement before mutation;
+- inventories archived prior SITRECs as historical provenance;
 - renders all A–S sections with repository identity, current state, invariants, end-to-end model, an explicit authority table, contracts, negative boundaries, capabilities, limitations, guarantees, non-guarantees, grounding descriptions, ordered rehydration steps, lifecycle, validation, and responsibility boundaries;
-- uses no clock, network, provider, Git mutation, or generated timestamp, so the same repository state, date, and title produce byte-identical content; and
-- refuses to overwrite an existing record unless `--replace` is explicit.
+- uses no network, provider, Git mutation, or generated timestamp, so the same repository state, resolved operational date, and title produce byte-identical content.
 
-The default output is `docs/SITREC - <date> Violence Checker Successor Semantic Baseline.md`. Use the same-date path with `--replace` when repository truth changes; do not create a duplicate record. `validate-all` independently reconstructs the current SITREC in memory and rejects drift from generator output. This generation-freshness check complements structural and lifecycle validation; it does not make the validator a source of application truth.
+Exactly one top-level active SITREC is permitted after mutation, and its date must equal the Pacific operational date. No operational date may appear more than once across active and archived lifecycle-managed records. Archived files retain their original filenames and substantive bytes and are readable historical provenance, not active authority. The default active output is `docs/SITREC - <date> Violence Checker Successor Semantic Baseline.md`. `validate-all` independently reconstructs the current SITREC in memory and rejects drift from generator output. This generation-freshness check complements structural and lifecycle validation; it does not make the validator a source of application truth.
 
 `validate-all` performs offline local governance checks:
 
-- validates every top-level SITREC structurally;
-- selects exactly one current SITREC as the unique newest ISO-dated record;
+- validates active and archived lifecycle-managed SITRECs structurally;
+- requires exactly one active top-level SITREC whose date equals the resolved Pacific date;
+- rejects stale, malformed, duplicate-date, and filename/document-date-mismatched lifecycle states;
+- excludes `docs/archive/sitrecs/` from active selection;
 - applies current-SITREC identity, semantic-authority, and historical-provenance hygiene;
 - rejects a current SITREC that differs from deterministic repository generation;
 - validates heartbeat JSONL structure; and
@@ -54,7 +63,7 @@ Use `baseline-readiness --skip-tests` only when the complete suite was already r
 - `docs/generated/repository_tree.txt`
 - `docs/generated/repository_knowledge_graph.md`
 
-Generation is deterministic and repository-scoped. Freshness validation compares these files byte-for-byte with an in-memory reconstruction. The knowledge graph includes both top-level and `tests/evaluation/` test modules and distinguishes the selected current SITREC from prior historical SITRECs.
+Generation is deterministic and repository-scoped. Freshness validation compares these files byte-for-byte with an in-memory reconstruction. The knowledge graph includes the router, lifecycle tests, active SITREC, archived historical SITRECs, and both top-level and `tests/evaluation/` test modules.
 
 ## Evaluation and historical authority
 

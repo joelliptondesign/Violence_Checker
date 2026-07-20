@@ -64,3 +64,7 @@ The application is a synthetic demonstration. Salesforce output is an illustrati
 Configuration precedence is Streamlit secrets, conventional environment variables, ignored local `.env`, and then the default model where applicable. Semantic extraction and Operator Communication have independently selectable model settings and share the configured provider credential. `app.py` is prepared as the sole Streamlit Community Cloud entrypoint with pinned dependencies and bounded missing-configuration behavior. Hosted deployment and hosted acceptance have not occurred; deployment remains a manual operator action.
 
 The approved design basis, successor specification, and migration strategy remain under `docs/`. They describe why this architecture is bounded and how creation-time evidence is isolated.
+
+## SITREC governance boundary
+
+SITREC governance is repository support and does not participate in application execution. `tools/repo_governance/sitrec_router.py` resolves the operational date with `America/Los_Angeles` and reports a deterministic route without filesystem mutation. Only top-level `docs/*.md` SITRECs are active candidates. Every mutating generation routes first, leaves one current-date active record, moves stale records to `docs/archive/sitrecs/`, updates rather than duplicates the same date, and rejects duplicate dates or filename/document Operational Date disagreement. Archived SITRECs remain historical provenance and are excluded from current authority selection.

@@ -10,7 +10,7 @@ from tools.repo_governance import governance
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-ACTIVE_SITREC = REPO_ROOT / "docs" / "SITREC - 2026-07-19 Violence Checker Successor Semantic Baseline.md"
+ACTIVE_SITREC = REPO_ROOT / "docs" / "SITREC - 2026-07-20 Violence Checker Successor Semantic Baseline.md"
 
 
 def test_governance_tooling_imports_without_foxcommand_runtime_path() -> None:
@@ -73,11 +73,11 @@ def test_sitrec_validation_accepts_current_active_sitrec() -> None:
     assert "no hosted deployment, hosted URL, or hosted acceptance is claimed" in text
 
 
-def test_sitrec_lifecycle_selects_one_newest_current_record() -> None:
+def test_sitrec_lifecycle_selects_one_active_current_record() -> None:
     assert governance.active_sitrec_paths(REPO_ROOT) == [
-        "docs/SITREC - 2026-07-19 Violence Checker Successor Semantic Baseline.md"
+        "docs/SITREC - 2026-07-20 Violence Checker Successor Semantic Baseline.md"
     ]
-    assert governance.validate_sitrec_lifecycle(REPO_ROOT) == []
+    assert governance.validate_sitrec_lifecycle(REPO_ROOT, "2026-07-20") == []
 
 
 def test_generated_governance_artifacts_are_fresh() -> None:

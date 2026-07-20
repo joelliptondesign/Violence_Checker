@@ -7,10 +7,13 @@ Entries are sorted, repository-relative, and exclude ignored local configuration
 README.md
 app.py
 docs/
-docs/SITREC - 2026-07-17 Violence Checker Phase 0 Demonstration Baseline.md
-docs/SITREC - 2026-07-18 Violence Checker Narrative Source Control Baseline.md
-docs/SITREC - 2026-07-19 Violence Checker Successor Semantic Baseline.md
+docs/SITREC - 2026-07-20 Violence Checker Successor Semantic Baseline.md
 docs/architecture.md
+docs/archive/
+docs/archive/sitrecs/
+docs/archive/sitrecs/SITREC - 2026-07-17 Violence Checker Phase 0 Demonstration Baseline.md
+docs/archive/sitrecs/SITREC - 2026-07-18 Violence Checker Narrative Source Control Baseline.md
+docs/archive/sitrecs/SITREC - 2026-07-19 Violence Checker Successor Semantic Baseline.md
 docs/demo_runbook.md
 docs/generated/
 docs/generated/repository_knowledge_graph.md
@@ -110,6 +113,7 @@ tests/test_semantic_authority_boundary.py
 tests/test_semantic_extractor.py
 tests/test_semantic_prompt.py
 tests/test_semantic_validation.py
+tests/test_sitrec_lifecycle.py
 tests/test_streamlit_empty_state.py
 tests/test_successor_downstream_authority.py
 tests/test_successor_policy_authority.py
@@ -122,3 +126,4 @@ tools/repo_governance/__init__.py
 tools/repo_governance/__main__.py
 tools/repo_governance/governance.py
 tools/repo_governance/sitrec.py
+tools/repo_governance/sitrec_router.py

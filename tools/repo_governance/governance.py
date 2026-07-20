@@ -23,6 +23,14 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .sitrec import DEFAULT_TITLE, default_output_path, render_sitrec, write_sitrec
+from .sitrec_router import (
+    ARCHIVE_PATH,
+    active_sitrecs,
+    extract_date,
+    extract_document_date,
+    pacific_today,
+    route_sitrec,
+)
 
 
 DEFAULT_REPOSITORY_TREE_PATH = Path("docs/generated/repository_tree.txt")
@@ -217,6 +225,7 @@ def markdown_table(headers: list[str], rows: list[list[str]]) -> list[str]:
 
 
 def sitrec_paths(root: Path) -> list[str]:
+    """Return active top-level SITREC candidate paths."""
     docs = root / "docs"
     if not docs.exists():
         return []
@@ -228,18 +237,27 @@ def sitrec_paths(root: Path) -> list[str]:
 
 
 def _sitrec_date(path: str) -> str | None:
-    match = re.search(r"(?<!\d)(20\d{2}-\d{2}-\d{2})(?!\d)", Path(path).name)
-    return match.group(1) if match else None
+    return extract_date(Path(path))
+
+
+def archived_sitrec_paths(root: Path) -> list[str]:
+    archive = root / ARCHIVE_PATH
+    if not archive.exists():
+        return []
+    return sorted(
+        path.relative_to(root).as_posix()
+        for path in archive.glob("*.md")
+        if "sitrec" in path.name.lower()
+    )
+
+
+def all_sitrec_paths(root: Path) -> list[str]:
+    return sorted([*sitrec_paths(root), *archived_sitrec_paths(root)])
 
 
 def active_sitrec_paths(root: Path) -> list[str]:
-    """Select the unique newest dated top-level SITREC as current."""
-    dated = [(path, _sitrec_date(path)) for path in sitrec_paths(root)]
-    valid = [(path, date) for path, date in dated if date is not None]
-    if not valid:
-        return []
-    newest = max(date for _path, date in valid)
-    return [path for path, date in valid if date == newest]
+    """Return every active top-level SITREC candidate without archive inference."""
+    return [candidate.path.relative_to(root).as_posix() for candidate in active_sitrecs(root)]
 
 
 def build_knowledge_graph(root: Path) -> str:
@@ -406,6 +424,16 @@ def validate_sitrec_file(path: Path) -> list[Finding]:
     text = path.read_text(encoding="utf-8")
     positions = sitrec_section_positions(text)
     findings: list[Finding] = []
+    filename_date = extract_date(path)
+    document_date = extract_document_date(text)
+    if filename_date is None:
+        findings.append(Finding(path.as_posix(), "SITREC filename has no valid operational date"))
+    if document_date is None:
+        findings.append(Finding(path.as_posix(), "SITREC document has no valid Operational Date"))
+    if filename_date is not None and document_date is not None and filename_date != document_date:
+        findings.append(
+            Finding(path.as_posix(), f"filename date {filename_date} disagrees with document Operational Date {document_date}")
+        )
     for section in REQUIRED_SITREC_SECTIONS:
         if section not in positions:
             findings.append(Finding(path.as_posix(), f"missing required section: {section}"))
@@ -419,16 +447,29 @@ def validate_sitrec_file(path: Path) -> list[Finding]:
     return findings
 
 
-def validate_sitrec_lifecycle(root: Path) -> list[Finding]:
-    paths = sitrec_paths(root)
+def validate_sitrec_lifecycle(root: Path, operational_date: str | None = None) -> list[Finding]:
+    paths = all_sitrec_paths(root)
     current = active_sitrec_paths(root)
     findings: list[Finding] = []
-    undated = [path for path in paths if _sitrec_date(path) is None]
-    if undated:
-        findings.extend(Finding(path, "top-level SITREC filename has no ISO date") for path in undated)
+    dated: dict[str, list[str]] = defaultdict(list)
+    for path in paths:
+        value = _sitrec_date(path)
+        if value is None:
+            findings.append(Finding(path, "lifecycle-managed SITREC filename has no valid operational date"))
+        else:
+            dated[value].append(path)
+    for value, duplicates in sorted(dated.items()):
+        if len(duplicates) > 1:
+            findings.append(Finding("docs", f"duplicate SITREC operational date {value}: {', '.join(duplicates)}"))
     if len(current) != 1:
-        findings.append(Finding("docs", "exactly one newest dated SITREC must be current"))
+        findings.append(Finding("docs", "exactly one active top-level SITREC must exist"))
         return findings
+    expected_date = operational_date or pacific_today()
+    active_date = _sitrec_date(current[0])
+    if active_date != expected_date:
+        findings.append(
+            Finding(current[0], f"active SITREC date {active_date or 'missing'} does not equal Pacific operational date {expected_date}")
+        )
     text = (root / current[0]).read_text(encoding="utf-8")
     identity = section_text(text, "A. SYSTEM IDENTITY").lower()
     state = section_text(text, "B. CURRENT STATE").lower()
@@ -535,7 +576,7 @@ def validate_repository_state(root: Path) -> list[Finding]:
 def validate_baseline_readiness(root: Path) -> list[Finding]:
     findings: list[Finding] = []
     findings.extend(validate_heartbeat_jsonl(root / HEARTBEAT_PATH))
-    for path in sitrec_paths(root):
+    for path in all_sitrec_paths(root):
         findings.extend(validate_sitrec_file(root / path))
     findings.extend(validate_sitrec_lifecycle(root))
     findings.extend(validate_current_sitrec_generation(root))
@@ -609,14 +650,25 @@ def command_validate_sitrec(args: argparse.Namespace) -> int:
     return print_findings("SITREC validation", findings)
 
 
+def command_route_sitrec(args: argparse.Namespace) -> int:
+    root = resolve_repo_root(args.repo_root)
+    route = route_sitrec(root)
+    print(json.dumps(route.to_dict(root), indent=2, sort_keys=True))
+    return 0
+
+
 def command_sitrec(args: argparse.Namespace) -> int:
     root = resolve_repo_root(args.repo_root)
-    output = args.output or default_output_path(args.date, args.title)
-    output = ensure_inside_root(root, output)
+    resolved_date = pacific_today()
+    if args.date is not None and args.date != resolved_date:
+        raise ValueError(
+            f"supplied SITREC date {args.date} does not equal Pacific operational date {resolved_date}"
+        )
+    output = ensure_inside_root(root, args.output) if args.output else None
     summary = write_sitrec(
         root,
-        operational_date=args.date,
-        output=output.relative_to(root),
+        operational_date=resolved_date,
+        output=output.relative_to(root) if output else None,
         title=args.title,
         replace=args.replace,
     )
@@ -631,7 +683,7 @@ def command_validate_all(args: argparse.Namespace) -> int:
     root = resolve_repo_root(args.repo_root)
     findings: list[Finding] = []
     findings.extend(validate_heartbeat_jsonl(root / HEARTBEAT_PATH))
-    for path in sitrec_paths(root):
+    for path in all_sitrec_paths(root):
         findings.extend(validate_sitrec_file(root / path))
     findings.extend(validate_sitrec_lifecycle(root))
     findings.extend(validate_current_sitrec_generation(root))
@@ -687,15 +739,18 @@ def build_parser() -> argparse.ArgumentParser:
     heartbeat.add_argument("--path", type=Path, default=HEARTBEAT_PATH)
     heartbeat.set_defaults(func=command_validate_heartbeat)
 
+    route = subparsers.add_parser("route-sitrec", help="report the non-mutating Pacific-date SITREC route")
+    route.set_defaults(func=command_route_sitrec)
+
     sitrec = subparsers.add_parser("validate-sitrec", help="validate one SITREC artifact")
     sitrec.add_argument("--path", type=Path, required=True)
     sitrec.set_defaults(func=command_validate_sitrec)
 
     generate_sitrec = subparsers.add_parser("sitrec", help="generate a complete deterministic Violence_Checker SITREC")
-    generate_sitrec.add_argument("--date", required=True, help="operational date in ISO YYYY-MM-DD form")
+    generate_sitrec.add_argument("--date", help="optional guard; must equal the resolved Pacific operational date")
     generate_sitrec.add_argument("--title", default=DEFAULT_TITLE, help="repository-specific SITREC title")
     generate_sitrec.add_argument("--output", type=Path, help="repository-local output path; defaults from date and title")
-    generate_sitrec.add_argument("--replace", action="store_true", help="replace an existing same-path SITREC")
+    generate_sitrec.add_argument("--replace", action="store_true", help="accepted for compatibility; same-day updates are automatic")
     generate_sitrec.set_defaults(func=command_sitrec)
 
     validate_all = subparsers.add_parser("validate-all", help="run local deterministic governance validators")

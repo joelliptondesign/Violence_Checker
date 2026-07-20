@@ -94,6 +94,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_semantic_extractor.py` | deterministic test | `FakeClient`, `FakeResponses`, `RaisingResponses` | 12 |
 | `tests/test_semantic_prompt.py` | deterministic test | none | 6 |
 | `tests/test_semantic_validation.py` | deterministic test | none | 10 |
+| `tests/test_sitrec_lifecycle.py` | deterministic test | none | 18 |
 | `tests/test_streamlit_empty_state.py` | deterministic test | none | 24 |
 | `tests/test_successor_downstream_authority.py` | deterministic test | none | 5 |
 | `tests/test_successor_policy_authority.py` | deterministic test | none | 7 |
@@ -102,8 +103,9 @@ This graph records deterministic repository relationships discoverable from file
 | `tools/build_successor_corpus.py` | deterministic | none | 7 |
 | `tools/repo_governance/__init__.py` | deterministic governance tooling | none | 0 |
 | `tools/repo_governance/__main__.py` | deterministic governance tooling | none | 0 |
-| `tools/repo_governance/governance.py` | deterministic governance tooling | `Finding` | 38 |
-| `tools/repo_governance/sitrec.py` | deterministic governance tooling | `SitrecFacts` | 8 |
+| `tools/repo_governance/governance.py` | deterministic governance tooling | `Finding` | 41 |
+| `tools/repo_governance/sitrec.py` | deterministic governance tooling | `SitrecFacts` | 10 |
+| `tools/repo_governance/sitrec_router.py` | deterministic governance tooling | `SitrecCandidate`, `SitrecRoute` | 9 |
 
 ## Import Relationships
 
@@ -175,6 +177,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_semantic_extractor.py` | `importlib`, `src.config`, `src.models`, `src.semantic_extractor`, `tests.successor_helpers` |
 | `tests/test_semantic_prompt.py` | `src.semantic_prompt` |
 | `tests/test_semantic_validation.py` | `copy`, `pytest`, `src.contracts`, `src.domain_validation`, `src.evaluation.corpus`, `src.schema_validation`, `src.semantic_validation`, `tests.successor_helpers` |
+| `tests/test_sitrec_lifecycle.py` | `__future__`, `datetime`, `json`, `pathlib`, `pytest`, `subprocess`, `sys`, `tools.repo_governance`, `tools.repo_governance.sitrec_router` |
 | `tests/test_streamlit_empty_state.py` | `app`, `importlib`, `inspect`, `pytest`, `src.app_logic`, `src.contracts`, `src.fixtures`, `src.models`, `src.policy`, `src.semantic_extractor`, `streamlit.testing.v1`, `sys`, `tests.successor_helpers`, `unittest.mock` |
 | `tests/test_successor_downstream_authority.py` | `pathlib`, `pytest`, `src.app_logic`, `src.contracts`, `src.evaluation.corpus`, `src.models`, `src.presentation`, `src.semantic_extractor` |
 | `tests/test_successor_policy_authority.py` | `pathlib`, `pytest`, `src.app_logic`, `src.contracts`, `src.models`, `src.policy`, `src.semantic_extractor`, `src.semantic_validation`, `tests.successor_helpers` |
@@ -183,8 +186,9 @@ This graph records deterministic repository relationships discoverable from file
 | `tools/build_successor_corpus.py` | `__future__`, `json`, `pathlib`, `src.contracts`, `src.evaluation.contracts`, `src.evaluation.corpus`, `src.policy`, `src.semantic_validation` |
 | `tools/repo_governance/__init__.py` | `.governance` |
 | `tools/repo_governance/__main__.py` | `.governance` |
-| `tools/repo_governance/governance.py` | `.sitrec`, `__future__`, `argparse`, `ast`, `collections`, `dataclasses`, `hashlib`, `json`, `pathlib`, `re`, `subprocess`, `sys` |
-| `tools/repo_governance/sitrec.py` | `__future__`, `dataclasses`, `datetime`, `json`, `pathlib` |
+| `tools/repo_governance/governance.py` | `.sitrec`, `.sitrec_router`, `__future__`, `argparse`, `ast`, `collections`, `dataclasses`, `hashlib`, `json`, `pathlib`, `re`, `subprocess`, `sys` |
+| `tools/repo_governance/sitrec.py` | `.sitrec_router`, `__future__`, `dataclasses`, `datetime`, `json`, `pathlib` |
+| `tools/repo_governance/sitrec_router.py` | `__future__`, `dataclasses`, `datetime`, `pathlib`, `re`, `zoneinfo` |
 
 ## Contracts
 
@@ -304,7 +308,9 @@ This graph records deterministic repository relationships discoverable from file
 | `SemanticIntentionality` | `src/contracts.py` |
 | `SemanticRelationship` | `src/contracts.py` |
 | `SemanticUncertainty` | `src/contracts.py` |
+| `SitrecCandidate` | `tools/repo_governance/sitrec_router.py` |
 | `SitrecFacts` | `tools/repo_governance/sitrec.py` |
+| `SitrecRoute` | `tools/repo_governance/sitrec_router.py` |
 | `TargetKind` | `src/contracts.py` |
 | `TemporalScope` | `src/contracts.py` |
 | `UncertaintyDimension` | `src/contracts.py` |
@@ -344,6 +350,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_semantic_extractor.py` | `src/semantic_extractor.py` |
 | `tests/test_semantic_prompt.py` | `src/semantic_prompt.py` |
 | `tests/test_semantic_validation.py` | `src/semantic_validation.py` |
+| `tests/test_sitrec_lifecycle.py` | unresolved |
 | `tests/test_streamlit_empty_state.py` | unresolved |
 | `tests/test_successor_downstream_authority.py` | unresolved |
 | `tests/test_successor_policy_authority.py` | unresolved |
@@ -353,10 +360,10 @@ This graph records deterministic repository relationships discoverable from file
 
 | Documentation group | Artifacts |
 | --- | --- |
-| current SITREC | `docs/SITREC - 2026-07-19 Violence Checker Successor Semantic Baseline.md` |
+| current SITREC | `docs/SITREC - 2026-07-20 Violence Checker Successor Semantic Baseline.md` |
 | documentation | `docs/architecture.md`, `docs/demo_runbook.md`, `docs/local_governance.md`, `docs/opord_004_repository_assessment.md`, `docs/opord_004_verification_authority.md`, `docs/semantic_design_basis.md`, `docs/semantic_migration_and_legacy_strategy.md`, `docs/successor_semantic_contract_specification.md` |
 | generated | `docs/generated/repository_knowledge_graph.md` |
-| historical SITREC | `docs/SITREC - 2026-07-17 Violence Checker Phase 0 Demonstration Baseline.md`, `docs/SITREC - 2026-07-18 Violence Checker Narrative Source Control Baseline.md` |
+| historical SITREC | `docs/archive/sitrecs/SITREC - 2026-07-17 Violence Checker Phase 0 Demonstration Baseline.md`, `docs/archive/sitrecs/SITREC - 2026-07-18 Violence Checker Narrative Source Control Baseline.md`, `docs/archive/sitrecs/SITREC - 2026-07-19 Violence Checker Successor Semantic Baseline.md` |
 
 ## Governance Artifacts
 
@@ -366,7 +373,7 @@ This graph records deterministic repository relationships discoverable from file
 | `docs/generated/repository_tree.txt` | Generated deterministic repository tree. |
 | `docs/generated/repository_knowledge_graph.md` | Generated deterministic repository knowledge graph. |
 | `telemetry/executor_heartbeat.jsonl` | Executor operations telemetry validated as JSONL. |
-| `docs/SITREC - 2026-07-19 Violence Checker Successor Semantic Baseline.md` | Active top-level SITREC candidates. |
+| `docs/SITREC - 2026-07-20 Violence Checker Successor Semantic Baseline.md` | Active top-level SITREC candidates. |
 
 ## Unresolved Relationships
 

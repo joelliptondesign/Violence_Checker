@@ -12,6 +12,14 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
+from .sitrec_router import (
+    ARCHIVE_PATH,
+    DECISION_UPDATE_CURRENT,
+    extract_date,
+    extract_document_date,
+    route_sitrec,
+)
+
 
 DEFAULT_TITLE = "Violence Checker Successor Semantic Baseline"
 CORPUS_PATH = Path("evaluation/corpus/successor_corpus.json")
@@ -83,10 +91,11 @@ def collect_sitrec_facts(root: Path, operational_date: str) -> SitrecFacts:
     if not isinstance(cases, list) or not cases:
         raise ValueError(f"{CORPUS_PATH.as_posix()} has no non-empty cases array")
 
+    candidates = [*(root / "docs").glob("*SITREC*.md"), *(root / ARCHIVE_PATH).glob("*SITREC*.md")]
     prior_sitrecs = tuple(
         path.relative_to(root).as_posix()
-        for path in sorted((root / "docs").glob("SITREC*.md"))
-        if normalized_date not in path.name
+        for path in sorted(candidates, key=lambda item: item.relative_to(root).as_posix())
+        if extract_date(path) != normalized_date
     )
     return SitrecFacts(
         operational_date=normalized_date,
@@ -138,15 +147,15 @@ def render_sitrec(root: Path, operational_date: str, title: str = DEFAULT_TITLE)
         ),
         (
             "F. DATA / CONTRACT MODEL",
-            f"Semantic schema `{facts.semantic_schema_identity}` version `{facts.semantic_schema_version}` defines typed entities, propositions, relationships, uncertainties, evidence excerpts, evidence supports, and repository-assigned extraction metadata. The extraction contract identity is deterministic and cannot be overridden by provider output. `PipelineResult` carries the semantic envelope, derived view, validation outcome, and policy result without a compatibility or operational-finding authority. `OperatorCommunicationInput` is an immutable narrative-free projection available only after successful validation and non-failure policy. `OperatorCommunication` contains only Incident Summary, Key Findings, and Why This Result for presentation. Current evaluation artifacts use schema `{facts.corpus_schema_version}`; recognized creation-time artifacts use schema `1.0.0` and remain intentionally incomparable with successor artifacts.",
+            f"Semantic schema `{facts.semantic_schema_identity}` version `{facts.semantic_schema_version}` defines typed entities, propositions, relationships, uncertainties, evidence excerpts, evidence supports, and repository-assigned extraction metadata. The extraction contract identity is deterministic and cannot be overridden by provider output. `PipelineResult` carries the semantic envelope, derived view, validation outcome, and policy result without a compatibility or operational-finding authority. `OperatorCommunicationInput` is an immutable narrative-free projection available only after successful validation and non-failure policy. `OperatorCommunication` contains only `incident_summary`, `key_findings`, and `why_this_result`, presented as Incident Summary, Key Findings, and Why This Result. Current evaluation artifacts use schema `{facts.corpus_schema_version}`; recognized creation-time artifacts use schema `1.0.0` and remain intentionally incomparable with successor artifacts.",
         ),
         (
             "G. SYSTEM BOUNDARIES",
-            "The repository does not provide a real Salesforce connection or write, clinical decision support, legal or safety determination, hospital workflow, PHI handling, external persistence, authentication, customer-authority control, or FoxCommand Runtime integration. Synthetic-only and no-PHI notices are mandatory. Streamlit Community Cloud deployment remains a manual operator follow-on; no hosted deployment, hosted URL, or hosted acceptance is claimed. Provider types, provider metadata authority, and provider-authored disposition do not cross the provider boundary.",
+            "The repository does not provide a real Salesforce connection or write, clinical decision support, legal or safety determination, hospital workflow, PHI handling, external persistence, authentication, customer-authority control, or FoxCommand Runtime integration. Use is restricted to synthetic demonstration data; real patient, PHI, confidential, or production incident data must not be submitted. Streamlit Community Cloud deployment remains a manual operator follow-on; no hosted deployment, hosted URL, or hosted acceptance is claimed. Provider types, provider metadata authority, and provider-authored disposition do not cross the provider boundary.",
         ),
         (
             "H. CURRENT CAPABILITIES",
-            f"The app accepts fixtures or unrestricted free-form manual narratives within deterministic input limits, applies total deterministic policy, and builds a policy-gated illustrative Salesforce preview. Affirmed completed interpersonal physical conduct with occurred contact remains detected when intentionality alone is undetermined; accidental contact, historical-only conduct, conflicts, and material uncertainty retain distinct outcomes. The accepted executive information architecture places the incident narrative first, Regex Keyword Detection left and AI-Powered Semantic Analysis right as the executive comparison, and the illustrative Salesforce record after both cards. Operator Communication appears once in the AI card. Regex and AI each own one collapsed Technical Details expander, while Salesforce owns its payload-details expander. Mobile widths 390, 360, and 320 CSS pixels use AI-first stacking without duplicate content or page-level overflow. Offline evaluation validates {facts.case_count} successor cases and supports explicit case selection, run creation, separately authorized baseline acceptance, within-family regression comparison, and evidence-only reports. Permanent Gate A–F tests and composed repository baseline-readiness governance protect the successor authority.",
+            f"The app accepts fixtures or unrestricted free-form manual narratives within deterministic input limits, applies total deterministic policy, and builds a policy-gated illustrative Salesforce preview. Affirmed completed interpersonal physical conduct with occurred contact remains detected when intentionality alone is undetermined; accidental contact, historical-only conduct, conflicts, and material uncertainty retain distinct outcomes. The accepted executive information architecture places the incident narrative first, Regex Keyword Detection left and AI-Powered Semantic Analysis right as the executive comparison, and an Illustrative Salesforce Record after both cards. Operator Communication appears once in the AI card with Incident Summary, Key Findings, and Why This Result. Regex and AI each own one collapsed Technical Details expander: Regex retains keyword inspection, while AI retains extracted entities, supporting evidence, and decision-logic YAML inspection. Salesforce owns its isolated Salesforce Payload Details expander. Desktop behavior and mobile widths 390, 360, and 320 CSS pixels are accepted, with AI-first mobile stacking and no duplicate content or page-level overflow. The accepted application baseline was established with 274 tests; added lifecycle governance coverage expands the current deterministic suite to 290 passing tests. Offline evaluation validates {facts.case_count} successor cases and supports explicit case selection, run creation, separately authorized baseline acceptance, within-family regression comparison, and evidence-only reports. Permanent Gate A–F tests and composed repository baseline-readiness governance protect the successor authority.",
         ),
         (
             "I. KNOWN LIMITATIONS",
@@ -175,11 +184,11 @@ def render_sitrec(root: Path, operational_date: str, title: str = DEFAULT_TITLE)
         ),
         (
             "P. SITREC LIFECYCLE",
-            f"This `{facts.operational_date}` record is the unique newest current rehydration artifact. {_prior_sitrec_text(facts)} Update the same-date record rather than creating a duplicate; a later operational-date record supersedes it according to authorized repository lifecycle policy.",
+            f"This `{facts.operational_date}` record is the sole active top-level rehydration artifact. {_prior_sitrec_text(facts)} `America/Los_Angeles` determines the operational date. Routing occurs before every mutation: update the current-date record, or archive stale active records under `docs/archive/sitrecs/` before creating the current-date record.",
         ),
         (
             "Q. DAILY UNIQUENESS",
-            f"Exactly one top-level SITREC may represent `{facts.operational_date}`. The generator targets `docs/SITREC - {facts.operational_date} {title}.md` and requires explicit replacement to update an existing record.",
+            f"Exactly one lifecycle-managed SITREC may represent `{facts.operational_date}` across active and archived records. The active generator target is `docs/SITREC - {facts.operational_date} {title}.md`; repeated same-day generation updates that record rather than creating a duplicate.",
         ),
         (
             "R. VALIDATION",
@@ -205,6 +214,34 @@ def render_sitrec(root: Path, operational_date: str, title: str = DEFAULT_TITLE)
     return "\n".join(lines).rstrip() + "\n"
 
 
+def _lifecycle_paths(root: Path) -> list[Path]:
+    active = [path for path in (root / "docs").glob("*.md") if "sitrec" in path.name.lower()]
+    archived = [path for path in (root / ARCHIVE_PATH).glob("*.md") if "sitrec" in path.name.lower()]
+    return sorted([*active, *archived], key=lambda path: path.relative_to(root).as_posix())
+
+
+def _validate_lifecycle_records(root: Path) -> None:
+    by_date: dict[str, list[Path]] = {}
+    for path in _lifecycle_paths(root):
+        filename_date = extract_date(path)
+        if filename_date is None:
+            raise ValueError(f"SITREC filename has no valid operational date: {path.relative_to(root)}")
+        document_date = extract_document_date(path.read_text(encoding="utf-8"))
+        if document_date is None:
+            raise ValueError(f"SITREC document has no valid Operational Date: {path.relative_to(root)}")
+        if document_date != filename_date:
+            raise ValueError(
+                f"SITREC filename date {filename_date} disagrees with document Operational Date "
+                f"{document_date}: {path.relative_to(root)}"
+            )
+        by_date.setdefault(filename_date, []).append(path)
+    duplicates = {value: paths for value, paths in by_date.items() if len(paths) > 1}
+    if duplicates:
+        value = sorted(duplicates)[0]
+        paths = ", ".join(path.relative_to(root).as_posix() for path in duplicates[value])
+        raise ValueError(f"duplicate SITREC operational date {value}: {paths}")
+
+
 def write_sitrec(
     root: Path,
     operational_date: str,
@@ -212,21 +249,46 @@ def write_sitrec(
     title: str = DEFAULT_TITLE,
     replace: bool = False,
 ) -> dict[str, object]:
-    target = root / (output or default_output_path(operational_date, title))
-    target = target.resolve()
-    try:
-        relative = target.relative_to(root.resolve())
-    except ValueError as error:
-        raise ValueError(f"SITREC output path escapes repository root: {target}") from error
-    if target.exists() and not replace:
-        raise ValueError(f"SITREC already exists; pass --replace to update it: {relative.as_posix()}")
-    content = render_sitrec(root, operational_date, title)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(content, encoding="utf-8")
+    """Route, normalize, and generate the Pacific-date SITREC as one mutation stage."""
+    root = root.resolve()
+    normalized_date = validate_operational_date(operational_date)
+    route = route_sitrec(root, normalized_date)
+    _validate_lifecycle_records(root)
+
+    current = [candidate for candidate in route.active_sitrecs if candidate.operational_date == normalized_date]
+    if len(current) > 1:
+        raise ValueError(f"multiple active SITRECs exist for {normalized_date}")
+
+    expected_target = current[0].path if current else root / default_output_path(normalized_date, title)
+    if output is not None and (root / output).resolve() != expected_target.resolve():
+        raise ValueError(f"SITREC output must match routed target: {expected_target.relative_to(root)}")
+
+    stale = [candidate.path for candidate in route.active_sitrecs if candidate.operational_date != normalized_date]
+    archive_moves = [(path, root / ARCHIVE_PATH / path.name) for path in stale]
+    for source, destination in archive_moves:
+        if destination.exists():
+            raise ValueError(
+                f"refusing to overwrite archived SITREC: {destination.relative_to(root).as_posix()}"
+            )
+
+    # Verify deterministic inputs before beginning the filesystem mutation.
+    collect_sitrec_facts(root, normalized_date)
+    if archive_moves:
+        (root / ARCHIVE_PATH).mkdir(parents=True, exist_ok=True)
+        for source, destination in archive_moves:
+            source.replace(destination)
+
+    content = render_sitrec(root, normalized_date, title)
+    expected_target.parent.mkdir(parents=True, exist_ok=True)
+    existed = expected_target.exists()
+    expected_target.write_text(content, encoding="utf-8")
+    relative = expected_target.relative_to(root)
     return {
         "path": relative.as_posix(),
-        "operational_date": validate_operational_date(operational_date),
+        "operational_date": normalized_date,
         "sections": 19,
         "bytes": len(content.encode("utf-8")),
-        "replaced": replace,
+        "replaced": existed or route.decision == DECISION_UPDATE_CURRENT,
+        "router_decision": route.decision,
+        "archived": [destination.relative_to(root).as_posix() for _source, destination in archive_moves],
     }

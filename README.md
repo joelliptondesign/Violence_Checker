@@ -97,10 +97,14 @@ Generated runs are evidence, never ground truth. Existing outputs are not overwr
 
 ```sh
 .venv/bin/python -m pytest
+python3 -m tools.repo_governance route-sitrec
+python3 -m tools.repo_governance validate-sitrec --path "docs/SITREC - 2026-07-20 Violence Checker Successor Semantic Baseline.md"
 python3 -m tools.repo_governance validate-all
 .venv/bin/python -m src.evaluation.corpus validate
 .venv/bin/python -m src.evaluation.corpus coverage
 ```
+
+SITREC lifecycle authority uses the `America/Los_Angeles` operational date. Only Markdown SITRECs directly under `docs/` are active candidates; historical records live under `docs/archive/sitrecs/`. The non-mutating router must run before generation. Lifecycle mutation leaves exactly one current-date active record, updates it on repeated same-day generation, archives stale active records before creating a later-date record, and rejects duplicate dates across active and archived records.
 
 See `docs/architecture.md`, `docs/demo_runbook.md`, `docs/local_governance.md`, and `evaluation/README.md` for the detailed boundaries and commands.
 
