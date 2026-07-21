@@ -4,4 +4,4 @@ Run artifacts are ordered observed evidence, never ground truth. Current runs us
 
 The committed creation-time run uses schema `1.0.0` and is byte-immutable. It is readable only through strict legacy routing and cannot become a successor baseline.
 
-Live-provider evidence is recorded in immutable, sequential artifacts. `true-north-live-evaluation-001.json` is the first 24-case run; `true-north-live-evaluation-002.json` is the second 24-case re-evaluation after bounded provider-semantic corrections. Neither run is an accepted baseline.
+Live-provider evidence is recorded in immutable, sequential artifacts. `true-north-live-evaluation-001.json` is the first 24-case run; `true-north-live-evaluation-002.json` is the second 24-case re-evaluation after bounded provider-semantic corrections; `true-north-live-evaluation-003.json` is the post-refactor 24-case live evaluation. None is an accepted baseline.
