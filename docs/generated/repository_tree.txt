@@ -7,13 +7,14 @@ Entries are sorted, repository-relative, and exclude ignored local configuration
 README.md
 app.py
 docs/
-docs/SITREC - 2026-07-20 Violence Checker Successor Semantic Baseline.md
+docs/SITREC - 2026-07-21 Violence Checker Successor Semantic Baseline.md
 docs/architecture.md
 docs/archive/
 docs/archive/sitrecs/
 docs/archive/sitrecs/SITREC - 2026-07-17 Violence Checker Phase 0 Demonstration Baseline.md
 docs/archive/sitrecs/SITREC - 2026-07-18 Violence Checker Narrative Source Control Baseline.md
 docs/archive/sitrecs/SITREC - 2026-07-19 Violence Checker Successor Semantic Baseline.md
+docs/archive/sitrecs/SITREC - 2026-07-20 Violence Checker Successor Semantic Baseline.md
 docs/demo_runbook.md
 docs/generated/
 docs/generated/repository_knowledge_graph.md
@@ -41,9 +42,12 @@ evaluation/reports/
 evaluation/reports/README.md
 evaluation/reports/initial-operational-comparison-001.json
 evaluation/reports/initial-operational-evaluation-001.md
+evaluation/reports/true-north-live-comparison-001.json
+evaluation/reports/true-north-live-evaluation-001.md
 evaluation/runs/
 evaluation/runs/README.md
 evaluation/runs/initial-operational-evaluation-001.json
+evaluation/runs/true-north-live-evaluation-001.json
 requirements.txt
 scripts/
 scripts/__init__.py

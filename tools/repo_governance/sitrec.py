@@ -23,6 +23,9 @@ from .sitrec_router import (
 
 DEFAULT_TITLE = "Violence Checker Successor Semantic Baseline"
 CORPUS_PATH = Path("evaluation/corpus/successor_corpus.json")
+LIVE_EVALUATION_RUN_PATH = Path("evaluation/runs/true-north-live-evaluation-001.json")
+LIVE_EVALUATION_COMPARISON_PATH = Path("evaluation/reports/true-north-live-comparison-001.json")
+LIVE_EVALUATION_REPORT_PATH = Path("evaluation/reports/true-north-live-evaluation-001.md")
 
 GROUNDING_ANCHORS = (
     ("README.md", "Repository purpose, local execution, and operator entry points."),
@@ -49,6 +52,9 @@ GROUNDING_ANCHORS = (
     ("app.py", "Executive information architecture and component ownership."),
     ("src/evaluation/", "Current evaluation contracts, execution, comparison, and reporting."),
     (CORPUS_PATH.as_posix(), "Repository-authored True North operational evaluation ground truth."),
+    (LIVE_EVALUATION_RUN_PATH.as_posix(), "Observed 24-case live-provider execution evidence; not ground truth or an accepted baseline."),
+    (LIVE_EVALUATION_COMPARISON_PATH.as_posix(), "Machine-readable doctrine comparison, failure attribution, and readiness assessment."),
+    (LIVE_EVALUATION_REPORT_PATH.as_posix(), "Evidence-only operational report for the completed live-provider evaluation."),
     ("tests/", "Permanent deterministic behavioral verification authority."),
     ("tools/repo_governance/", "Supporting repository governance and SITREC generation tooling."),
 )
@@ -62,6 +68,11 @@ class SitrecFacts:
     corpus_schema_version: str
     semantic_schema_identity: str
     semantic_schema_version: str
+    live_evaluation_readiness: str
+    live_evaluation_passes: int
+    live_evaluation_validation_failures: int
+    live_evaluation_semantic_mismatches: int
+    live_evaluation_provider_timeouts: int
     prior_sitrecs: tuple[str, ...]
 
 
@@ -95,6 +106,21 @@ def collect_sitrec_facts(root: Path, operational_date: str) -> SitrecFacts:
     if not isinstance(cases, list) or not cases:
         raise ValueError(f"{CORPUS_PATH.as_posix()} has no non-empty cases array")
 
+    live_comparison = json.loads(
+        _required_path(root, LIVE_EVALUATION_COMPARISON_PATH.as_posix()).read_text(encoding="utf-8")
+    )
+    live_summary = live_comparison.get("aggregate_summary")
+    if not isinstance(live_summary, dict) or live_comparison.get("execution", {}).get("attempted_cases") != len(cases):
+        raise ValueError("live evaluation comparison does not cover the active corpus")
+    readiness = live_comparison.get("readiness_conclusion")
+    if readiness not in {
+        "READY_FOR_BASELINE_REVIEW",
+        "NOT_READY_SEMANTIC_FAILURES",
+        "NOT_READY_PROVIDER_AVAILABILITY",
+        "NOT_READY_INCOMPLETE_RUN",
+    }:
+        raise ValueError("live evaluation comparison has no recognized readiness conclusion")
+
     candidates = [*(root / "docs").glob("*SITREC*.md"), *(root / ARCHIVE_PATH).glob("*SITREC*.md")]
     prior_sitrecs = tuple(
         path.relative_to(root).as_posix()
@@ -108,6 +134,11 @@ def collect_sitrec_facts(root: Path, operational_date: str) -> SitrecFacts:
         corpus_schema_version=str(corpus.get("corpus_schema_version", "missing")),
         semantic_schema_identity=str(corpus.get("semantic_schema_identity", "missing")),
         semantic_schema_version=str(corpus.get("semantic_schema_version", "missing")),
+        live_evaluation_readiness=str(readiness),
+        live_evaluation_passes=int(live_summary.get("passes", 0)),
+        live_evaluation_validation_failures=int(live_summary.get("validation_failures", 0)),
+        live_evaluation_semantic_mismatches=int(live_summary.get("semantic_mismatches", 0)),
+        live_evaluation_provider_timeouts=int(live_summary.get("provider_timeouts", 0)),
         prior_sitrecs=prior_sitrecs,
     )
 
@@ -135,7 +166,7 @@ def render_sitrec(root: Path, operational_date: str, title: str = DEFAULT_TITLE)
         ),
         (
             "B. CURRENT STATE",
-            f"Current repository facts: `TrueNorthSemanticEnvelope` is the sole current semantic authority. The True North runtime is active across extraction, repository adaptation, schema and domain validation, deterministic derivation and policy, application orchestration, comparison, illustrative Salesforce projection, bounded Operator Communication, presentation, and Streamlit. The repository-authored `{facts.corpus_identity}` contains {facts.case_count} synthetic operational cases under evaluation schema `{facts.corpus_schema_version}`, explicit expectations for all eight demonstration fixtures, and adversarial evidence-integrity coverage. Historical evaluation artifacts remain immutable, readable through their creation-time family, and non-authoritative. Live-provider evaluation, baseline acceptance, deployment, and hosted acceptance remain pending.",
+            f"Current repository facts: `TrueNorthSemanticEnvelope` is the sole current semantic authority. The True North runtime is active across extraction, repository adaptation, schema and domain validation, deterministic derivation and policy, application orchestration, comparison, illustrative Salesforce projection, bounded Operator Communication, presentation, and Streamlit. The repository-authored `{facts.corpus_identity}` contains {facts.case_count} synthetic operational cases under evaluation schema `{facts.corpus_schema_version}`, explicit expectations for all eight demonstration fixtures, and adversarial evidence-integrity coverage. The first 24-case live-provider evaluation is complete with {facts.live_evaluation_passes} passes, {facts.live_evaluation_validation_failures} evidence-integrity validation failures, {facts.live_evaluation_semantic_mismatches} semantic mismatches, and {facts.live_evaluation_provider_timeouts} provider timeouts; its assessment is `{facts.live_evaluation_readiness}`. Historical evaluation artifacts remain immutable, readable through their creation-time family, and non-authoritative. No True North baseline has been accepted; deployment and hosted acceptance remain pending.",
         ),
         (
             "C. CORE INVARIANTS",
@@ -163,11 +194,11 @@ def render_sitrec(root: Path, operational_date: str, title: str = DEFAULT_TITLE)
         ),
         (
             "I. KNOWN LIMITATIONS",
-            "The lexical baseline is intentionally shallow. Provider quality is not guaranteed, and deterministic validation cannot prove unrestricted natural-language entailment. Live-provider evaluation is pending and non-deterministic even though its surrounding contracts are deterministic. No True North evaluation baseline has been accepted. Deployment and hosted acceptance have not occurred. Historical and True North artifact families remain intentionally incomparable.",
+            f"The lexical baseline is intentionally shallow. Provider quality is not guaranteed, and deterministic validation cannot prove unrestricted natural-language entailment. The completed live-provider evaluation is non-deterministic even though its surrounding contracts are deterministic; it recorded {facts.live_evaluation_provider_timeouts} provider timeouts and the readiness assessment `{facts.live_evaluation_readiness}`. No True North evaluation baseline has been accepted. Deployment and hosted acceptance have not occurred. Historical and True North artifact families remain intentionally incomparable.",
         ),
         (
             "J. INTERACTION MODEL",
-            "Analysis begins only after explicit `Run Analysis`; invalid input and non-analysis interaction issue no semantic requests. A valid analysis performs lexical matching and one semantic extraction with SDK retries disabled. Communication generation is a separate presentation-only request and failure preserves deterministic fallback. Deterministic evaluation requires an injected executor and sends only case identity and narrative; live-provider evaluation is explicit and pending. Baseline acceptance and deployment are separate operator actions and never occur during evaluation or governance validation.",
+            "Analysis begins only after explicit `Run Analysis`; invalid input and non-analysis interaction issue no semantic requests. A valid analysis performs lexical matching and one semantic extraction with SDK retries disabled. Communication generation is a separate presentation-only request and failure preserves deterministic fallback. Deterministic evaluation requires an injected executor and sends only case identity and narrative; the completed live-provider evaluation used one request per selected case, zero retries, and a 120-second case boundary. Baseline acceptance and deployment are separate operator actions and never occur during evaluation or governance validation.",
         ),
         (
             "K. GUARANTEES",
@@ -184,7 +215,7 @@ def render_sitrec(root: Path, operational_date: str, title: str = DEFAULT_TITLE)
         ),
         (
             "O. REHYDRATION INSTRUCTIONS",
-            "1. Read `README.md`, `docs/architecture.md`, this SITREC, `docs/local_governance.md`, `docs/opord_004_verification_authority.md`, `docs/operator_communication_tone_guidelines.md`, `docs/workplace_violence_doctrine.md`, `docs/true_north_semantic_contract_specification.md`, and `docs/true_north_migration_strategy.md`.\n2. Inspect the True North contracts, adapter, validation/derivation/policy chain, application and presentation runtime, `src/evaluation/`, and `evaluation/corpus/successor_corpus.json`.\n3. Inspect `git status --short` before mutation and preserve unrelated work.\n4. Run `python3 -m tools.repo_governance validate-all`; for readiness run `python3 -m tools.repo_governance baseline-readiness` without accepting a baseline.\n5. Preserve provider operational-fact authority, repository bookkeeping, request boundaries, fail-closed validation, deterministic policy, active True North evaluation, operator communication authority, and historical artifact immutability.\n6. Treat live-provider evaluation, baseline acceptance, deployment, and hosted acceptance as separately authorized follow-on actions.\n7. Regenerate this artifact with the governed `sitrec` command whenever repository truth changes.",
+            "1. Read `README.md`, `docs/architecture.md`, this SITREC, `docs/local_governance.md`, `docs/opord_004_verification_authority.md`, `docs/operator_communication_tone_guidelines.md`, `docs/workplace_violence_doctrine.md`, `docs/true_north_semantic_contract_specification.md`, and `docs/true_north_migration_strategy.md`.\n2. Inspect the True North contracts, adapter, validation/derivation/policy chain, application and presentation runtime, `src/evaluation/`, `evaluation/corpus/successor_corpus.json`, and the three `true-north-live-*-001` evaluation artifacts.\n3. Inspect `git status --short` before mutation and preserve unrelated work.\n4. Run `python3 -m tools.repo_governance validate-all`; for readiness run `python3 -m tools.repo_governance baseline-readiness` without accepting a baseline.\n5. Preserve provider operational-fact authority, repository bookkeeping, request boundaries, fail-closed validation, deterministic policy, active True North evaluation, operator communication authority, and historical artifact immutability.\n6. Treat baseline acceptance, deployment, and hosted acceptance as separately authorized follow-on actions; the completed live evaluation accepted no baseline.\n7. Regenerate this artifact with the governed `sitrec` command whenever repository truth changes.",
         ),
         (
             "P. SITREC LIFECYCLE",
