@@ -40,6 +40,7 @@ Current repository facts: `TrueNorthSemanticEnvelope` is the sole current semant
 | Schema/domain validators | Admissibility and fail-closed rejection |
 | Semantic derivation | Active/superseded sets, contradiction membership, and incident direction |
 | Deterministic policy | Sole authority for the four doctrinal outcomes |
+| Operator Communication Tone Guidelines | Governing presentation policy for every operator-facing communication surface |
 | Operator Communication | Presentation-only projection with no semantic or policy authority |
 | Historical artifacts | Immutable creation-time evidence; non-authoritative for True North |
 | Tests | Permanent deterministic behavioral verification |
@@ -81,6 +82,7 @@ The repository does not guarantee model accuracy, exhaustive violence ontology c
 | `docs/architecture.md` | Current end-to-end architecture and authority boundaries. |
 | `docs/local_governance.md` | Repository-local generation, validation, and readiness commands. |
 | `docs/opord_004_verification_authority.md` | Permanent successor verification gates and test authority. |
+| `docs/operator_communication_tone_guidelines.md` | Governing authority for all operator-facing communication and presentation wording. |
 | `docs/semantic_design_basis.md` | Historical proposition design record; not current authority. |
 | `docs/successor_semantic_contract_specification.md` | Historical proposition successor specification. |
 | `docs/workplace_violence_doctrine.md` | Authoritative doctrine for the active True North runtime and evaluation. |
@@ -109,11 +111,11 @@ Repository state is authoritative. If this SITREC conflicts with code, contracts
 
 ## O. REHYDRATION INSTRUCTIONS
 
-1. Read `README.md`, `docs/architecture.md`, this SITREC, `docs/local_governance.md`, `docs/opord_004_verification_authority.md`, `docs/workplace_violence_doctrine.md`, `docs/true_north_semantic_contract_specification.md`, and `docs/true_north_migration_strategy.md`.
+1. Read `README.md`, `docs/architecture.md`, this SITREC, `docs/local_governance.md`, `docs/opord_004_verification_authority.md`, `docs/operator_communication_tone_guidelines.md`, `docs/workplace_violence_doctrine.md`, `docs/true_north_semantic_contract_specification.md`, and `docs/true_north_migration_strategy.md`.
 2. Inspect the True North contracts, adapter, validation/derivation/policy chain, application and presentation runtime, `src/evaluation/`, and `evaluation/corpus/successor_corpus.json`.
 3. Inspect `git status --short` before mutation and preserve unrelated work.
 4. Run `python3 -m tools.repo_governance validate-all`; for readiness run `python3 -m tools.repo_governance baseline-readiness` without accepting a baseline.
-5. Preserve provider operational-fact authority, repository bookkeeping, request boundaries, fail-closed validation, deterministic policy, active True North evaluation, and historical artifact immutability.
+5. Preserve provider operational-fact authority, repository bookkeeping, request boundaries, fail-closed validation, deterministic policy, active True North evaluation, operator communication authority, and historical artifact immutability.
 6. Treat live-provider evaluation, baseline acceptance, deployment, and hosted acceptance as separately authorized follow-on actions.
 7. Regenerate this artifact with the governed `sitrec` command whenever repository truth changes.
 

@@ -31,6 +31,8 @@ The following documents govern the planned true-north successor design; they do 
 - [True North Semantic Contract Specification](docs/true_north_semantic_contract_specification.md)
 - [True North Migration Strategy](docs/true_north_migration_strategy.md)
 
+The [Operator Communication Tone Guidelines](docs/operator_communication_tone_guidelines.md) are the governing authority for all operator-facing wording, including prompts, deterministic fallback communication, Streamlit presentation, operational facts, decision logic, Salesforce previews, and future communication evaluations. They establish presentation policy only and do not change runtime behavior or classification authority.
+
 ## Completed recovery baseline
 
 The provider returns semantic candidate content with temporary local references only. Repository code assigns incident identity, semantic and extraction contract identity, canonical identifiers and ordering, and final reference remapping before strict schema and domain validation. Provider metadata cannot override those deterministic values.

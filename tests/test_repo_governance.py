@@ -11,6 +11,7 @@ from tools.repo_governance import governance
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ACTIVE_SITREC = REPO_ROOT / "docs" / "SITREC - 2026-07-20 Violence Checker Successor Semantic Baseline.md"
+COMMUNICATION_AUTHORITY = REPO_ROOT / "docs" / "operator_communication_tone_guidelines.md"
 
 
 def test_governance_tooling_imports_without_foxcommand_runtime_path() -> None:
@@ -76,7 +77,39 @@ def test_sitrec_validation_accepts_current_active_sitrec() -> None:
     assert "docs/workplace_violence_doctrine.md" in text
     assert "docs/true_north_semantic_contract_specification.md" in text
     assert "docs/true_north_migration_strategy.md" in text
+    assert "docs/operator_communication_tone_guidelines.md" in text
+    assert "Governing presentation policy for every operator-facing communication surface" in text
     assert "Live-provider evaluation, baseline acceptance, deployment, and hosted acceptance remain pending" in text
+
+
+def test_operator_communication_authority_covers_required_surfaces_and_examples() -> None:
+    text = COMMUNICATION_AUTHORITY.read_text(encoding="utf-8")
+
+    assert "The UI does not expose repository fields one-for-one." in text
+    assert "The UI answers operator questions." in text
+    for surface in (
+        "Incident Summary",
+        "Key Findings",
+        "Why This Result",
+        "Operational Facts",
+        "Decision Logic",
+        "Salesforce Preview",
+        "deterministic fallback communication",
+        "provider-generated communication",
+    ):
+        assert surface in text
+    for example in (
+        "Intentional interpersonal assault",
+        "Verbal threat",
+        "Self-harm",
+        "Intentional property violence",
+        "Accidental contact",
+        "Historical-only conduct",
+        "Corrected allegation",
+        "Unresolved contradiction",
+        "Unable to determine",
+    ):
+        assert f"### {example}" in text
 
 
 def test_sitrec_lifecycle_selects_one_active_current_record() -> None:

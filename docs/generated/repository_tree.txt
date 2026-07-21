@@ -19,6 +19,7 @@ docs/generated/
 docs/generated/repository_knowledge_graph.md
 docs/generated/repository_tree.txt
 docs/local_governance.md
+docs/operator_communication_tone_guidelines.md
 docs/opord_004_repository_assessment.md
 docs/opord_004_verification_authority.md
 docs/semantic_design_basis.md

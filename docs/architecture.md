@@ -81,4 +81,6 @@ The repository remains a synthetic demonstration. It does not provide clinical, 
 
 ## Governing authority
 
-The approved [Workplace Violence Doctrine](workplace_violence_doctrine.md), [True North Semantic Contract Specification](true_north_semantic_contract_specification.md), and [True North Migration Strategy](true_north_migration_strategy.md) govern this boundary. Later packages must complete live-provider evaluation, baseline acceptance, deployment, and hosted acceptance without restoring dual semantic authority.
+The approved [Workplace Violence Doctrine](workplace_violence_doctrine.md), [True North Semantic Contract Specification](true_north_semantic_contract_specification.md), and [True North Migration Strategy](true_north_migration_strategy.md) govern the semantic and policy boundary. The [Operator Communication Tone Guidelines](operator_communication_tone_guidelines.md) govern every operator-facing presentation surface, including provider-generated and fallback communication, Streamlit labels and prose, operational facts, decision logic, technical details, and the illustrative Salesforce preview. This communication authority changes presentation policy only; it cannot alter supported facts, validation, classification, or runtime behavior.
+
+Later packages must implement and evaluate operator-facing wording against that communication authority while completing live-provider evaluation, baseline acceptance, deployment, and hosted acceptance without restoring dual semantic authority.
