@@ -7,11 +7,17 @@ import sys
 from pathlib import Path
 
 from tools.repo_governance import governance
+from tools.repo_governance.sitrec_router import extract_date, pacific_today
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-ACTIVE_SITREC = REPO_ROOT / "docs" / "SITREC - 2026-07-20 Violence Checker Successor Semantic Baseline.md"
 COMMUNICATION_AUTHORITY = REPO_ROOT / "docs" / "operator_communication_tone_guidelines.md"
+
+
+def current_active_sitrec() -> Path:
+    active_paths = governance.active_sitrec_paths(REPO_ROOT)
+    assert len(active_paths) == 1
+    return REPO_ROOT / active_paths[0]
 
 
 def test_governance_tooling_imports_without_foxcommand_runtime_path() -> None:
@@ -62,8 +68,9 @@ def test_heartbeat_jsonl_validation_accepts_local_telemetry() -> None:
 
 
 def test_sitrec_validation_accepts_current_active_sitrec() -> None:
-    findings = governance.validate_sitrec_file(ACTIVE_SITREC)
-    text = ACTIVE_SITREC.read_text(encoding="utf-8")
+    active_sitrec = current_active_sitrec()
+    findings = governance.validate_sitrec_file(active_sitrec)
+    text = active_sitrec.read_text(encoding="utf-8")
 
     assert findings == []
     assert "Provider authority is limited to semantic candidates" in text
@@ -79,7 +86,8 @@ def test_sitrec_validation_accepts_current_active_sitrec() -> None:
     assert "docs/true_north_migration_strategy.md" in text
     assert "docs/operator_communication_tone_guidelines.md" in text
     assert "Governing presentation policy for every operator-facing communication surface" in text
-    assert "Live-provider evaluation, baseline acceptance, deployment, and hosted acceptance remain pending" in text
+    assert "The first 24-case live-provider evaluation is complete" in text
+    assert "No True North baseline has been accepted" in text
 
 
 def test_operator_communication_authority_covers_required_surfaces_and_examples() -> None:
@@ -120,10 +128,12 @@ def test_operator_communication_authority_covers_required_surfaces_and_examples(
 
 
 def test_sitrec_lifecycle_selects_one_active_current_record() -> None:
-    assert governance.active_sitrec_paths(REPO_ROOT) == [
-        "docs/SITREC - 2026-07-20 Violence Checker Successor Semantic Baseline.md"
-    ]
-    assert governance.validate_sitrec_lifecycle(REPO_ROOT, "2026-07-20") == []
+    active_sitrec = current_active_sitrec()
+    operational_date = pacific_today()
+
+    assert extract_date(active_sitrec) == operational_date
+    assert active_sitrec.parent == REPO_ROOT / "docs"
+    assert governance.validate_sitrec_lifecycle(REPO_ROOT, operational_date) == []
 
 
 def test_generated_governance_artifacts_are_fresh() -> None:

@@ -88,7 +88,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_policy.py` | deterministic test | none | 17 |
 | `tests/test_presentation.py` | deterministic test | none | 4 |
 | `tests/test_regex_baseline.py` | deterministic test | none | 9 |
-| `tests/test_repo_governance.py` | deterministic test | none | 13 |
+| `tests/test_repo_governance.py` | deterministic test | none | 14 |
 | `tests/test_salesforce_preview.py` | deterministic test | none | 3 |
 | `tests/test_semantic_authority_boundary.py` | deterministic test | none | 8 |
 | `tests/test_semantic_extractor.py` | deterministic test | `FakeClient`, `FakeResponses` | 9 |
@@ -171,7 +171,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_policy.py` | `inspect`, `pytest`, `src.contracts`, `src.models`, `src.policy`, `src.provider_adapter`, `src.semantic_validation` |
 | `tests/test_presentation.py` | `src.app_logic`, `src.contracts`, `src.models`, `src.presentation`, `tests.test_app_logic` |
 | `tests/test_regex_baseline.py` | `src.fixtures`, `src.regex_baseline` |
-| `tests/test_repo_governance.py` | `__future__`, `importlib`, `json`, `pathlib`, `subprocess`, `sys`, `tools.repo_governance` |
+| `tests/test_repo_governance.py` | `__future__`, `importlib`, `json`, `pathlib`, `subprocess`, `sys`, `tools.repo_governance`, `tools.repo_governance.sitrec_router` |
 | `tests/test_salesforce_preview.py` | `pytest`, `src.app_logic`, `src.contracts`, `src.models`, `src.policy`, `src.salesforce_preview`, `tests.test_app_logic` |
 | `tests/test_semantic_authority_boundary.py` | `pathlib`, `pydantic`, `pytest`, `src.contracts`, `src.models`, `src.provider_adapter` |
 | `tests/test_semantic_extractor.py` | `importlib`, `src.config`, `src.contracts`, `src.models`, `src.semantic_extractor` |
