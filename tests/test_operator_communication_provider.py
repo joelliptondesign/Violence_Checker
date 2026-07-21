@@ -14,9 +14,9 @@ from tests.test_app_logic import candidate_for, extraction_for
 
 
 PAYLOAD = OperatorCommunication(
-    incident_summary="Intentional physical violence was reported during the current incident.",
-    key_findings=("Physical violence identified", "Current incident confirmed"),
-    why_this_result="The supplied operational facts establish qualifying current conduct.",
+    incident_summary="The patient intentionally struck the nurse during the reported event.",
+    key_findings=("Patient struck nurse", "Physical contact occurred", "Contact was intentional"),
+    why_this_result="Intentional physical contact against another person meets the workplace violence criteria.",
 )
 
 
@@ -59,7 +59,18 @@ def test_provider_sends_one_strict_request_with_only_narrow_facts():
     assert set(call) == {"model", "instructions", "input", "text_format"}
     assert call["text_format"] is OperatorCommunication
     assert sent == facts_for_provider().model_dump(mode="json")
-    assert "narrative" not in call["input"]
+    assert "incident_id" not in call["input"]
+    assert "evidence_id" not in call["input"]
+    assert sent["active_facts"][0]["evidence_excerpts"] == [
+        "Patient intentionally struck the nurse today."
+    ]
+    invented = PAYLOAD.model_copy(update={
+        "incident_summary": "The patient intentionally struck the nurse in the hallway."
+    })
+    rejected = configured(FakeClient(FakeResponses(parsed=invented)))
+    assert rejected.status == OperatorCommunicationStatus.VALIDATION_FAILURE
+    assert rejected.communication is None
+    assert "unsupported detail introduced" in rejected.failure_message
 
 
 def test_missing_configuration_and_untyped_input_make_no_request():

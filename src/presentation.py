@@ -17,9 +17,9 @@ from src.contracts import (
 
 SALESFORCE_OPERATOR_FIELDS = (
     ("Illustrative_Incident_Identifier__c", "Incident Identifier"),
-    ("Illustrative_Deterministic_Outcome__c", "Deterministic Outcome"),
-    ("Illustrative_Qualifying_Conduct__c", "Qualifying Conduct"),
-    ("Illustrative_Incident_Direction__c", "Incident Direction"),
+    ("Illustrative_Deterministic_Outcome__c", "Outcome"),
+    ("Illustrative_Qualifying_Conduct__c", "What Happened"),
+    ("Illustrative_Incident_Direction__c", "Who or What Was Involved"),
     ("Illustrative_Operational_Facts__c", "Operational Facts"),
     ("Illustrative_Evidence__c", "Evidence"),
 )
@@ -31,20 +31,71 @@ def _humanize(value: object) -> str:
 
 
 def operational_fact_rows(validation_result: ValidationResult) -> list[dict[str, str]]:
-    """Project validated facts into an identifier-free operational table."""
-    if not validation_result.passed or validation_result.validated_envelope is None:
+    """Project active facts into operator questions without internal state fields."""
+    if (
+        not validation_result.passed
+        or validation_result.validated_envelope is None
+        or validation_result.derived_semantics is None
+    ):
         return []
-    return [
-        {
-            "Conduct": _humanize(fact.conduct) if fact.conduct is not None else "Unresolved",
-            "Direction": _humanize(fact.direction),
-            "Intent": _humanize(fact.intentionality),
-            "Timing": _humanize(fact.temporal_scope),
-            "Assertion": _humanize(fact.assertion_status),
-            "Resolution": _humanize(fact.resolution_status),
+    active_ids = set(validation_result.derived_semantics.active_fact_ids)
+    rows: list[dict[str, str]] = []
+    for fact in validation_result.validated_envelope.facts:
+        if fact.fact_id not in active_ids:
+            continue
+        evidence = " ".join(item.excerpt for item in fact.evidence).casefold()
+        roles = []
+        if "patient" in evidence or "pt" in evidence.split():
+            roles.append("Patient")
+        if "registered nurse" in evidence or "rn" in evidence.split():
+            roles.append("registered nurse")
+        elif "nurse" in evidence:
+            roles.append("nurse")
+        if "technician" in evidence or "tech" in evidence.split():
+            roles.append("technician")
+        if "aide" in evidence:
+            roles.append("aide")
+        if fact.direction.value == "object_directed":
+            target = next((
+                label for term, label in (
+                    ("medication room door", "Medication room door"),
+                    ("hospital window", "Hospital window"),
+                    ("window", "Window"),
+                    ("side rail", "Side rail"),
+                    ("door", "Door"),
+                    ("wall", "Wall"),
+                ) if term in evidence
+            ), "Property described in the report")
+            involvement_label, involvement = "What Was Targeted", target
+        elif fact.direction.value == "self_directed":
+            involvement_label, involvement = "Who Was Involved", roles[0] if roles else "Person described in the report"
+        else:
+            involvement_label = "Who Was Involved"
+            involvement = " and ".join(roles[:2]) if roles else "People described in the report"
+        conduct = _humanize(fact.conduct).capitalize() if fact.conduct is not None else "Reported conduct"
+        if fact.assertion_status == AssertionStatus.DENIED:
+            conduct = f"Reported {conduct.lower()} did not occur"
+        fields = {
+            "What Happened": conduct,
+            involvement_label: involvement,
+            "Intent": {
+                "intentional": "Intentional", "accidental": "Accidental",
+                "unresolved": "Not established",
+            }[fact.intentionality.value],
+            "When": {
+                "current": "During the event being reported",
+                "historical": "Before the event being reported",
+                "unresolved": "Not established",
+            }[fact.temporal_scope.value],
         }
-        for fact in validation_result.validated_envelope.facts
-    ]
+        rows.append({
+            "What Happened": fields["What Happened"],
+            "Who Was Involved": fields.get("Who Was Involved", "—"),
+            "What Was Targeted": fields.get("What Was Targeted", "—"),
+            "Intent": fields["Intent"],
+            "When": fields["When"],
+        })
+    return rows
 
 
 def validated_evidence_excerpts(validation_result: ValidationResult) -> tuple[str, ...]:
@@ -67,11 +118,22 @@ def _readable_salesforce_value(value: object) -> object:
 
 
 def salesforce_operator_rows(payload: dict[str, object]) -> list[dict[str, object]]:
-    return [
-        {"Field": label, "Value": _readable_salesforce_value(payload[name])}
-        for name, label in SALESFORCE_OPERATOR_FIELDS
-        if name in payload
-    ]
+    rows = []
+    for name, label in SALESFORCE_OPERATOR_FIELDS:
+        if name not in payload:
+            continue
+        value = payload[name]
+        if name == "Illustrative_Qualifying_Conduct__c" and isinstance(value, list):
+            value = [str(item).replace("_", " ").capitalize() for item in value]
+        if name == "Illustrative_Incident_Direction__c":
+            facts = payload.get("Illustrative_Operational_Facts__c", [])
+            if isinstance(facts, list) and facts:
+                parts = str(facts[0]).split("; ")
+                involved = next((part.split(": ", 1)[1] for part in parts if part.startswith(("Who Was Involved:", "What Was Targeted:"))), None)
+                if involved is not None:
+                    value = involved
+        rows.append({"Field": label, "Value": _readable_salesforce_value(value)})
+    return rows
 
 
 def salesforce_payload_rows(payload: dict[str, object]) -> list[dict[str, object]]:
@@ -82,10 +144,10 @@ def salesforce_payload_rows(payload: dict[str, object]) -> list[dict[str, object
 
 
 POLICY_EXPLANATIONS = {
-    PolicyOutcome.VIOLENCE_DETECTED: "The active incident facts establish qualifying current intentional violence.",
-    PolicyOutcome.NO_VIOLENCE_DETECTED: "The active incident facts do not establish qualifying current intentional violence.",
-    PolicyOutcome.UNCERTAIN: "A classification-critical incident fact remains unresolved.",
-    PolicyOutcome.UNABLE_TO_DETERMINE: "A complete admissible analysis was unavailable.",
+    PolicyOutcome.VIOLENCE_DETECTED: "The reported event meets the workplace violence criteria.",
+    PolicyOutcome.NO_VIOLENCE_DETECTED: "The reported event does not meet the workplace violence criteria.",
+    PolicyOutcome.UNCERTAIN: "The available information does not establish a clear determination.",
+    PolicyOutcome.UNABLE_TO_DETERMINE: "The available information was insufficient to complete a reliable analysis.",
 }
 
 POLICY_REASON_EXPLANATIONS = {
@@ -151,13 +213,13 @@ def semantic_summary(validation_result: ValidationResult, decision: PolicyDecisi
         return POLICY_EXPLANATIONS[PolicyOutcome.UNABLE_TO_DETERMINE]
     facts = validation_result.validated_envelope.facts
     if decision.outcome == PolicyOutcome.VIOLENCE_DETECTED:
-        return "The incident contains active, affirmed, intentional current qualifying conduct."
+        return "The reported event includes intentional conduct covered by the workplace violence criteria."
     if decision.outcome == PolicyOutcome.UNCERTAIN:
-        return "The incident contains unresolved information that could change classification."
+        return "The available accounts leave an important incident detail unresolved."
     if any(fact.intentionality == Intentionality.ACCIDENTAL for fact in facts):
         return "The incident describes accidental rather than intentional conduct."
     if any(fact.temporal_scope == TemporalScope.HISTORICAL for fact in facts):
         return "The reported conduct is historical rather than part of the current incident."
     if any(fact.assertion_status == AssertionStatus.DENIED for fact in facts):
-        return "The active incident facts deny the potentially qualifying conduct."
+        return "The account states that the potentially qualifying conduct did not occur."
     return POLICY_EXPLANATIONS[decision.outcome]

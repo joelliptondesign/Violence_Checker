@@ -70,7 +70,8 @@ def test_provider_failure_is_unable_without_salesforce_payload():
     )
     assert result.policy_decision.outcome == PolicyOutcome.UNABLE_TO_DETERMINE
     assert result.salesforce_preview is None
-    assert "could not be classified" in result.communication.incident_summary
+    assert "not contain enough supported information" in result.communication.incident_summary
+    assert "classified" not in result.communication.incident_summary.casefold()
 
 
 def test_normalization_preserves_raw_narrative_and_uses_normalized_input():

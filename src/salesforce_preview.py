@@ -13,15 +13,43 @@ from src.contracts import (
 
 
 def _operational_fact(fact) -> str:
-    conduct = fact.conduct.value if fact.conduct is not None else "unresolved_conduct"
-    return " | ".join((
-        conduct,
-        fact.direction.value,
-        fact.intentionality.value,
-        fact.temporal_scope.value,
-        fact.assertion_status.value,
-        fact.resolution_status.value,
-    ))
+    evidence = " ".join(item.excerpt for item in fact.evidence).casefold()
+    roles = []
+    if "patient" in evidence or "pt" in evidence.split():
+        roles.append("Patient")
+    if "registered nurse" in evidence or "rn" in evidence.split():
+        roles.append("registered nurse")
+    elif "nurse" in evidence:
+        roles.append("nurse")
+    if "technician" in evidence or "tech" in evidence.split():
+        roles.append("technician")
+    if "aide" in evidence:
+        roles.append("aide")
+    conduct = fact.conduct.value.replace("_", " ").capitalize() if fact.conduct else "Reported conduct"
+    if fact.assertion_status != AssertionStatus.AFFIRMED:
+        conduct = f"Reported {conduct.lower()}"
+    if fact.direction.value == "object_directed":
+        label = "What Was Targeted"
+        involved = next((
+            value for term, value in (
+                ("medication room door", "Medication room door"), ("hospital window", "Hospital window"),
+                ("window", "Window"), ("side rail", "Side rail"), ("door", "Door"), ("wall", "Wall"),
+            ) if term in evidence
+        ), "Property described in the report")
+    else:
+        label = "Who Was Involved"
+        involved = " and ".join(roles[:2]) if roles else "People described in the report"
+    intent = {
+        "intentional": "Intentional", "accidental": "Accidental", "unresolved": "Not established",
+    }[fact.intentionality.value]
+    timing = {
+        "current": "During the event being reported",
+        "historical": "Before the event being reported",
+        "unresolved": "Not established",
+    }[fact.temporal_scope.value]
+    return (
+        f"What Happened: {conduct}; {label}: {involved}; Intent: {intent}; When: {timing}"
+    )
 
 
 def build_salesforce_preview(
