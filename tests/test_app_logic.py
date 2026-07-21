@@ -1,9 +1,9 @@
 from src.app_logic import AnalysisResult, run_analysis
 from src.contracts import (
     AssertionStatus, Conduct, FactDirection, InputValidationResult, Intentionality,
-    MaterialAttribute, PolicyOutcome, ProviderFactCandidate,
-    ProviderFactEvidenceCandidate, ProviderStructuredResponse, ResolutionStatus,
-    TemporalScope, UncertaintyDimension,
+    PolicyOutcome, ProviderFactCandidate, ProviderMaterialAttribute,
+    ProviderFactEvidenceCandidate, ProviderStructuredResponse, TemporalScope,
+    UncertaintyDimension,
 )
 from src.models import Incident
 from src.provider_adapter import semantic_candidate_from_provider_response
@@ -11,9 +11,9 @@ from src.semantic_extractor import SemanticExtractionResult, SemanticExtractionS
 
 
 ALL_SUPPORTS = [
-    MaterialAttribute.CONDUCT, MaterialAttribute.DIRECTION,
-    MaterialAttribute.INTENTIONALITY, MaterialAttribute.TEMPORAL_SCOPE,
-    MaterialAttribute.ASSERTION_STATUS,
+    ProviderMaterialAttribute.CONDUCT, ProviderMaterialAttribute.DIRECTION,
+    ProviderMaterialAttribute.INTENTIONALITY, ProviderMaterialAttribute.TEMPORAL_SCOPE,
+    ProviderMaterialAttribute.ASSERTION_STATUS,
 ]
 
 
@@ -24,7 +24,6 @@ def candidate_for(narrative="Patient intentionally struck the nurse today.", inc
         intentionality=Intentionality.INTENTIONAL,
         temporal_scope=TemporalScope.CURRENT,
         assertion_status=AssertionStatus.AFFIRMED,
-        resolution_status=ResolutionStatus.ACTIVE,
         evidence=[ProviderFactEvidenceCandidate(excerpt=narrative, supports=ALL_SUPPORTS)],
         uncertainty=[],
     )

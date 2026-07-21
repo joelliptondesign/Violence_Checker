@@ -9,14 +9,13 @@ from src.contracts import (
     FactDirection,
     IncidentDirection,
     Intentionality,
-    MaterialAttribute,
+    ProviderMaterialAttribute,
     PolicyOutcome,
     PolicyReasonCode,
     ProcessingStatus,
     ProviderFactCandidate,
     ProviderFactEvidenceCandidate,
     ProviderStructuredResponse,
-    ResolutionStatus,
     TemporalScope,
     UncertaintyDimension,
 )
@@ -27,11 +26,11 @@ from src.semantic_validation import validate_semantic_candidate
 
 
 BASE_SUPPORTS = [
-    MaterialAttribute.CONDUCT,
-    MaterialAttribute.DIRECTION,
-    MaterialAttribute.INTENTIONALITY,
-    MaterialAttribute.TEMPORAL_SCOPE,
-    MaterialAttribute.ASSERTION_STATUS,
+    ProviderMaterialAttribute.CONDUCT,
+    ProviderMaterialAttribute.DIRECTION,
+    ProviderMaterialAttribute.INTENTIONALITY,
+    ProviderMaterialAttribute.TEMPORAL_SCOPE,
+    ProviderMaterialAttribute.ASSERTION_STATUS,
 ]
 
 
@@ -43,7 +42,6 @@ def fact(local_ref, excerpt, **updates):
         intentionality=Intentionality.INTENTIONAL,
         temporal_scope=TemporalScope.CURRENT,
         assertion_status=AssertionStatus.AFFIRMED,
-        resolution_status=ResolutionStatus.ACTIVE,
         evidence=[ProviderFactEvidenceCandidate(excerpt=excerpt, supports=BASE_SUPPORTS)],
         uncertainty=[],
     )
@@ -136,7 +134,7 @@ def test_active_unresolved_qualifying_contradiction_is_uncertain():
     first_text = "Witness A said he intentionally punched the coworker today."
     second_text = "Witness B said he did not intentionally punch the coworker today."
     narrative = f"{first_text} {second_text}"
-    supports = BASE_SUPPORTS + [MaterialAttribute.CONTRADICTION]
+    supports = BASE_SUPPORTS + [ProviderMaterialAttribute.CONTRADICTION]
     facts = [
         fact(
             "account-a", first_text,
@@ -180,7 +178,7 @@ def test_historical_contradiction_does_not_create_current_classification_uncerta
     first_text = "Witness A described an intentional punch last year."
     second_text = "Witness B disputed the intentional punch last year."
     narrative = f"{first_text} {second_text}"
-    supports = BASE_SUPPORTS + [MaterialAttribute.CONTRADICTION]
+    supports = BASE_SUPPORTS + [ProviderMaterialAttribute.CONTRADICTION]
     common = dict(
         temporal_scope=TemporalScope.HISTORICAL,
         assertion_status=AssertionStatus.DISPUTED,
@@ -198,17 +196,14 @@ def test_superseded_violent_fact_never_participates_in_classification():
     earlier_text = "Initial report: he intentionally shoved her today."
     later_text = "Later corrected: the contact was accidental today."
     narrative = f"{earlier_text} {later_text}"
-    earlier = fact(
-        "earlier", earlier_text,
-        resolution_status=ResolutionStatus.SUPERSEDED,
-    )
+    earlier = fact("earlier", earlier_text)
     later = fact(
         "later", later_text,
         intentionality=Intentionality.ACCIDENTAL,
         supersedes_local_ref="earlier",
         evidence=[ProviderFactEvidenceCandidate(
             excerpt=later_text,
-            supports=BASE_SUPPORTS + [MaterialAttribute.SUPERSESSION],
+            supports=BASE_SUPPORTS + [ProviderMaterialAttribute.SUPERSESSION],
         )],
     )
     result = validation(narrative, [later, earlier])

@@ -22,7 +22,7 @@ The contract is a target design, not executable code and not current runtime tru
 | --- | --- |
 | Raw normalized narrative | Evidence text and exact-excerpt containment |
 | Provider | Candidate incident facts, candidate evidence links, and candidate uncertainty only |
-| Repository adapter | Schema identity, schema version, incident identity, canonical fact/evidence identifiers and ordering, extraction bookkeeping |
+| Repository adapter | Schema identity, schema version, incident identity, canonical fact/evidence identifiers and ordering, resolution status, extraction bookkeeping |
 | Schema and evidence validators | Admissibility; rejection or explicit unresolved preservation |
 | Validated contract | Sole successor semantic truth |
 | Deterministic derivation | Active fact set, incident direction, and material uncertainty only; local indexes have no contract authority |
@@ -68,7 +68,7 @@ The surrounding repository pipeline records `processing_status` (`admissible` or
 | `intentionality` | Whether conduct was intentional, accidental, or unresolved | Candidate value | Validate or reject | Required because intent is material | No presumption from contact or severity | Only `intentional` can qualify; unresolved may yield `Uncertain` | May be stated only when projected | Required |
 | `temporal_scope` | Whether conduct belongs to the current incident | Candidate value | Validate or reject | Required for `current` or `historical` | No inference from document placement alone | Only `current` can qualify; unresolved may yield `Uncertain` | May distinguish historical from current | Required |
 | `assertion_status` | Whether the conduct claim is affirmed, denied, disputed, or unresolved | Candidate value | Validate conflicts and correction state | Required for the asserted state | May become `disputed` only from explicit unresolved contradictory evidence | Only active `affirmed` facts can qualify | May explain denial/dispute without resolving it | Required |
-| `resolution_status` | Whether the fact controls now or has been superseded | Candidate ordering/reference only | Repository validates reference and derives active set | Supersession requires correction evidence | A referenced earlier fact becomes `superseded`; otherwise `active` | Policy reads active facts only | May explain a supported correction | Required |
+| `resolution_status` | Whether the fact controls now or has been superseded | None | Repository derives the value from validated candidate correction references | Supersession requires correction evidence on the later fact | A referenced earlier fact becomes `superseded`; otherwise `active` | Policy reads active facts only | May explain a supported correction | Required in repository envelope; absent from provider response |
 | `evidence` | Exact excerpts and the material attributes each excerpt supports | Candidate excerpts and links | Verify containment, specificity, consistency, and coverage | At least one link; together links cover every material asserted attribute | IDs/order may be assigned; meaning may not be invented | Establishes admissibility | Not passed through unless explicitly needed and safely bounded | Required, non-empty |
 | `uncertainty` | Material dimensions explicitly unresolved for this fact | Candidate dimensions | Validate correspondence to unresolved/disputed values and evidence | Each dimension requires supporting ambiguity or conflict evidence | Material-uncertainty projection is deterministic | Material unresolved dimensions may yield `Uncertain` | May explain only projected uncertainty | Required; empty allowed |
 | `supersedes_fact_id` | Narrow correction link from a later fact to the earlier fact it replaces | Candidate local reference | Remap and validate later-to-earlier, acyclic reference | Correction/supersession evidence required | Drives `resolution_status` | Prevents stale allegation from qualifying | May support correction explanation | Optional |
@@ -155,7 +155,7 @@ Validation must reject at least these combinations:
 
 ## Evidence Linkage
 
-Each evidence item contains an exact non-empty substring of the normalized narrative and a non-empty `supports` list drawn from `conduct`, `direction`, `intentionality`, `temporal_scope`, `assertion_status`, `resolution_status`, `supersession`, and `contradiction`.
+Each evidence item contains an exact non-empty substring of the normalized narrative and a non-empty `supports` list drawn from `conduct`, `direction`, `intentionality`, `temporal_scope`, `assertion_status`, `supersession`, and `contradiction`. Resolution status is deterministic bookkeeping and is not an evidence-support label.
 
 The union of a fact's evidence links must cover each policy-relevant asserted attribute. Reuse of one excerpt is allowed only when that excerpt actually supports each linked attribute. A full-narrative excerpt is not blanket support. Exact containment is necessary but not sufficient: validators also apply explicit denial, accident, historical-scope, no-contact, property-direction, correction, and contradiction rules.
 
@@ -226,7 +226,7 @@ Generated prose must pass factual-consistency checks against the projection. Fai
 
 ## Provider Response Boundary
 
-The provider response may contain only candidate fact values, temporary local fact/group references, exact evidence excerpts, support-attribute links, and explicit uncertainty. It must not contain repository schema identity/version, incident identity, canonical IDs/order, extraction metadata, processing/completeness status, a free-standing negative conclusion, policy outcome, reason codes, communication prose, or compatibility payloads as authority.
+The provider response may contain only candidate proposition values, temporary local fact/group references, exact evidence excerpts, support-attribute links, and explicit uncertainty. It must not contain resolution status, repository schema identity/version, incident identity, canonical IDs/order, extraction metadata, processing/completeness status, a free-standing negative conclusion, policy outcome, reason codes, communication prose, or compatibility payloads as authority.
 
 The adapter terminates provider objects and assigns repository bookkeeping before strict validation. Malformed or unsupported output fails closed; no repair request or silent default is allowed.
 
@@ -238,6 +238,7 @@ Bookkeeping remains outside operational facts:
 - incident ID;
 - canonical fact, evidence, contradiction-group, and support IDs;
 - canonical ordering;
+- fact resolution status derived from candidate supersession references;
 - provider/model/request observations and timestamps;
 - validation results, repository-owned processing/completeness status, and failure provenance;
 - policy identity/version and reason codes;
@@ -563,7 +564,6 @@ Invalid because the validated target of supersession cannot remain active.
 The doctrine does not settle these bounded engineering choices:
 
 - Whether evidence is stored inline per fact or normalized into an evidence table plus typed support links. The external semantics and fact-level coverage must be identical.
-- Whether `resolution_status` is provider-proposed and repository-verified or entirely repository-derived from validated correction references.
 - Whether source attribution is needed to validate correction precedence or contradiction membership. If introduced, it must be narrow, evidence-backed, and excluded from policy unless doctrine is separately amended.
 - The exact schema-version and evaluation-version increment policy beyond the required identity separation and fail-closed routing.
 - The deterministic factual-consistency mechanism for generated communication and the conditions that select fallback.

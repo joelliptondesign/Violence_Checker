@@ -208,16 +208,6 @@ def validate_semantic_domain(
             issues.append(_issue(ValidationIssueCode.INVALID_CORRECTION_REFERENCE, fact.fact_id, "A corrected fact must be superseded."))
         if fact.resolution_status == ResolutionStatus.SUPERSEDED and fact.fact_id not in target_set:
             issues.append(_issue(ValidationIssueCode.INVALID_CORRECTION_REFERENCE, fact.fact_id, "A superseded fact requires a later correction reference."))
-        participates_in_correction = fact.fact_id in target_set or fact.supersedes_fact_id is not None
-        if not participates_in_correction:
-            for evidence in fact.evidence:
-                if MaterialAttribute.RESOLUTION_STATUS in evidence.supports:
-                    issues.append(_issue(
-                        ValidationIssueCode.INVALID_EVIDENCE_SUPPORT,
-                        f"{fact.fact_id}.evidence",
-                        "Ordinary active facts cannot claim resolution-status evidence.",
-                    ))
-
     for group_id, members in sorted(groups.items()):
         if len(members) < 2:
             issues.append(_issue(ValidationIssueCode.INVALID_CONTRADICTION_GROUP, group_id, "A contradiction group requires at least two facts."))

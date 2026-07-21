@@ -73,7 +73,8 @@ def test_sitrec_validation_accepts_current_active_sitrec() -> None:
     text = active_sitrec.read_text(encoding="utf-8")
 
     assert findings == []
-    assert "Provider authority is limited to semantic candidates" in text
+    assert "Provider authority is limited to semantic propositions, exact supporting evidence" in text
+    assert "Repository code owns identity, canonical ordering and references, derived resolution status" in text
     assert "all eight demonstration fixtures" in text
     assert "24 synthetic operational cases" in text
     assert "Streamlit Community Cloud deployment remains a manual operator follow-on" in text

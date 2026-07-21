@@ -9,11 +9,10 @@ from src.contracts import (
     EXTRACTION_CONTRACT_IDENTITY,
     FactDirection,
     Intentionality,
-    MaterialAttribute,
+    ProviderMaterialAttribute,
     ProviderFactCandidate,
     ProviderFactEvidenceCandidate,
     ProviderStructuredResponse,
-    ResolutionStatus,
     SEMANTIC_SCHEMA_IDENTITY,
     SEMANTIC_SCHEMA_VERSION,
     TemporalScope,
@@ -25,11 +24,11 @@ from src.provider_adapter import semantic_candidate_from_provider_response
 
 
 SUPPORTS = [
-    MaterialAttribute.CONDUCT,
-    MaterialAttribute.DIRECTION,
-    MaterialAttribute.INTENTIONALITY,
-    MaterialAttribute.TEMPORAL_SCOPE,
-    MaterialAttribute.ASSERTION_STATUS,
+    ProviderMaterialAttribute.CONDUCT,
+    ProviderMaterialAttribute.DIRECTION,
+    ProviderMaterialAttribute.INTENTIONALITY,
+    ProviderMaterialAttribute.TEMPORAL_SCOPE,
+    ProviderMaterialAttribute.ASSERTION_STATUS,
 ]
 
 
@@ -41,7 +40,6 @@ def candidate(local_ref, excerpt, **updates):
         intentionality=Intentionality.INTENTIONAL,
         temporal_scope=TemporalScope.CURRENT,
         assertion_status=AssertionStatus.AFFIRMED,
-        resolution_status=ResolutionStatus.ACTIVE,
         evidence=[ProviderFactEvidenceCandidate(excerpt=excerpt, supports=SUPPORTS)],
         uncertainty=[],
     )
@@ -61,6 +59,7 @@ def test_adapter_terminates_provider_object_and_assigns_all_repository_bookkeepi
     assert adapted.extraction_contract_identity == EXTRACTION_CONTRACT_IDENTITY
     assert adapted.incident_id == "REPOSITORY_CASE"
     assert [fact.fact_id for fact in adapted.facts] == ["FACT-0001"]
+    assert adapted.facts[0].resolution_status.value == "active"
     assert [item.evidence_id for item in adapted.facts[0].evidence] == ["EVID-0001"]
     assert adapted.facts[0].evidence[0].start_offset == 0
     assert adapted.facts[0].evidence[0].end_offset == len(narrative)
@@ -79,6 +78,14 @@ def test_provider_authored_repository_bookkeeping_is_rejected_not_discarded():
                 values,
                 incident=Incident(incident_id="CASE", narrative="text"),
             )
+
+    provider_fact = candidate("fact", "text").model_dump()
+    provider_fact["resolution_status"] = "active"
+    with pytest.raises(ValidationError):
+        semantic_candidate_from_provider_response(
+            {"facts": [provider_fact]},
+            incident=Incident(incident_id="CASE", narrative="text"),
+        )
 
 
 def test_equivalent_provider_order_and_local_names_produce_equivalent_bookkeeping():
@@ -101,7 +108,7 @@ def test_correction_and_contradiction_local_references_are_canonically_remapped(
     first_text = "Witness A reported an intentional punch today."
     second_text = "Witness B disputed the intentional punch today."
     narrative = f"{first_text} {second_text}"
-    contradiction_supports = SUPPORTS + [MaterialAttribute.CONTRADICTION]
+    contradiction_supports = SUPPORTS + [ProviderMaterialAttribute.CONTRADICTION]
     provider = ProviderStructuredResponse(facts=[
         candidate(
             "b", second_text,
@@ -137,6 +144,33 @@ def test_unresolved_provider_correction_reference_fails_closed():
             provider,
             incident=Incident(incident_id="CASE", narrative=narrative),
         )
+
+
+def test_resolution_status_is_deterministically_derived_from_correction_references():
+    earlier_text = "Initial report: he intentionally shoved her today."
+    later_text = "Later corrected: the contact was accidental today."
+    narrative = f"{earlier_text} {later_text}"
+    provider = ProviderStructuredResponse(facts=[
+        candidate(
+            "later",
+            later_text,
+            intentionality=Intentionality.ACCIDENTAL,
+            supersedes_local_ref="earlier",
+            evidence=[ProviderFactEvidenceCandidate(
+                excerpt=later_text,
+                supports=SUPPORTS + [ProviderMaterialAttribute.SUPERSESSION],
+            )],
+        ),
+        candidate("earlier", earlier_text),
+    ])
+
+    adapted = semantic_candidate_from_provider_response(
+        provider,
+        incident=Incident(incident_id="CASE", narrative=narrative),
+    )
+
+    assert [fact.resolution_status.value for fact in adapted.facts] == ["superseded", "active"]
+    assert adapted.facts[1].supersedes_fact_id == "FACT-0001"
 
 
 def test_provider_correction_cycle_and_false_offsets_fail_closed():

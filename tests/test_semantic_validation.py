@@ -7,7 +7,7 @@ from src.contracts import (
     FactDirection,
     IncidentDirection,
     Intentionality,
-    MaterialAttribute,
+    ProviderMaterialAttribute,
     ProcessingStatus,
     ProviderFactCandidate,
     ProviderFactEvidenceCandidate,
@@ -24,11 +24,11 @@ from src.semantic_validation import validate_semantic_candidate, validation_not_
 
 
 BASE_SUPPORTS = [
-    MaterialAttribute.CONDUCT,
-    MaterialAttribute.DIRECTION,
-    MaterialAttribute.INTENTIONALITY,
-    MaterialAttribute.TEMPORAL_SCOPE,
-    MaterialAttribute.ASSERTION_STATUS,
+    ProviderMaterialAttribute.CONDUCT,
+    ProviderMaterialAttribute.DIRECTION,
+    ProviderMaterialAttribute.INTENTIONALITY,
+    ProviderMaterialAttribute.TEMPORAL_SCOPE,
+    ProviderMaterialAttribute.ASSERTION_STATUS,
 ]
 
 
@@ -40,7 +40,6 @@ def fact(excerpt, **updates):
         intentionality=Intentionality.INTENTIONAL,
         temporal_scope=TemporalScope.CURRENT,
         assertion_status=AssertionStatus.AFFIRMED,
-        resolution_status=ResolutionStatus.ACTIVE,
         evidence=[ProviderFactEvidenceCandidate(excerpt=excerpt, supports=BASE_SUPPORTS)],
         uncertainty=[],
     )
@@ -221,7 +220,6 @@ def test_supported_correction_requires_later_reference_evidence_and_resolution_s
     earlier = fact(
         "Initial report: he intentionally shoved her today.",
         local_ref="earlier",
-        resolution_status=ResolutionStatus.SUPERSEDED,
     )
     later = fact(
         "Later corrected: the contact was accidental today.",
@@ -230,7 +228,7 @@ def test_supported_correction_requires_later_reference_evidence_and_resolution_s
         supersedes_local_ref="earlier",
         evidence=[ProviderFactEvidenceCandidate(
             excerpt="Later corrected: the contact was accidental today.",
-            supports=BASE_SUPPORTS + [MaterialAttribute.SUPERSESSION],
+            supports=BASE_SUPPORTS + [ProviderMaterialAttribute.SUPERSESSION],
         )],
     )
     envelope = adapt(narrative, [later, earlier])
@@ -246,11 +244,7 @@ def test_correction_can_affirm_property_conduct_while_denying_interpersonal_cont
     earlier_text = "The initial note said the patient struck a nurse."
     later_text = "A later supported correction states the patient intentionally struck a door and did not touch staff."
     narrative = f"{earlier_text} {later_text}"
-    earlier = fact(
-        earlier_text,
-        local_ref="earlier",
-        resolution_status=ResolutionStatus.SUPERSEDED,
-    )
+    earlier = fact(earlier_text, local_ref="earlier")
     later = fact(
         later_text,
         local_ref="later",
@@ -259,7 +253,7 @@ def test_correction_can_affirm_property_conduct_while_denying_interpersonal_cont
         supersedes_local_ref="earlier",
         evidence=[ProviderFactEvidenceCandidate(
             excerpt=later_text,
-            supports=BASE_SUPPORTS + [MaterialAttribute.SUPERSESSION],
+            supports=BASE_SUPPORTS + [ProviderMaterialAttribute.SUPERSESSION],
         )],
     )
     assert validate(adapt(narrative, [earlier, later]), narrative).passed
@@ -292,21 +286,6 @@ def test_explicit_omitted_correction_relationship_fails_closed():
     }
 
 
-def test_ordinary_active_fact_rejects_unsupported_resolution_status_evidence_label():
-    narrative = "The employee intentionally punched the nurse today."
-    labeled = fact(
-        narrative,
-        evidence=[ProviderFactEvidenceCandidate(
-            excerpt=narrative,
-            supports=BASE_SUPPORTS + [MaterialAttribute.RESOLUTION_STATUS],
-        )],
-    )
-    result = validate(adapt(narrative, [labeled]), narrative)
-    assert ValidationIssueCode.INVALID_EVIDENCE_SUPPORT in {
-        issue.code for issue in result.domain_validation.issues
-    }
-
-
 def test_unknown_direction_preserves_supported_qualifying_conduct():
     narrative = "An intentional punch occurred today, but the target is unknown."
     unknown_direction = fact(
@@ -324,7 +303,7 @@ def test_unresolved_contradiction_requires_two_active_disputed_supported_members
     first_text = "Witness A said he intentionally punched the coworker today."
     second_text = "Witness B said he did not intentionally punch the coworker today."
     narrative = f"{first_text} {second_text}"
-    contradiction_supports = BASE_SUPPORTS + [MaterialAttribute.CONTRADICTION]
+    contradiction_supports = BASE_SUPPORTS + [ProviderMaterialAttribute.CONTRADICTION]
     first = fact(
         first_text,
         local_ref="account-a",

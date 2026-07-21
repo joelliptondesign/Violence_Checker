@@ -9,7 +9,7 @@ def test_prompt_requests_only_true_north_operational_facts_and_exact_evidence():
     prompt = SEMANTIC_EXTRACTION_PROMPT.casefold()
     for required in (
         "operational incident facts", "conduct", "direction", "intentionality",
-        "temporal_scope", "assertion_status", "resolution_status", "exact fact-specific evidence",
+        "temporal_scope", "assertion_status", "exact fact-specific evidence",
         "uncertainty", "supersedes_local_ref", "contradiction_group_local_ref",
     ):
         assert required in prompt
@@ -44,7 +44,8 @@ def test_prompt_encodes_fact_level_evidence_and_integrity_adversaries():
     assert "accidental evidence" in prompt
     assert "historical evidence" in prompt
     assert "no-contact evidence" in prompt
-    assert "unresolved materially conflicting active facts" in prompt
+    assert "unresolved materially conflicting facts" in prompt
+    assert "not correction targets" in prompt
 
 
 def test_prompt_limits_facts_and_closes_observed_evidence_and_timing_gaps():
@@ -79,7 +80,7 @@ def test_prompt_enforces_contact_direction_intentionality_and_evidence_boundarie
     assert "property damage is property_violence only when intentionality" in prompt
     assert "property conduct is object_directed" in prompt
     assert "direction unknown must carry direction uncertainty" in prompt
-    assert "do not add resolution_status to ordinary active facts" in prompt
+    assert "resolution status is repository-derived" in prompt
     assert "do not reuse a broad excerpt indiscriminately" in prompt
 
 

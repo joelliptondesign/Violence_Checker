@@ -223,7 +223,7 @@ class RegexResult(BaseModel):
 
 SEMANTIC_SCHEMA_IDENTITY = "violence-checker.true-north-incident-facts"
 SEMANTIC_SCHEMA_VERSION = "1.0.0"
-EXTRACTION_CONTRACT_IDENTITY = "violence-checker.true-north-fact-extraction@1.0.0"
+EXTRACTION_CONTRACT_IDENTITY = "violence-checker.true-north-fact-extraction@2.0.0"
 
 
 class Conduct(str, Enum):
@@ -290,6 +290,18 @@ class UncertaintyDimension(str, Enum):
     INTENTIONALITY = "intentionality"
     TEMPORAL_SCOPE = "temporal_scope"
     ASSERTION_STATUS = "assertion_status"
+
+
+class ProviderMaterialAttribute(str, Enum):
+    """Evidence-support vocabulary limited to provider-authored semantics."""
+
+    CONDUCT = "conduct"
+    DIRECTION = "direction"
+    INTENTIONALITY = "intentionality"
+    TEMPORAL_SCOPE = "temporal_scope"
+    ASSERTION_STATUS = "assertion_status"
+    SUPERSESSION = "supersession"
+    CONTRADICTION = "contradiction"
 
 
 class FactEvidence(BaseModel):
@@ -402,7 +414,7 @@ class ProviderFactEvidenceCandidate(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid")
 
     excerpt: StrictStr
-    supports: list[MaterialAttribute]
+    supports: list[ProviderMaterialAttribute]
     start_offset: Optional[int] = Field(default=None, ge=0)
     end_offset: Optional[int] = Field(default=None, ge=0)
 
@@ -415,7 +427,10 @@ class ProviderFactEvidenceCandidate(BaseModel):
 
     @field_validator("supports")
     @classmethod
-    def require_unique_supports(cls, value: list[MaterialAttribute]) -> list[MaterialAttribute]:
+    def require_unique_supports(
+        cls,
+        value: list[ProviderMaterialAttribute],
+    ) -> list[ProviderMaterialAttribute]:
         if not value or len(value) != len(set(value)):
             raise ValueError("evidence supports must be non-empty and unique")
         return value
@@ -438,7 +453,6 @@ class ProviderFactCandidate(BaseModel):
     intentionality: Intentionality
     temporal_scope: TemporalScope
     assertion_status: AssertionStatus
-    resolution_status: ResolutionStatus
     evidence: list[ProviderFactEvidenceCandidate]
     uncertainty: list[UncertaintyDimension]
     supersedes_local_ref: Optional[StrictStr] = None

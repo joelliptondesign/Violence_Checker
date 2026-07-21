@@ -28,7 +28,6 @@ For each separately supportable fact, provide:
 - intentionality: intentional, accidental, or unresolved;
 - temporal_scope: current, historical, or unresolved;
 - assertion_status: affirmed, denied, disputed, or unresolved;
-- resolution_status: active or superseded;
 - exact fact-specific evidence excerpts with the material attributes each excerpt
   supports;
 - every explicit material uncertainty; and
@@ -53,17 +52,15 @@ Evidence rules:
   subject-oriented support graph and do not treat the full narrative as blanket
   support for multiple facts.
 - Each evidence supports list may contain only conduct, direction,
-  intentionality, temporal_scope, assertion_status, resolution_status,
-  supersession, or contradiction.
+  intentionality, temporal_scope, assertion_status, supersession, or contradiction.
 - Together a fact's evidence must support conduct when resolved, every settled
   policy-relevant attribute, every attribute marked unresolved or uncertain, and every
   explicit correction or contradiction link. When conduct is null or direction,
   intentionality, temporal scope, or assertion state is unresolved, include the
   corresponding attribute in evidence supports.
 - Evidence labels must identify only attributes established by that exact excerpt.
-  Do not add resolution_status to ordinary active facts. Use resolution_status
-  evidence only when the excerpt itself establishes correction or supersession; use
-  supersession for the controlling later correction link.
+  Use supersession only when the excerpt establishes the controlling later correction
+  link. Resolution status is repository-derived and is not an evidence-support label.
 - Do not produce unsupported semantic facts or inferred outcomes. Do not infer
   intentionality solely from contact, injury, force, agitation, severity, or property
   damage; current scope from document placement; physical contact from an attempt,
@@ -100,16 +97,16 @@ Fact integrity rules:
   matching uncertainty dimension. Direction unknown must carry direction
   uncertainty. Do not add uncertainty for an attribute that the narrative settles.
 - Preserve a supported correction as a later fact that references the earlier
-  fact through supersedes_local_ref. Keep the earlier fact as superseded and the
-  controlling later fact as active. Include supersession evidence on the later
-  fact.
+  fact through supersedes_local_ref. Include supersession evidence on the later
+  fact. The repository derives active and superseded status from the reference.
 - A later denial or affirmation that explicitly updates an earlier allegation is a
   correction, not an unrelated fact. Do not omit the earlier fact, leave it active,
   or omit supersedes_local_ref. If the narrative explicitly says a correction or
   correction relationship exists but does not provide enough information to form a
   valid reference, do not invent the missing fact or link; the candidate must fail
   closed at validation.
-- Use a shared contradiction_group_local_ref only for unresolved materially conflicting active facts.
+- Use a shared contradiction_group_local_ref only for unresolved materially conflicting facts
+  that are not correction targets.
   Mark every member disputed, include the disputed
   uncertainty dimension, and include contradiction evidence for every member.
 - Do not settle a denial, correction, or conflicting account unless the narrative

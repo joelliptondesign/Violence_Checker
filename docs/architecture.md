@@ -31,18 +31,19 @@ The provider response contains only candidate facts, exact evidence excerpts, at
 
 - incident, schema, extraction-contract, fact, evidence, or contradiction-group identity;
 - canonical ordering;
+- active or superseded resolution status;
 - processing or completeness status;
 - policy results or reasons;
 - recommendations, inferred outcomes, or negative conclusions; or
 - compatibility, communication, presentation, entity, proposition, relationship, or graph payloads.
 
-`provider_adapter.py` terminates the provider object. It rejects extra provider-authored bookkeeping, validates temporary reference resolution, assigns repository incident/schema/extraction identity, creates deterministic `FACT-`, `EVID-`, and `CGRP-` identifiers, canonicalizes collections and narrow references, and records exact offsets only when an excerpt occurrence is unambiguous or provider offsets identify it exactly.
+`provider_adapter.py` terminates the provider object. It rejects extra provider-authored bookkeeping, validates temporary reference resolution, assigns repository incident/schema/extraction identity, creates deterministic `FACT-`, `EVID-`, and `CGRP-` identifiers, canonicalizes collections and narrow references, derives active/superseded status solely from correction references, and records exact offsets only when an excerpt occurrence is unambiguous or provider offsets identify it exactly.
 
 ## Evidence integrity
 
 Evidence is fact-oriented. Every evidence record belongs to one fact, preserves an exact non-empty narrative excerpt, has repository-owned identity, may carry exact offsets, and names the material attributes it supports. There is no subject-oriented evidence graph.
 
-Schema validation enforces strict shape, exact identities and versions, bounded enumerations, canonical identifiers and ordering, and reference integrity. Domain validation enforces exact containment and offsets, material-attribute coverage, uncertainty correspondence, doctrinal combinations, denial/accident/historical/no-contact safeguards, correction order and acyclicity, explicit correction-marker linkage, contradiction-group integrity, and rejection of unsupported resolution-status evidence on ordinary active facts. Denied propositions may retain their explicitly supported conduct attributes without becoming affirmed facts.
+Schema validation enforces strict shape, exact identities and versions, bounded enumerations, canonical identifiers and ordering, and reference integrity. Domain validation enforces exact containment and offsets, material-attribute coverage, uncertainty correspondence, doctrinal combinations, denial/accident/historical/no-contact safeguards, correction order and acyclicity, explicit correction-marker linkage, and contradiction-group integrity. Denied propositions may retain their explicitly supported conduct attributes without becoming affirmed facts.
 
 Validation is deterministic and fail-closed. It does not repair candidates, apply silent semantic defaults, or attempt unrestricted natural-language entailment.
 

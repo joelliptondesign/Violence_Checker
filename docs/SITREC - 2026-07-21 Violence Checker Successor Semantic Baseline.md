@@ -17,8 +17,8 @@ Current repository facts: `TrueNorthSemanticEnvelope` is the sole current semant
 
 - Raw free-form narrative is the evidence authority; normalization is formatting-only.
 - Exactly one semantic extraction request is permitted per valid explicit analysis or selected live evaluation case; non-analysis interactions and invalid input issue zero provider requests.
-- Provider authority is limited to semantic candidates with temporary local references; provider SDK objects terminate at the adapter boundary.
-- Repository code owns identity, canonical ordering and references, processing and completeness status, validation, derivation, deterministic policy, and downstream representation.
+- Provider authority is limited to semantic propositions, exact supporting evidence, uncertainty, and temporary local references; provider SDK objects terminate at the adapter boundary.
+- Repository code owns identity, canonical ordering and references, derived resolution status, processing and completeness status, validation, derivation, deterministic policy, and downstream representation.
 - Schema and domain validation fail closed before policy.
 - Evaluation compares only deterministic outcomes, operational facts, supported evidence, processing/completeness status, and doctrine compliance.
 - Operator Communication is presentation-only and cannot change repository authority.
@@ -35,8 +35,8 @@ Current repository facts: `TrueNorthSemanticEnvelope` is the sole current semant
 | --- | --- |
 | True North operational corpus | Doctrine-authored deterministic evaluation expectations |
 | Raw narrative | Free-form evidence and excerpt-containment authority |
-| Provider | Bounded candidate operational facts with temporary references only |
-| Contract adapter | Provider termination and repository-owned identity/order/reference mapping |
+| Provider | Bounded semantic propositions, exact supporting evidence, uncertainty, and temporary references only |
+| Contract adapter | Provider termination and repository-owned identity/order/reference mapping and resolution status |
 | Schema/domain validators | Admissibility and fail-closed rejection |
 | Semantic derivation | Active/superseded sets, contradiction membership, and incident direction |
 | Deterministic policy | Sole authority for the four doctrinal outcomes |
@@ -48,7 +48,7 @@ Current repository facts: `TrueNorthSemanticEnvelope` is the sole current semant
 
 ## F. DATA / CONTRACT MODEL
 
-Semantic schema `violence-checker.true-north-incident-facts` version `1.0.0` defines one ordered operational fact collection with conduct, atomic direction, intentionality, temporal scope, assertion and resolution status, explicit uncertainty, fact-local evidence, and narrow correction or contradiction references. `PipelineResult` carries validation status, deterministic views, the four-outcome policy result, and optional illustrative Salesforce payload. Evaluation schema `3.0.0` compares only operational doctrine truth and has no proposition, entity, relationship, PolicyCandidateView, or retired pipeline-failure dependency. Recognized creation-time artifacts use schema `1.0.0` and remain readable but incomparable and non-authoritative.
+Semantic schema `violence-checker.true-north-incident-facts` version `1.0.0` defines one ordered operational fact collection with conduct, atomic direction, intentionality, temporal scope, assertion status, repository-derived resolution status, explicit uncertainty, fact-local evidence, and narrow correction or contradiction references. `PipelineResult` carries validation status, deterministic views, the four-outcome policy result, and optional illustrative Salesforce payload. Evaluation schema `3.0.0` compares only operational doctrine truth and has no proposition, entity, relationship, PolicyCandidateView, or retired pipeline-failure dependency. Recognized creation-time artifacts use schema `1.0.0` and remain readable but incomparable and non-authoritative.
 
 ## G. SYSTEM BOUNDARIES
 
@@ -68,7 +68,7 @@ Analysis begins only after explicit `Run Analysis`; invalid input and non-analys
 
 ## K. GUARANTEES
 
-Strict contracts reject malformed or inadmissible semantics before policy. Denied propositions may preserve specifically supported conduct attributes without becoming affirmed; explicit correction markers require correction links; and ordinary active facts cannot claim unsupported resolution-status evidence. Provider metadata cannot override deterministic repository bookkeeping. Policy is total over admissible states. Operator Communication cannot alter validation, policy, comparison, Salesforce eligibility, or Salesforce payload content, and deterministic fallback remains available when communication generation fails. Collections and serialized current artifacts have canonical ordering. Successor baseline acceptance rejects legacy runs. Existing governed artifact paths are protected from implicit overwrite. Repository generation is deterministic for the same operational date and repository state.
+Strict contracts reject malformed or inadmissible semantics before policy. Denied propositions may preserve specifically supported conduct attributes without becoming affirmed; explicit correction markers require correction links; and resolution status is derived deterministically from those links. Provider metadata cannot override deterministic repository bookkeeping. Policy is total over admissible states. Operator Communication cannot alter validation, policy, comparison, Salesforce eligibility, or Salesforce payload content, and deterministic fallback remains available when communication generation fails. Collections and serialized current artifacts have canonical ordering. Successor baseline acceptance rejects legacy runs. Existing governed artifact paths are protected from implicit overwrite. Repository generation is deterministic for the same operational date and repository state.
 
 ## L. NON-GUARANTEES
 

@@ -6,11 +6,10 @@ from src.contracts import (
     Conduct,
     FactDirection,
     Intentionality,
-    MaterialAttribute,
+    ProviderMaterialAttribute,
     ProviderFactCandidate,
     ProviderFactEvidenceCandidate,
     ProviderStructuredResponse,
-    ResolutionStatus,
     TemporalScope,
     TrueNorthSemanticEnvelope,
 )
@@ -41,10 +40,9 @@ def provider_response(narrative="Patient intentionally struck the nurse today.")
         intentionality=Intentionality.INTENTIONAL,
         temporal_scope=TemporalScope.CURRENT,
         assertion_status=AssertionStatus.AFFIRMED,
-        resolution_status=ResolutionStatus.ACTIVE,
         evidence=[ProviderFactEvidenceCandidate(
             excerpt=narrative,
-            supports=list(MaterialAttribute)[:5],
+            supports=list(ProviderMaterialAttribute)[:5],
         )],
         uncertainty=[],
     )])

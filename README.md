@@ -35,7 +35,7 @@ The [Operator Communication Tone Guidelines](docs/operator_communication_tone_gu
 
 ## Completed recovery baseline
 
-The provider returns semantic candidate content with temporary local references only. Repository code assigns incident identity, semantic and extraction contract identity, canonical identifiers and ordering, and final reference remapping before strict schema and domain validation. Provider metadata cannot override those deterministic values.
+The provider returns semantic propositions, exact supporting evidence, uncertainty, and temporary local references only. Repository code assigns incident identity, semantic and extraction contract identity, canonical identifiers and ordering, final reference remapping, and active/superseded resolution status before strict schema and domain validation. Provider metadata cannot override those deterministic values.
 
 The current stakeholder workflow has been verified across all eight synthetic fixtures. CASE_003 completes as a historical disclosure with no active current interpersonal violence. Representative free-form manual narratives, including supported violence, non-violence, and bounded ambiguity, traverse the same one-request semantic pipeline; narrative wording remains user-authored and unrestricted except for deterministic input-boundary limits. Invalid input and non-analysis interactions make zero provider requests.
 

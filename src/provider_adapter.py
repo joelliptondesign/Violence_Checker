@@ -10,8 +10,10 @@ from src.contracts import (
     SEMANTIC_SCHEMA_VERSION,
     FactEvidence,
     IncidentFact,
+    MaterialAttribute,
     ProviderFactCandidate,
     ProviderStructuredResponse,
+    ResolutionStatus,
     TrueNorthSemanticEnvelope,
 )
 from src.models import Incident
@@ -31,7 +33,6 @@ def _fact_key(fact: ProviderFactCandidate, narrative: str) -> tuple:
         fact.conduct.value if fact.conduct is not None else "",
         fact.direction.value,
         fact.intentionality.value,
-        fact.resolution_status.value,
         tuple(sorted(item.excerpt for item in fact.evidence)),
         tuple(item.value for item in sorted(fact.uncertainty, key=_enum_rank)),
         fact.local_ref,
@@ -94,6 +95,11 @@ def semantic_candidate_from_provider_response(
     provider = ProviderStructuredResponse.model_validate(response)
     ordered = _canonical_facts(provider, incident.narrative)
     fact_ids = {fact.local_ref: f"FACT-{index:04d}" for index, fact in enumerate(ordered, 1)}
+    superseded_local_refs = {
+        fact.supersedes_local_ref
+        for fact in ordered
+        if fact.supersedes_local_ref is not None
+    }
 
     group_members: dict[str, list[int]] = defaultdict(list)
     for index, fact in enumerate(ordered):
@@ -129,7 +135,10 @@ def semantic_candidate_from_provider_response(
                 FactEvidence(
                     evidence_id=f"EVID-{evidence_counter:04d}",
                     excerpt=item.excerpt,
-                    supports=sorted(item.supports, key=_enum_rank),
+                    supports=[
+                        MaterialAttribute(value.value)
+                        for value in sorted(item.supports, key=_enum_rank)
+                    ],
                     start_offset=start,
                     end_offset=end,
                 )
@@ -143,7 +152,11 @@ def semantic_candidate_from_provider_response(
                 intentionality=fact.intentionality,
                 temporal_scope=fact.temporal_scope,
                 assertion_status=fact.assertion_status,
-                resolution_status=fact.resolution_status,
+                resolution_status=(
+                    ResolutionStatus.SUPERSEDED
+                    if fact.local_ref in superseded_local_refs
+                    else ResolutionStatus.ACTIVE
+                ),
                 supersedes_fact_id=(
                     fact_ids[fact.supersedes_local_ref]
                     if fact.supersedes_local_ref is not None

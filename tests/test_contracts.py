@@ -9,8 +9,8 @@ from src.contracts import (
     MaterialAttribute,
     ProviderFactCandidate,
     ProviderFactEvidenceCandidate,
+    ProviderMaterialAttribute,
     ProviderStructuredResponse,
-    ResolutionStatus,
     TemporalScope,
     TrueNorthSemanticEnvelope,
     UncertaintyDimension,
@@ -25,15 +25,14 @@ def provider_fact(**updates):
         "intentionality": Intentionality.INTENTIONAL,
         "temporal_scope": TemporalScope.CURRENT,
         "assertion_status": AssertionStatus.AFFIRMED,
-        "resolution_status": ResolutionStatus.ACTIVE,
         "evidence": [ProviderFactEvidenceCandidate(
             excerpt="He intentionally punched a coworker today.",
             supports=[
-                MaterialAttribute.CONDUCT,
-                MaterialAttribute.DIRECTION,
-                MaterialAttribute.INTENTIONALITY,
-                MaterialAttribute.TEMPORAL_SCOPE,
-                MaterialAttribute.ASSERTION_STATUS,
+                ProviderMaterialAttribute.CONDUCT,
+                ProviderMaterialAttribute.DIRECTION,
+                ProviderMaterialAttribute.INTENTIONALITY,
+                ProviderMaterialAttribute.TEMPORAL_SCOPE,
+                ProviderMaterialAttribute.ASSERTION_STATUS,
             ],
         )],
         "uncertainty": [],
@@ -51,6 +50,8 @@ def test_true_north_vocabularies_are_exact_and_atomic_direction_excludes_multipl
     }
     assert {item.value for item in Intentionality} == {"intentional", "accidental", "unresolved"}
     assert {item.value for item in AssertionStatus} == {"affirmed", "denied", "disputed", "unresolved"}
+    assert "resolution_status" in {item.value for item in MaterialAttribute}
+    assert "resolution_status" not in {item.value for item in ProviderMaterialAttribute}
 
 
 def test_provider_contract_contains_only_operational_fact_candidates():
@@ -58,13 +59,13 @@ def test_provider_contract_contains_only_operational_fact_candidates():
     fields = set(ProviderFactCandidate.model_fields)
     assert fields == {
         "local_ref", "conduct", "direction", "intentionality", "temporal_scope",
-        "assertion_status", "resolution_status", "evidence", "uncertainty",
+        "assertion_status", "evidence", "uncertainty",
         "supersedes_local_ref", "contradiction_group_local_ref",
     }
     forbidden = {
         "incident_id", "schema_identity", "schema_version", "fact_id", "evidence_id",
         "policy_outcome", "policy_reason", "processing_status", "completeness_status",
-        "entities", "propositions", "relationships",
+        "resolution_status", "entities", "propositions", "relationships",
     }
     assert fields.isdisjoint(forbidden)
 
@@ -84,12 +85,12 @@ def test_fact_evidence_is_fact_local_exact_text_with_attribute_supports():
     evidence_fields = set(ProviderFactEvidenceCandidate.model_fields)
     assert evidence_fields == {"excerpt", "supports", "start_offset", "end_offset"}
     with pytest.raises(ValidationError, match="must not be empty"):
-        ProviderFactEvidenceCandidate(excerpt="  ", supports=[MaterialAttribute.CONDUCT])
+        ProviderFactEvidenceCandidate(excerpt="  ", supports=[ProviderMaterialAttribute.CONDUCT])
     with pytest.raises(ValidationError, match="non-empty and unique"):
         ProviderFactEvidenceCandidate(excerpt="text", supports=[])
     with pytest.raises(ValidationError, match="supplied together"):
         ProviderFactEvidenceCandidate(
-            excerpt="text", supports=[MaterialAttribute.CONDUCT], start_offset=0,
+            excerpt="text", supports=[ProviderMaterialAttribute.CONDUCT], start_offset=0,
         )
 
 
