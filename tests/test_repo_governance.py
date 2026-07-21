@@ -85,9 +85,16 @@ def test_sitrec_validation_accepts_current_active_sitrec() -> None:
 def test_operator_communication_authority_covers_required_surfaces_and_examples() -> None:
     text = COMMUNICATION_AUTHORITY.read_text(encoding="utf-8")
 
+    assert "The purpose of operator communication is to help a hospital operator understand what happened." in text
+    assert "The purpose is not to explain how the software reached its conclusion." in text
     assert "The UI does not expose repository fields one-for-one." in text
     assert "The UI answers operator questions." in text
+    assert "## Incident-first principle" in text
+    assert "## Classification separation" in text
+    assert "If the Incident Summary is not noticeably easier to understand than the original narrative" in text
+    assert "## Acceptance checklist" in text
     for surface in (
+        "Outcome subtitle",
         "Incident Summary",
         "Key Findings",
         "Why This Result",
@@ -100,14 +107,14 @@ def test_operator_communication_authority_covers_required_surfaces_and_examples(
         assert surface in text
     for example in (
         "Intentional interpersonal assault",
-        "Verbal threat",
+        "Explicit physical threat",
         "Self-harm",
         "Intentional property violence",
         "Accidental contact",
         "Historical-only conduct",
         "Corrected allegation",
         "Unresolved contradiction",
-        "Unable to determine",
+        "Insufficient information",
     ):
         assert f"### {example}" in text
 
