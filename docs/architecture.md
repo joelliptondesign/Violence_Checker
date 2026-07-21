@@ -43,7 +43,7 @@ The provider response contains only candidate facts, exact evidence excerpts, at
 
 Evidence is fact-oriented. Every evidence record belongs to one fact, preserves an exact non-empty narrative excerpt, has repository-owned identity, may carry exact offsets, and names the material attributes it supports. There is no subject-oriented evidence graph.
 
-Schema validation enforces strict shape, exact identities and versions, bounded enumerations, canonical identifiers and ordering, and reference integrity. Domain validation enforces exact containment and offsets, material-attribute coverage, uncertainty correspondence, doctrinal combinations, denial/accident/historical/no-contact safeguards, correction order and acyclicity, explicit correction-marker linkage, and contradiction-group integrity. Denied propositions may retain their explicitly supported conduct attributes without becoming affirmed facts.
+Schema validation enforces strict shape, exact identities and versions, bounded enumerations, canonical identifiers and ordering, and reference integrity. Domain validation enforces exact containment and offsets, material-attribute coverage, uncertainty correspondence, doctrinal combinations, denial/accident/historical/no-contact safeguards, explicit historical and unresolved temporal evidence, correction order and acyclicity, explicit correction-marker linkage, and contradiction-group integrity. Denied propositions may retain their explicitly supported conduct attributes without becoming affirmed facts.
 
 Validation is deterministic and fail-closed. It does not repair candidates, apply silent semantic defaults, or attempt unrestricted natural-language entailment.
 

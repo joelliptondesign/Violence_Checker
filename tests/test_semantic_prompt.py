@@ -54,7 +54,9 @@ def test_prompt_limits_facts_and_closes_observed_evidence_and_timing_gaps():
     assert "do not emit separate facts solely for emotion" in prompt
     assert "every attribute marked unresolved or uncertain" in prompt
     assert "volitional action phrasing" in prompt
-    assert "never convert missing timing into historical" in prompt
+    assert "reported incident as the default temporal context" in prompt
+    assert "lack of explicit words such as \"today,\" \"current,\" or" in prompt
+    assert "never convert missing timing into historical or unresolved scope" in prompt
     assert "do not duplicate a fact" in prompt
 
 

@@ -75,6 +75,48 @@ def _contains_correction_marker(text: str) -> bool:
     ))
 
 
+def _contains_historical_temporal_evidence(text: str) -> bool:
+    return bool(re.search(
+        r"\b(?:"
+        r"historical|history\s+of|previously|previous\s+(?:admission|visit|encounter)|"
+        r"prior\s+(?:incident|event|admission|visit|encounter)|"
+        r"last\s+(?:night|week|month|year)|"
+        r"earlier\s+this\s+(?:week|month|year)|"
+        r"\d+\s+(?:days?|weeks?|months?|years?|yrs?)\s+ago|"
+        r"years?\s+ago|yrs?\s+ago"
+        r")\b",
+        text,
+    ))
+
+
+def _contains_unresolved_temporal_evidence(text: str) -> bool:
+    return bool(re.search(
+        r"\b(?:"
+        r"unclear\s+whether\b.{0,120}\b(?:current|this\s+incident|during\s+the\s+current\s+event)|"
+        r"(?:timing|timeframe|temporal\s+scope)\s+(?:is\s+)?(?:unclear|unknown|unresolved|not\s+recorded)|"
+        r"conflicting\s+timing\s+accounts?|"
+        r"copied[- ]forward\s+documentation\b.{0,120}\b(?:unresolved|unclear|unknown)\s+timing|"
+        r"current\s+incident\s+fact\b.{0,120}\bunresolved|"
+        r"insufficient\s+information\b.{0,120}\b(?:current|this\s+incident|during\s+the\s+current\s+event)|"
+        r"may\s+have\s+happened\b.{0,120}\binsufficient\s+information"
+        r")",
+        text,
+    ))
+
+
+def _contains_current_blocking_temporal_ambiguity(text: str) -> bool:
+    return bool(re.search(
+        r"\b(?:"
+        r"unclear\s+whether\b.{0,120}\b(?:current|this\s+incident|during\s+the\s+current\s+event)|"
+        r"(?:timing|timeframe|temporal\s+scope)\s+(?:is\s+)?(?:unclear|unknown|unresolved|not\s+recorded)|"
+        r"conflicting\s+timing\s+accounts?|"
+        r"copied[- ]forward\s+documentation\b.{0,120}\b(?:unresolved|unclear|unknown)\s+timing|"
+        r"insufficient\s+information\b.{0,120}\b(?:current|this\s+incident|during\s+the\s+current\s+event)"
+        r")",
+        text,
+    ))
+
+
 def validate_semantic_domain(
     envelope: TrueNorthSemanticEnvelope,
     *,
@@ -142,8 +184,15 @@ def validate_semantic_domain(
         if fact.intentionality == Intentionality.INTENTIONAL and re.search(r"\b(accident|accidental|accidentally|unintentional)\b", intentionality_text):
             issues.append(_issue(ValidationIssueCode.INVALID_EVIDENCE_SUPPORT, f"{field}.intentionality", "Accidental evidence cannot support intentional conduct."))
         temporal_text = _support_text(fact, MaterialAttribute.TEMPORAL_SCOPE)
-        if fact.temporal_scope == TemporalScope.CURRENT and re.search(r"\b(historical|previously|prior|last year|years? ago|yrs? ago)\b", temporal_text):
-            issues.append(_issue(ValidationIssueCode.INVALID_EVIDENCE_SUPPORT, f"{field}.temporal_scope", "Historical-only evidence cannot support current scope."))
+        if fact.temporal_scope == TemporalScope.CURRENT and (
+            _contains_historical_temporal_evidence(temporal_text)
+            or _contains_current_blocking_temporal_ambiguity(temporal_text)
+        ):
+            issues.append(_issue(ValidationIssueCode.INVALID_EVIDENCE_SUPPORT, f"{field}.temporal_scope", "Historical or materially ambiguous timing evidence cannot support current scope."))
+        if fact.temporal_scope == TemporalScope.HISTORICAL and not _contains_historical_temporal_evidence(temporal_text):
+            issues.append(_issue(ValidationIssueCode.INVALID_EVIDENCE_SUPPORT, f"{field}.temporal_scope", "Historical scope requires explicit historical timing evidence."))
+        if fact.temporal_scope == TemporalScope.UNRESOLVED and not _contains_unresolved_temporal_evidence(temporal_text):
+            issues.append(_issue(ValidationIssueCode.INVALID_EVIDENCE_SUPPORT, f"{field}.temporal_scope", "Unresolved temporal scope requires explicit materially ambiguous timing evidence."))
         conduct_text = _support_text(fact, MaterialAttribute.CONDUCT)
         if (
             fact.conduct == Conduct.PHYSICAL_CONTACT

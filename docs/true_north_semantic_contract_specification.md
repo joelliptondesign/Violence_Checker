@@ -66,7 +66,7 @@ The surrounding repository pipeline records `processing_status` (`admissible` or
 | `conduct` | The doctrinal qualifying-conduct distinction asserted by this fact | Candidate value or `null` only for explicit unresolved distinction | Validate or reject; never upgrade | Direct support for the exact conduct distinction, or support for potentially qualifying unresolved conduct | None | Required to test qualification | May be stated only when projected | Required; nullable only with `uncertainty: [conduct]` |
 | `direction` | Direction of this conduct fact | Candidate value when evidenced; `unknown` otherwise | Validate evidence and derive incident aggregate | Required when explicitly stated; `unknown` needs no invented target | `incident_direction` derives from active facts | Unknown alone does not change detection | May be stated only when projected | Required |
 | `intentionality` | Whether conduct was intentional, accidental, or unresolved | Candidate value | Validate or reject | Required because intent is material | No presumption from contact or severity | Only `intentional` can qualify; unresolved may yield `Uncertain` | May be stated only when projected | Required |
-| `temporal_scope` | Whether conduct belongs to the current incident | Candidate value | Validate or reject | Required for `current` or `historical` | No inference from document placement alone | Only `current` can qualify; unresolved may yield `Uncertain` | May distinguish historical from current | Required |
+| `temporal_scope` | Whether conduct belongs to the reported incident | Candidate value | Validate or reject | Required for `current`, `historical`, or `unresolved` | Reported-incident narration is current unless explicit historical timing or material timing ambiguity exists | Only `current` can qualify; unresolved may yield `Uncertain` | May distinguish historical from current | Required |
 | `assertion_status` | Whether the conduct claim is affirmed, denied, disputed, or unresolved | Candidate value | Validate conflicts and correction state | Required for the asserted state | May become `disputed` only from explicit unresolved contradictory evidence | Only active `affirmed` facts can qualify | May explain denial/dispute without resolving it | Required |
 | `resolution_status` | Whether the fact controls now or has been superseded | None | Repository derives the value from validated candidate correction references | Supersession requires correction evidence on the later fact | A referenced earlier fact becomes `superseded`; otherwise `active` | Policy reads active facts only | May explain a supported correction | Required in repository envelope; absent from provider response |
 | `evidence` | Exact excerpts and the material attributes each excerpt supports | Candidate excerpts and links | Verify containment, specificity, consistency, and coverage | At least one link; together links cover every material asserted attribute | IDs/order may be assigned; meaning may not be invented | Establishes admissibility | Not passed through unless explicitly needed and safely bounded | Required, non-empty |
@@ -114,6 +114,8 @@ Fact identity and the two narrow references are structural aids, not independent
 - `historical`
 - `unresolved`
 
+A fact narrated as part of the reported incident is `current` unless the narrative explicitly establishes historical timing or material temporal ambiguity. Lack of explicit words such as "today," "current," or "this incident" does not create unresolved temporal scope. `historical` requires explicit evidence that the conduct occurred outside the reported incident, such as a previous admission, prior incident, history of assault, previously struck staff, earlier this year, or a last-month/last-year reference. `unresolved` requires evidence that timing itself is materially unclear, such as conflicting timing accounts, copied-forward documentation with unresolved timing, or insufficient information to determine whether the conduct belongs to the reported event.
+
 ### `assertion_status`
 
 - `affirmed`
@@ -142,7 +144,9 @@ Validation must reject at least these combinations:
 - `physical_attempt` supported only by completed-contact evidence without evidence of an attempt distinction.
 - Any affirmed fact whose evidence explicitly denies the fact, unless the same linked evidence contains a later supported correction that affirms it.
 - `intentional` supported by evidence that describes the conduct as accidental.
-- `current` supported only by evidence that describes the conduct as historical.
+- `current` supported only by evidence that describes the conduct as historical or materially ambiguous in timing.
+- `historical` without explicit historical timing evidence.
+- `unresolved` temporal scope without explicit materially ambiguous timing evidence.
 - `active` on a fact that is the validated target of a later active superseding correction.
 - `superseded` without a valid later `supersedes_fact_id` reference and correction evidence.
 - `disputed` without a contradiction group or other explicit conflict evidence.

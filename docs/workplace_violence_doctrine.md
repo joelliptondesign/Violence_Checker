@@ -89,6 +89,12 @@ Temporal scope uses `current`, `historical`, or `unresolved`.
 
 Only current-incident conduct can produce `Violence Detected`. Historical conduct mentioned in a current nonviolent event does not qualify as current violence. If current-versus-historical scope is material and unresolved, the outcome is `Uncertain`.
 
+A fact narrated as part of the reported incident is `current` unless the narrative explicitly establishes that the fact is historical or the timing is materially ambiguous. Ordinary incident narratives do not require words such as "today," "current," or "this incident" to establish current scope.
+
+Use `historical` only when the narrative explicitly places the conduct outside the reported incident, such as "last month," "previous admission," "history of assault," "previously struck staff," "earlier this year," or "prior incident."
+
+Use `unresolved` only when timing itself is materially unclear, such as conflicting timing accounts, copied-forward documentation with unresolved timing, or insufficient information to determine whether the conduct belongs to the reported event. Missing explicit temporal words alone do not create unresolved temporal scope.
+
 ## Assertion and Resolution
 
 Assertion status uses `affirmed`, `denied`, `disputed`, or `unresolved`. Resolution status uses `active` or `superseded`.

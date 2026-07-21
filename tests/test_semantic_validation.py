@@ -181,6 +181,70 @@ def test_explicit_denial_accident_historical_and_no_contact_adversaries_fail(nar
     assert ValidationIssueCode.INVALID_EVIDENCE_SUPPORT in {issue.code for issue in result.domain_validation.issues}
 
 
+@pytest.mark.parametrize("narrative,updates", [
+    ("Patient struck nurse.", {}),
+    ("Visitor punched window.", {
+        "conduct": Conduct.PROPERTY_VIOLENCE,
+        "direction": FactDirection.OBJECT_DIRECTED,
+    }),
+    ("Patient threatened staff.", {"conduct": Conduct.VERBAL_THREAT}),
+    ("Patient hit own head.", {
+        "conduct": Conduct.SELF_HARM,
+        "direction": FactDirection.SELF_DIRECTED,
+    }),
+    ("Patient hit nurse with a closed fist.", {}),
+])
+def test_reported_incident_facts_are_current_without_explicit_temporal_words(narrative, updates):
+    result = validate(adapt(narrative, [fact(narrative, **updates)]), narrative)
+    assert result.passed
+    assert result.validated_envelope.facts[0].temporal_scope == TemporalScope.CURRENT
+
+
+@pytest.mark.parametrize("narrative", [
+    "Last month the patient struck a nurse.",
+    "During a previous admission the patient punched staff.",
+    "The note documents a history of assault against staff.",
+    "The patient previously struck staff.",
+    "Earlier this year the visitor punched a window.",
+    "A prior incident involved the patient hitting own head.",
+])
+def test_explicit_historical_temporal_evidence_supports_historical_scope(narrative):
+    result = validate(adapt(narrative, [fact(narrative, temporal_scope=TemporalScope.HISTORICAL)]), narrative)
+    assert result.passed
+    assert result.validated_envelope.facts[0].temporal_scope == TemporalScope.HISTORICAL
+
+
+def test_copied_forward_historical_language_supports_historical_scope():
+    narrative = "Copied-forward note states the patient previously struck staff."
+    result = validate(adapt(narrative, [fact(narrative, temporal_scope=TemporalScope.HISTORICAL)]), narrative)
+    assert result.passed
+    assert result.validated_envelope.facts[0].temporal_scope == TemporalScope.HISTORICAL
+
+
+def test_materially_ambiguous_timing_supports_unresolved_scope():
+    narrative = "It is unclear whether the patient struck staff during the current event."
+    unresolved = fact(
+        narrative,
+        temporal_scope=TemporalScope.UNRESOLVED,
+        uncertainty=[UncertaintyDimension.TEMPORAL_SCOPE],
+    )
+    result = validate(adapt(narrative, [unresolved]), narrative)
+    assert result.passed
+    assert result.validated_envelope.facts[0].temporal_scope == TemporalScope.UNRESOLVED
+
+
+@pytest.mark.parametrize("temporal_scope,uncertainty", [
+    (TemporalScope.HISTORICAL, []),
+    (TemporalScope.UNRESOLVED, [UncertaintyDimension.TEMPORAL_SCOPE]),
+])
+def test_ordinary_reported_incident_text_cannot_support_noncurrent_temporal_scope(temporal_scope, uncertainty):
+    narrative = "Patient struck nurse."
+    candidate = fact(narrative, temporal_scope=temporal_scope, uncertainty=uncertainty)
+    result = validate(adapt(narrative, [candidate]), narrative)
+    assert result.failure_stage == ValidationFailureStage.DOMAIN
+    assert ValidationIssueCode.INVALID_EVIDENCE_SUPPORT in {issue.code for issue in result.domain_validation.issues}
+
+
 def test_unresolved_values_require_matching_uncertainty_and_support():
     narrative = "Possible contact occurred today, but intent is unresolved."
     unresolved = fact(

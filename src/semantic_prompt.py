@@ -63,8 +63,11 @@ Evidence rules:
   link. Resolution status is repository-derived and is not an evidence-support label.
 - Do not produce unsupported semantic facts or inferred outcomes. Do not infer
   intentionality solely from contact, injury, force, agitation, severity, or property
-  damage; current scope from document placement; physical contact from an attempt,
+  damage; physical contact from an attempt,
   threat, or missed action; or interpersonal direction from object-directed evidence.
+  Treat the reported incident as the default temporal context: a fact narrated as
+  part of the reported incident is current unless the narrative explicitly
+  establishes historical timing or materially ambiguous timing.
   Unambiguously volitional action phrasing such as "swung at," "punched," "kicked,"
   or "hit with a closed fist" may support the intentionality of the proposition unless
   the action itself is qualified as accidental, hypothetical, or otherwise unresolved.
@@ -72,9 +75,17 @@ Evidence rules:
   direction, conventional action intentionality, and timing when supported, while
   assertion_status alone records that the proposition is denied or disputed. A denial
   must never become an affirmed fact.
+- Use current when the narrative describes the reported event, actions occur as
+  part of the incident narrative, and no explicit historical language or material
+  timing ambiguity exists. Lack of explicit words such as "today," "current," or
+  "this incident" does not create unresolved temporal scope.
 - Use historical only when the narrative explicitly places the fact before the
-  current incident. When timing is material but unavailable, use unresolved temporal
-  scope with temporal_scope uncertainty; never convert missing timing into historical.
+  reported incident, such as last month, previous admission, history of assault,
+  previously struck staff, earlier this year, or prior incident.
+- Use unresolved temporal scope only when timing itself is materially unclear,
+  such as conflicting timing accounts, unresolved copied-forward documentation, or
+  insufficient information to determine whether conduct belongs to the reported
+  event. Never convert missing timing into historical or unresolved scope.
 - Evidence containing a denial cannot support an affirmed fact unless that same
   excerpt contains a later explicit correction affirming it. Accidental evidence
   cannot support intentionality. Historical evidence cannot support current
