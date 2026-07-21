@@ -1,23 +1,18 @@
-"""Strict, provider-independent contracts for current successor evaluation.
-
-These models describe evaluation data only. They do not execute the semantic
-pipeline, infer expected values, compare cases, or call a provider.
-"""
+"""Strict operational contracts for the True North evaluation family."""
 
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, StrictBool, StrictStr, field_validator, model_validator
 
 from src.contracts import (
-    DerivedSemanticView,
-    PipelineFailureProvenance,
-    PolicyDecision,
-    ValidationFailureStage,
-    ViolenceSemanticEnvelope,
+    AssertionStatus, CompletenessStatus, Conduct, FactDirection, IncidentDirection,
+    Intentionality, MaterialAttribute, PolicyOutcome, ProcessingStatus,
+    ResolutionStatus, TemporalScope, UncertaintyDimension, ValidationFailureStage,
+    ValidationIssueCode,
 )
 
 
@@ -25,16 +20,10 @@ class EvaluationContract(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid")
 
 
-def _require_identifier(value: str, field_name: str) -> str:
+def _identifier(value: str, field: str) -> str:
     if not value.strip():
-        raise ValueError(f"{field_name} must not be empty or whitespace")
+        raise ValueError(f"{field} must not be empty")
     return value
-
-
-def _require_unique(values: List[Enum], field_name: str) -> List[Enum]:
-    if len(values) != len(set(values)):
-        raise ValueError(f"{field_name} must not contain duplicates")
-    return values
 
 
 class ExpectedSemanticOutcome(str, Enum):
@@ -59,10 +48,10 @@ class EvaluationExecutionMode(str, Enum):
 
 
 class ExpectedField(str, Enum):
-    FAILURE_PROVENANCE = "failure_provenance"
-    VALIDATION_STAGE = "validation_stage"
-    DERIVED_SEMANTICS = "derived_semantics"
-    POLICY_DECISION = "policy_decision"
+    OPERATIONAL_FACTS = "operational_facts"
+    DETERMINISTIC_OUTCOME = "deterministic_outcome"
+    PROCESSING_STATUS = "processing_status"
+    COMPLETENESS_STATUS = "completeness_status"
 
 
 class DifferenceClassification(str, Enum):
@@ -84,12 +73,10 @@ class DifferenceReasonCode(str, Enum):
     UNEXPECTED_OBSERVED_VALUE = "unexpected_observed_value"
     SCALAR_MISMATCH = "scalar_mismatch"
     COLLECTION_MISMATCH = "collection_mismatch"
-    VALIDATION_STAGE_MISMATCH = "validation_stage_mismatch"
-    FAILURE_PROVENANCE_MISMATCH = "failure_provenance_mismatch"
     POLICY_OUTCOME_MISMATCH = "policy_outcome_mismatch"
-    POLICY_REASON_MISMATCH = "policy_reason_mismatch"
-    SEMANTIC_SUCCESS_MISMATCH = "semantic_success_mismatch"
-    NON_COMPARABLE_PROVIDER_FAILURE = "non_comparable_provider_failure"
+    PROCESSING_STATUS_MISMATCH = "processing_status_mismatch"
+    COMPLETENESS_STATUS_MISMATCH = "completeness_status_mismatch"
+    DOCTRINE_COMPLIANCE_MISMATCH = "doctrine_compliance_mismatch"
 
 
 class CaseEvaluationStatus(str, Enum):
@@ -106,7 +93,10 @@ class FailurePattern(str, Enum):
     MISSING_OBSERVATION = "missing_observation"
     UNSUPPORTED_EVIDENCE = "unsupported_evidence"
     EVIDENCE_OMISSION = "evidence_omission"
-    SEMANTIC_FIELD_MISMATCH = "semantic_field_mismatch"
+    OPERATIONAL_FACT_MISMATCH = "operational_fact_mismatch"
+    PROCESSING_STATUS_MISMATCH = "processing_status_mismatch"
+    COMPLETENESS_STATUS_MISMATCH = "completeness_status_mismatch"
+    DOCTRINE_MISMATCH = "doctrine_mismatch"
     VALIDATION_REJECTION = "validation_rejection"
     POLICY_MISMATCH = "policy_mismatch"
     PIPELINE_FAILURE = "pipeline_failure"
@@ -135,18 +125,30 @@ class BaselineObservationCode(str, Enum):
 
 
 class EvaluationCategory(str, Enum):
-    COMPLETED_PHYSICAL_ASSAULT = "completed_physical_assault"
-    ATTEMPTED_PHYSICAL_ASSAULT = "attempted_physical_assault"
-    VERBAL_THREAT = "verbal_threat"
+    EXPLICIT_THREAT = "explicit_threat"
+    PHYSICAL_ATTEMPT = "physical_attempt"
+    COMPLETED_PHYSICAL_CONTACT = "completed_physical_contact"
+    SELF_HARM = "self_harm"
+    INTENTIONAL_PROPERTY_VIOLENCE = "intentional_property_violence"
     ACCIDENTAL_CONTACT = "accidental_contact"
-    HISTORICAL_DISCLOSURE = "historical_disclosure"
-    NEGATED_EVENT = "negated_event"
-    CORRECTION = "correction"
-    CONFLICTING_NARRATIVE = "conflicting_narrative"
-    OBJECT_DIRECTED_AGGRESSION = "object_directed_aggression"
-    SELF_DIRECTED_VIOLENCE = "self_directed_violence"
-    AMBIGUOUS_ENCOUNTER = "ambiguous_encounter"
-    INCOMPLETE_REPORT = "incomplete_report"
+    HISTORICAL_ONLY_CONDUCT = "historical_only_conduct"
+    CORRECTED_ALLEGATION = "corrected_allegation"
+    DENIAL = "denial"
+    DENIAL_FOLLOWED_BY_CORRECTION = "denial_followed_by_correction"
+    COPIED_FORWARD_CORRECTION = "copied_forward_correction"
+    UNRESOLVED_CONTRADICTORY_WITNESSES = "unresolved_contradictory_witnesses"
+    PROFANITY_WITHOUT_PHYSICAL_THREAT = "profanity_without_physical_threat"
+    INSUFFICIENT_INFORMATION = "insufficient_information"
+    QUALIFYING_VIOLENCE_UNKNOWN_DIRECTION = "qualifying_violence_unknown_direction"
+    MIXED_DIRECTION_INCIDENT = "mixed_direction_incident"
+    ADVERSARIAL_DENIAL_AS_AFFIRMED = "adversarial_denial_as_affirmed"
+    ADVERSARIAL_ACCIDENTAL_AS_INTENTIONAL = "adversarial_accidental_as_intentional"
+    ADVERSARIAL_HISTORICAL_AS_CURRENT = "adversarial_historical_as_current"
+    ADVERSARIAL_NO_CONTACT_AS_CONTACT = "adversarial_no_contact_as_contact"
+    ADVERSARIAL_OBJECT_AS_INTERPERSONAL = "adversarial_object_as_interpersonal"
+    ADVERSARIAL_OMITTED_CORRECTION = "adversarial_omitted_correction"
+    ADVERSARIAL_OMITTED_CONTRADICTION = "adversarial_omitted_contradiction"
+    ADVERSARIAL_BROAD_EVIDENCE_REUSE = "adversarial_broad_evidence_reuse"
 
 
 class DocumentationQualityTag(str, Enum):
@@ -163,111 +165,119 @@ class DocumentationQualityTag(str, Enum):
     TEMPORAL_AMBIGUITY = "temporal_ambiguity"
 
 
-class EvaluationCaseMetadata(EvaluationContract):
-    categories: List[StrictStr]
-    documentation_quality_tags: List[StrictStr] = Field(default_factory=list)
-    engineering_notes: Optional[StrictStr] = None
-    primary_category: Optional[EvaluationCategory] = None
-    compound: StrictBool = False
+class DoctrineCompliance(str, Enum):
+    COMPLIANT = "compliant"
+    REJECTED_VIOLATION = "rejected_violation"
+    BOUNDED_NOT_PROVABLE = "bounded_not_provable"
 
-    @field_validator("categories", "documentation_quality_tags")
+
+class AdversarialCondition(str, Enum):
+    DENIAL_AS_AFFIRMED = "denial_as_affirmed"
+    ACCIDENTAL_AS_INTENTIONAL = "accidental_as_intentional"
+    HISTORICAL_AS_CURRENT = "historical_as_current"
+    NO_CONTACT_AS_CONTACT = "no_contact_as_contact"
+    OBJECT_AS_INTERPERSONAL = "object_as_interpersonal"
+    OMITTED_CORRECTION = "omitted_correction"
+    OMITTED_CONTRADICTION = "omitted_contradiction"
+    BROAD_EVIDENCE_REUSE = "broad_evidence_reuse"
+
+
+class ExpectedEvidence(EvaluationContract):
+    excerpt: StrictStr
+    supports: Tuple[MaterialAttribute, ...] = (
+        MaterialAttribute.CONDUCT,
+        MaterialAttribute.DIRECTION,
+        MaterialAttribute.INTENTIONALITY,
+        MaterialAttribute.TEMPORAL_SCOPE,
+        MaterialAttribute.ASSERTION_STATUS,
+    )
+
+    @field_validator("excerpt")
     @classmethod
-    def require_non_empty_items(cls, values: List[str]) -> List[str]:
-        if any(not value.strip() for value in values):
-            raise ValueError("metadata list items must not be empty or whitespace")
-        if len(values) != len(set(values)):
-            raise ValueError("metadata lists must not contain duplicates")
-        return values
+    def non_empty(cls, value: str) -> str:
+        return _identifier(value, "excerpt")
 
-    @model_validator(mode="after")
-    def require_category(self) -> "EvaluationCaseMetadata":
-        if not self.categories:
-            raise ValueError("evaluation metadata requires at least one category")
-        if self.engineering_notes is not None and not self.engineering_notes.strip():
-            raise ValueError("engineering_notes must be omitted or non-empty")
-        if self.primary_category is not None:
-            allowed_categories = {item.value for item in EvaluationCategory}
-            allowed_tags = {item.value for item in DocumentationQualityTag}
-            if self.categories[0] != self.primary_category.value:
-                raise ValueError("primary_category must be the first ordered category")
-            if any(value not in allowed_categories for value in self.categories):
-                raise ValueError("authoritative categories must use bounded vocabulary")
-            if any(value not in allowed_tags for value in self.documentation_quality_tags):
-                raise ValueError("authoritative documentation tags must use bounded vocabulary")
-        return self
+
+class ExpectedOperationalFact(EvaluationContract):
+    conduct: Optional[Conduct]
+    direction: FactDirection = FactDirection.INTERPERSONAL
+    intentionality: Intentionality = Intentionality.INTENTIONAL
+    temporal_scope: TemporalScope = TemporalScope.CURRENT
+    assertion_status: AssertionStatus = AssertionStatus.AFFIRMED
+    resolution_status: ResolutionStatus = ResolutionStatus.ACTIVE
+    uncertainty: Tuple[UncertaintyDimension, ...] = ()
+    evidence: Tuple[ExpectedEvidence, ...]
+    correction_of_fact: Optional[int] = Field(default=None, ge=0)
+    contradiction_group: Optional[StrictStr] = None
 
 
 class ExpectedEvaluationOutcome(EvaluationContract):
-    semantic_outcome: ExpectedSemanticOutcome
-    semantic_envelope: Optional[ViolenceSemanticEnvelope] = None
-    expected_derived: Optional[DerivedSemanticView] = None
-    validation_failure_stage: Optional[ValidationFailureStage] = None
-    failure_provenance: Optional[PipelineFailureProvenance] = None
-    policy_decision: Optional[PolicyDecision] = None
-    intentionally_not_asserted: List[ExpectedField] = Field(default_factory=list)
-
-    @field_validator("intentionally_not_asserted")
-    @classmethod
-    def require_unique_unasserted_fields(cls, values: List[ExpectedField]) -> List[ExpectedField]:
-        return _require_unique(values, "intentionally_not_asserted")
+    semantic_outcome: ExpectedSemanticOutcome = ExpectedSemanticOutcome.SUCCESS
+    deterministic_outcome: PolicyOutcome
+    qualifying_conduct: Tuple[Conduct, ...] = ()
+    incident_direction: IncidentDirection
+    operational_facts: Tuple[ExpectedOperationalFact, ...]
+    processing_status: ProcessingStatus = ProcessingStatus.SUCCESSFUL_ANALYSIS
+    completeness_status: CompletenessStatus = CompletenessStatus.COMPLETE_ADMISSIBLE_ANALYSIS
+    validation_failure_stage: ValidationFailureStage = ValidationFailureStage.NONE
+    validation_issue_codes: Tuple[ValidationIssueCode, ...] = ()
+    doctrine_compliance: DoctrineCompliance = DoctrineCompliance.COMPLIANT
 
     @model_validator(mode="after")
-    def require_consistent_expectation(self) -> "ExpectedEvaluationOutcome":
-        if self.semantic_outcome == ExpectedSemanticOutcome.SUCCESS:
-            if self.semantic_envelope is None or self.expected_derived is None:
-                raise ValueError("expected success requires semantic_envelope and expected_derived")
-            if self.validation_failure_stage is not None or self.failure_provenance is not None:
-                raise ValueError("expected success cannot contain failure provenance")
-        else:
-            if self.semantic_envelope is not None or self.expected_derived is not None:
-                raise ValueError("expected failure cannot contain successful semantic payloads")
-            if self.policy_decision is not None and self.policy_decision.failure_provenance is None:
-                raise ValueError("expected failure cannot contain a non-failure policy decision")
-            if self.validation_failure_stage is None and self.failure_provenance is None:
-                raise ValueError("expected failure requires validation stage or failure provenance")
-            if self.validation_failure_stage in {
-                ValidationFailureStage.NONE,
-                ValidationFailureStage.NOT_RUN,
-            }:
-                raise ValueError("expected failure requires an actual validation failure stage")
+    def consistent(self) -> "ExpectedEvaluationOutcome":
+        failed = self.processing_status != ProcessingStatus.SUCCESSFUL_ANALYSIS
+        if failed != (self.semantic_outcome == ExpectedSemanticOutcome.FAILURE):
+            raise ValueError("semantic outcome must match repository processing status")
+        if failed and self.deterministic_outcome != PolicyOutcome.UNABLE_TO_DETERMINE:
+            raise ValueError("failed processing requires Unable to Determine")
+        if not failed and self.validation_failure_stage != ValidationFailureStage.NONE:
+            raise ValueError("successful processing cannot have a validation failure stage")
+        return self
 
-        asserted_values = {
-            ExpectedField.FAILURE_PROVENANCE: self.failure_provenance,
-            ExpectedField.VALIDATION_STAGE: self.validation_failure_stage,
-            ExpectedField.DERIVED_SEMANTICS: self.expected_derived,
-            ExpectedField.POLICY_DECISION: self.policy_decision,
-        }
-        contradictory = [field.value for field in self.intentionally_not_asserted if asserted_values[field] is not None]
-        if contradictory:
-            raise ValueError(f"fields cannot be both asserted and intentionally unasserted: {contradictory}")
+
+class EvaluationCaseMetadata(EvaluationContract):
+    primary_category: EvaluationCategory
+    categories: Tuple[EvaluationCategory, ...] = ()
+    documentation_quality_tags: Tuple[DocumentationQualityTag, ...] = ()
+    engineering_notes: Optional[StrictStr] = None
+    compound: StrictBool = False
+
+    @model_validator(mode="after")
+    def category_order(self) -> "EvaluationCaseMetadata":
+        if self.categories and self.categories[0] != self.primary_category:
+            raise ValueError("primary category must be first")
         return self
 
 
 class EvaluationCase(EvaluationContract):
     case_id: StrictStr
-    schema_version: StrictStr
-    synthetic: StrictBool
+    schema_version: StrictStr = "3.0.0"
+    synthetic: StrictBool = True
     narrative: StrictStr
     metadata: EvaluationCaseMetadata
+    adversarial_condition: Optional[AdversarialCondition] = None
     ground_truth: ExpectedEvaluationOutcome
 
-    @field_validator("case_id", "schema_version")
+    @field_validator("case_id", "schema_version", "narrative")
     @classmethod
-    def require_identifiers(cls, value: str, info: Any) -> str:
-        return _require_identifier(value, info.field_name)
-
-    @field_validator("narrative")
-    @classmethod
-    def require_narrative(cls, value: str) -> str:
-        if not value.strip():
-            raise ValueError("narrative must not be empty or whitespace")
-        return value
+    def identifiers(cls, value: str, info: Any) -> str:
+        return _identifier(value, info.field_name)
 
     @model_validator(mode="after")
-    def require_synthetic_designation(self) -> "EvaluationCase":
+    def synthetic_only(self) -> "EvaluationCase":
         if self.synthetic is not True:
             raise ValueError("evaluation cases must be explicitly synthetic")
         return self
+
+
+class FixtureExpectation(EvaluationContract):
+    fixture_id: StrictStr
+    expected_outcome: PolicyOutcome
+    expected_conduct: Tuple[Conduct, ...]
+    expected_direction: IncidentDirection
+    expected_uncertainty: Tuple[UncertaintyDimension, ...]
+    expected_processing_status: ProcessingStatus
+    expected_completeness_status: CompletenessStatus
 
 
 class EvaluationArtifactProvenance(EvaluationContract):
@@ -279,19 +289,6 @@ class EvaluationArtifactProvenance(EvaluationContract):
     run_timestamp: datetime
     execution_mode: EvaluationExecutionMode
 
-    @field_validator(
-        "evaluation_schema_version",
-        "corpus_identity",
-        "repository_commit",
-        "model_identifier",
-        "extraction_configuration_identity",
-    )
-    @classmethod
-    def require_provenance_identifiers(cls, value: Optional[str], info: Any) -> Optional[str]:
-        if value is not None:
-            return _require_identifier(value, info.field_name)
-        return value
-
 
 class ObservedEvaluationResult(EvaluationContract):
     case_id: StrictStr
@@ -299,42 +296,10 @@ class ObservedEvaluationResult(EvaluationContract):
     provenance: EvaluationArtifactProvenance
     semantic_outcome: ObservedSemanticOutcome
     validation_outcome: ObservedValidationOutcome
-    validation_failure_stage: Optional[ValidationFailureStage] = None
-    semantic_envelope: Optional[ViolenceSemanticEnvelope] = None
-    derived_semantics: Optional[DerivedSemanticView] = None
-    policy_decision: Optional[PolicyDecision] = None
-    failure_provenance: Optional[PipelineFailureProvenance] = None
-
-    @field_validator("case_id", "run_id")
-    @classmethod
-    def require_identifiers(cls, value: str, info: Any) -> str:
-        return _require_identifier(value, info.field_name)
-
-    @model_validator(mode="after")
-    def require_consistent_observation(self) -> "ObservedEvaluationResult":
-        if self.semantic_outcome == ObservedSemanticOutcome.SUCCESS:
-            if self.validation_outcome != ObservedValidationOutcome.PASSED or self.semantic_envelope is None or self.derived_semantics is None:
-                raise ValueError("observed success requires passed validation, semantic_envelope, and derived_semantics")
-            if self.validation_failure_stage is not None or self.failure_provenance is not None:
-                raise ValueError("observed success cannot contain failure provenance")
-        else:
-            if self.semantic_envelope is not None or self.derived_semantics is not None:
-                raise ValueError("observed failure cannot expose admissible successor semantics")
-            if self.validation_outcome == ObservedValidationOutcome.PASSED:
-                raise ValueError("observed failure cannot report passed validation")
-            if self.validation_outcome == ObservedValidationOutcome.FAILED:
-                if self.validation_failure_stage not in {
-                    ValidationFailureStage.SCHEMA,
-                    ValidationFailureStage.DOMAIN,
-                }:
-                    raise ValueError("failed validation requires schema or domain failure stage")
-            elif self.validation_failure_stage is not None:
-                raise ValueError("validation stage is allowed only when validation failed")
-            if self.failure_provenance is None and self.validation_failure_stage is None:
-                raise ValueError("observed failure requires explicit failure provenance")
-            if self.policy_decision is not None and self.policy_decision.failure_provenance is None:
-                raise ValueError("observed failure cannot contain a non-failure policy decision")
-        return self
+    processing_status: ProcessingStatus
+    completeness_status: CompletenessStatus
+    deterministic_outcome: PolicyOutcome
+    operational_facts: Tuple[ExpectedOperationalFact, ...] = ()
 
 
 class FieldDifference(EvaluationContract):
@@ -344,21 +309,6 @@ class FieldDifference(EvaluationContract):
     classification: DifferenceClassification
     reason_code: DifferenceReasonCode
     explanation: Optional[StrictStr] = None
-
-    @field_validator("field")
-    @classmethod
-    def require_field(cls, value: str) -> str:
-        return _require_identifier(value, "field")
-
-    @model_validator(mode="after")
-    def require_reason_alignment(self) -> "FieldDifference":
-        if self.classification == DifferenceClassification.MATCH and self.reason_code != DifferenceReasonCode.VALUES_EQUAL:
-            raise ValueError("matching differences require values_equal reason")
-        if self.classification != DifferenceClassification.MATCH and self.reason_code == DifferenceReasonCode.VALUES_EQUAL:
-            raise ValueError("material differences cannot use values_equal reason")
-        if self.explanation is not None and not self.explanation.strip():
-            raise ValueError("difference explanation must be omitted or non-empty")
-        return self
 
     @property
     def material(self) -> bool:
@@ -374,34 +324,17 @@ class CaseEvaluationResult(EvaluationContract):
     failure_patterns: List[FailurePattern] = Field(default_factory=list)
     non_comparable_reason: Optional[NonComparableReason] = None
 
-    @field_validator("result_id", "case_id", "observed_run_id")
-    @classmethod
-    def require_identifiers(cls, value: str, info: Any) -> str:
-        return _require_identifier(value, info.field_name)
-
-    @field_validator("failure_patterns")
-    @classmethod
-    def require_unique_failure_patterns(cls, values: List[FailurePattern]) -> List[FailurePattern]:
-        return _require_unique(values, "failure_patterns")
-
     @model_validator(mode="after")
-    def require_status_invariants(self) -> "CaseEvaluationResult":
-        material_differences = [difference for difference in self.field_differences if difference.material]
-        if self.status == CaseEvaluationStatus.MATCH:
-            if material_differences or self.failure_patterns or self.non_comparable_reason is not None:
-                raise ValueError("match cannot contain material differences or failure provenance")
-        elif self.status == CaseEvaluationStatus.PARTIAL_MISMATCH:
-            if not material_differences:
-                raise ValueError("partial mismatch requires at least one material difference")
-            if self.non_comparable_reason is not None:
-                raise ValueError("partial mismatch cannot contain non-comparable provenance")
-        elif self.status == CaseEvaluationStatus.FAILURE:
-            if not self.failure_patterns:
-                raise ValueError("failure requires at least one ordered failure pattern")
-            if self.non_comparable_reason is not None:
-                raise ValueError("failure cannot contain non-comparable provenance")
-        elif self.non_comparable_reason is None:
-            raise ValueError("non-comparable result requires explicit provenance")
+    def status_invariants(self) -> "CaseEvaluationResult":
+        differences = [item for item in self.field_differences if item.material]
+        if self.status == CaseEvaluationStatus.MATCH and (differences or self.failure_patterns or self.non_comparable_reason):
+            raise ValueError("match cannot carry mismatch evidence")
+        if self.status == CaseEvaluationStatus.PARTIAL_MISMATCH and not differences:
+            raise ValueError("partial mismatch requires differences")
+        if self.status == CaseEvaluationStatus.FAILURE and not self.failure_patterns:
+            raise ValueError("failure requires failure patterns")
+        if self.status == CaseEvaluationStatus.NON_COMPARABLE and self.non_comparable_reason is None:
+            raise ValueError("non-comparable requires a reason")
         return self
 
 
@@ -409,26 +342,10 @@ class BaselineComparisonObservation(EvaluationContract):
     code: BaselineObservationCode
     detail: StrictStr
 
-    @field_validator("detail")
-    @classmethod
-    def require_detail(cls, value: str) -> str:
-        return _require_identifier(value, "detail")
-
 
 class BaselineComparison(EvaluationContract):
     comparison_id: StrictStr
     prior_result_id: StrictStr
     current_result_id: StrictStr
     classification: BaselineClassification
-    observations: List[BaselineComparisonObservation] = Field(default_factory=list)
-
-    @field_validator("comparison_id", "prior_result_id", "current_result_id")
-    @classmethod
-    def require_identifiers(cls, value: str, info: Any) -> str:
-        return _require_identifier(value, info.field_name)
-
-    @model_validator(mode="after")
-    def require_comparison_observations(self) -> "BaselineComparison":
-        if not self.observations:
-            raise ValueError("baseline classification requires ordered comparison observations")
-        return self
+    observations: List[BaselineComparisonObservation]

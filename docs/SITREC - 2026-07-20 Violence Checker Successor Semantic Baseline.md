@@ -7,50 +7,47 @@ Generation Inputs: repository paths declared in `tools/repo_governance/sitrec.py
 
 ## A. SYSTEM IDENTITY
 
-Repository: `Violence_Checker`. This is a local Python and Streamlit demonstration under migration to true-north incident-fact semantics. The semantic, deterministic-derivation, repository-status, policy, communication, presentation, application orchestration, illustrative Salesforce, and Streamlit runtime are integrated. Evaluation and corpus reconstruction remain pending. It is non-production.
+Repository: `Violence_Checker`. This is a non-production local Python and Streamlit demonstration using the current True North incident-fact semantic authority, deterministic workplace-violence policy, and operational evaluation framework.
 
 ## B. CURRENT STATE
 
-Current repository facts: `TrueNorthSemanticEnvelope` is the sole implemented semantic contract. Schema `violence-checker.true-north-incident-facts` version `1.0.0` contains ordered operational facts with fact-local evidence, material-attribute supports, explicit uncertainty, and narrow correction and contradiction references. `ProviderStructuredResponse` contains only temporary candidate facts; the adapter rejects provider bookkeeping and assigns incident, schema, extraction-contract, fact, evidence, contradiction-group, reference, and ordering identity. Schema and domain validation enforce exact contracts, references, evidence identity and containment, evidence coverage, correction integrity, contradiction integrity, and bounded doctrinal safeguards without unrestricted entailment.
-
-Repository validation now assigns processing and completeness status outside semantic facts and derives active facts, superseded facts, contradiction groups, and incident direction without creating semantic truth. Deterministic policy evaluates validated facts directly and returns `Violence Detected`, `No Violence Detected`, `Uncertain`, or `Unable to Determine`. No `PolicyCandidateView` or replacement policy-input aggregate exists.
-
-The migration remains intentionally incomplete. Evaluation and corpus consumers still reference historical proposition semantics and are not repaired by this execution. No live-provider validation, new evaluation family, baseline acceptance, deployment, or hosted acceptance is claimed. Historical artifacts remain unchanged in their creation-time schema families.
+Current repository facts: `TrueNorthSemanticEnvelope` is the sole current semantic authority. The True North runtime is active across extraction, repository adaptation, schema and domain validation, deterministic derivation and policy, application orchestration, comparison, illustrative Salesforce projection, bounded Operator Communication, presentation, and Streamlit. The repository-authored `violence-checker-true-north-operational-evaluation` contains 24 synthetic operational cases under evaluation schema `3.0.0`, explicit expectations for all eight demonstration fixtures, and adversarial evidence-integrity coverage. Historical evaluation artifacts remain immutable, readable through their creation-time family, and non-authoritative. Live-provider evaluation, baseline acceptance, deployment, and hosted acceptance remain pending.
 
 ## C. CORE INVARIANTS
 
 - Raw free-form narrative is the evidence authority; normalization is formatting-only.
 - Exactly one semantic extraction request is permitted per valid explicit analysis or selected live evaluation case; non-analysis interactions and invalid input issue zero provider requests.
-- Provider authority is limited to candidate operational facts, fact-local exact evidence and supports, explicit uncertainty, and temporary narrow references; provider SDK objects terminate at the adapter boundary.
-- Repository code owns incident/schema/extraction identity, canonical fact/evidence/contradiction-group identifiers, ordering, final references, and validation.
-- Schema validation and violence-domain validation fail closed before policy.
-- True-north derivation and policy are deterministic; later comparison, Salesforce, communication, serialization, and reporting cannot acquire semantic authority.
-- Operator Communication is presentation-only and consumes only a bounded validated projection after deterministic policy.
+- Provider authority is limited to semantic candidates with temporary local references; provider SDK objects terminate at the adapter boundary.
+- Repository code owns identity, canonical ordering and references, processing and completeness status, validation, derivation, deterministic policy, and downstream representation.
+- Schema and domain validation fail closed before policy.
+- Evaluation compares only deterministic outcomes, operational facts, supported evidence, processing/completeness status, and doctrine compliance.
+- Operator Communication is presentation-only and cannot change repository authority.
 - No retries, semantic repair, silent semantic defaults, output-derived ground truth, compatibility reconstruction, or dual current semantic authority is permitted.
-- Historical evaluation artifacts remain byte-immutable and cannot be promoted into the successor baseline family.
+- Historical evaluation artifacts remain byte-immutable and cannot become active True North authority.
 
 ## D. SYSTEM MODEL
 
-Implemented runtime: `input validation` → `normalization` → one structured provider fact response → deterministic repository adapter → strict schema validation → deterministic domain/evidence validation → validated true-north envelope → repository processing/completeness status and semantic views → direct deterministic policy → regex comparison → illustrative Salesforce projection → bounded operator communication → presentation. Evaluation reconstruction is pending.
+`input validation` → formatting-only normalization → lexical baseline plus one structured operational-fact extraction → repository adapter → schema and domain/evidence validation → deterministic semantic views → four-outcome policy → comparison and illustrative Salesforce projection → bounded communication and presentation; offline evaluation compares the resulting repository truth against doctrine-authored operational expectations.
 
 ## E. AUTHORITY MODEL
 
 | Component | Authority |
 | --- | --- |
-| Existing repository-authored corpus | Historical proposition-family ground truth only; true-north reconstruction pending |
+| True North operational corpus | Doctrine-authored deterministic evaluation expectations |
 | Raw narrative | Free-form evidence and excerpt-containment authority |
-| Provider | Bounded candidate semantic claims with temporary local references only |
-| Contract adapter | Provider termination; repository-owned incident/schema/extraction identity, canonical IDs/order, and final reference remapping |
+| Provider | Bounded candidate operational facts with temporary references only |
+| Contract adapter | Provider termination and repository-owned identity/order/reference mapping |
 | Schema/domain validators | Admissibility and fail-closed rejection |
-| Semantic derivation | Repository-owned active/superseded sets, contradiction membership, and incident direction only |
-| Deterministic policy | Sole authority for the four doctrinal outcomes over validated facts and repository status |
-| Operator Communication | Bounded presentation-only projection; no semantic or policy authority |
-| Semantic-focused tests | Current boundary verification |
-| Governance tooling | Supporting generation, freshness, and readiness checks; never application truth |
+| Semantic derivation | Active/superseded sets, contradiction membership, and incident direction |
+| Deterministic policy | Sole authority for the four doctrinal outcomes |
+| Operator Communication | Presentation-only projection with no semantic or policy authority |
+| Historical artifacts | Immutable creation-time evidence; non-authoritative for True North |
+| Tests | Permanent deterministic behavioral verification |
+| Governance tooling | Deterministic continuity and freshness checks; never application truth |
 
 ## F. DATA / CONTRACT MODEL
 
-Semantic schema `violence-checker.true-north-incident-facts` version `1.0.0` defines one ordered fact collection. Each fact carries conduct, atomic direction, intentionality, temporal scope, assertion and resolution status, fact-local evidence with material-attribute support, uncertainty, and optional narrow supersession and contradiction-group references. Repository-owned extraction contract identity is `violence-checker.true-north-fact-extraction@1.0.0`. Processing has five bounded states; completeness has complete, incomplete, and unresolved states. These statuses, deterministic views, and policy outcomes remain outside semantic truth. No entity, proposition, relationship graph, or policy-candidate aggregate exists.
+Semantic schema `violence-checker.true-north-incident-facts` version `1.0.0` defines one ordered operational fact collection with conduct, atomic direction, intentionality, temporal scope, assertion and resolution status, explicit uncertainty, fact-local evidence, and narrow correction or contradiction references. `PipelineResult` carries validation status, deterministic views, the four-outcome policy result, and optional illustrative Salesforce payload. Evaluation schema `3.0.0` compares only operational doctrine truth and has no proposition, entity, relationship, PolicyCandidateView, or retired pipeline-failure dependency. Recognized creation-time artifacts use schema `1.0.0` and remain readable but incomparable and non-authoritative.
 
 ## G. SYSTEM BOUNDARIES
 
@@ -58,23 +55,23 @@ The repository does not provide a real Salesforce connection or write, clinical 
 
 ## H. CURRENT CAPABILITIES
 
-Current capability includes strict provider fact extraction, deterministic provider termination and bookkeeping, schema and domain/evidence validation, repository status assignment, active/superseded and contradiction derivation, five-valued incident direction, direct four-outcome deterministic policy, regex comparison, illustrative Salesforce projection, bounded communication, operational-fact presentation, and Streamlit execution. Policy recognizes all qualifying conduct, including self-harm and intentional property violence; excludes accidental, historical, denied, and superseded facts; preserves classification-material uncertainty; and treats unknown direction alone as non-material. Historical evaluation capabilities are not current acceptance evidence for this incompatible contract.
+The app accepts fixtures and bounded free-form narratives, applies total deterministic policy, and builds policy-gated presentation projections. Technical details expose operational facts and supporting evidence without retired graph structures. Offline True North evaluation validates 24 cases spanning threats, attempts, contact, self-harm, property violence, exclusions, corrections, contradictions, uncertainty, mixed directions, and adversarial evidence integrity. All eight demonstration fixtures have explicit outcome, conduct, direction, uncertainty, processing, and completeness expectations. Runs, within-family regression comparison, and reporting use evaluation schema `3.0.0`; accepting a new baseline remains a separate operator action.
 
 ## I. KNOWN LIMITATIONS
 
-Provider quality is not guaranteed, and deterministic validation cannot prove unrestricted natural-language entailment. Historical evaluation imports and tests are expected to fail until separately authorized migration. No true-north evaluation family, live validation, accepted baseline, deployment, or hosted acceptance exists.
+The lexical baseline is intentionally shallow. Provider quality is not guaranteed, and deterministic validation cannot prove unrestricted natural-language entailment. Live-provider evaluation is pending and non-deterministic even though its surrounding contracts are deterministic. No True North evaluation baseline has been accepted. Deployment and hosted acceptance have not occurred. Historical and True North artifact families remain intentionally incomparable.
 
 ## J. INTERACTION MODEL
 
-The semantic extractor preserves the one-request boundary and disables SDK retries. It sends only the normalized narrative, true-north prompt, model selector, and strict provider fact schema. Missing configuration, provider failure, missing structured output, malformed candidates, provider-authored bookkeeping, and adapter failure return typed failures without repair. End-to-end `Run Analysis` uses the integrated true-north runtime; live corpus execution and hosted interaction are not accepted.
+Analysis begins only after explicit `Run Analysis`; invalid input and non-analysis interaction issue no semantic requests. A valid analysis performs lexical matching and one semantic extraction with SDK retries disabled. Communication generation is a separate presentation-only request and failure preserves deterministic fallback. Deterministic evaluation requires an injected executor and sends only case identity and narrative; live-provider evaluation is explicit and pending. Baseline acceptance and deployment are separate operator actions and never occur during evaluation or governance validation.
 
 ## K. GUARANTEES
 
-Strict contracts reject malformed provider output and provider-authored bookkeeping. The adapter assigns deterministic repository identity and ordering. Schema and domain validation fail closed on invalid references, evidence, corrections, contradictions, or doctrinal combinations. Successful validation assigns repository status, derives bounded views, and permits direct deterministic policy without a policy-candidate aggregate. Failed, incomplete, mismatched, or malformed policy input returns `Unable to Determine`.
+Strict contracts reject malformed or inadmissible semantics before policy. Provider metadata cannot override deterministic repository bookkeeping. Policy is total over admissible states. Operator Communication cannot alter validation, policy, comparison, Salesforce eligibility, or Salesforce payload content, and deterministic fallback remains available when communication generation fails. Collections and serialized current artifacts have canonical ordering. Successor baseline acceptance rejects legacy runs. Existing governed artifact paths are protected from implicit overwrite. Repository generation is deterministic for the same operational date and repository state.
 
 ## L. NON-GUARANTEES
 
-The repository does not guarantee model accuracy, unrestricted entailment validation, exhaustive ontology coverage, evaluation compatibility, production suitability, PHI-safe operation, external persistence, hosted availability, or cross-schema equivalence.
+The repository does not guarantee model accuracy, exhaustive violence ontology coverage, production suitability, PHI-safe operation, human-review workflow, external-system persistence, hosted availability or acceptance, cross-schema semantic equivalence, or that governance validation proves application truth.
 
 ## M. GROUNDING ANCHORS
 
@@ -84,26 +81,26 @@ The repository does not guarantee model accuracy, unrestricted entailment valida
 | `docs/architecture.md` | Current end-to-end architecture and authority boundaries. |
 | `docs/local_governance.md` | Repository-local generation, validation, and readiness commands. |
 | `docs/opord_004_verification_authority.md` | Permanent successor verification gates and test authority. |
-| `docs/semantic_design_basis.md` | Historical proposition-oriented design authority; not current semantic truth. |
+| `docs/semantic_design_basis.md` | Historical proposition design record; not current authority. |
 | `docs/successor_semantic_contract_specification.md` | Historical proposition successor specification. |
-| `docs/workplace_violence_doctrine.md` | Authoritative doctrine for true-north implementation. |
-| `docs/true_north_semantic_contract_specification.md` | Implemented incident-fact and evidence-integrity design authority for this boundary. |
-| `docs/true_north_migration_strategy.md` | Approved replacement order, component dispositions, and remaining verification gates. |
-| `src/contracts.py` | Provider-independent true-north semantic and validation contracts plus unchanged non-semantic boundary contracts. |
+| `docs/workplace_violence_doctrine.md` | Authoritative doctrine for the active True North runtime and evaluation. |
+| `docs/true_north_semantic_contract_specification.md` | Implemented incident-fact contract and evidence-integrity authority. |
+| `docs/true_north_migration_strategy.md` | Approved replacement order and remaining acceptance gates. |
+| `src/contracts.py` | Provider-independent semantic and pipeline contracts. |
 | `src/provider_adapter.py` | Provider boundary and conversion into repository contracts. |
 | `src/semantic_validation.py` | Schema admissibility enforcement. |
 | `src/domain_validation.py` | Violence-domain admissibility enforcement. |
-| `src/semantic_derivation.py` | Implemented deterministic true-north semantic views. |
-| `src/policy.py` | Implemented direct four-outcome doctrinal policy. |
-| `src/app_logic.py` | Integrated true-north application orchestration and pipeline result. |
+| `src/semantic_derivation.py` | Deterministic derived semantic views. |
+| `src/policy.py` | Sole deterministic illustrative disposition authority. |
+| `src/app_logic.py` | Application orchestration and request boundary. |
 | `src/operator_communication.py` | Narrative-free communication projection and deterministic fallback. |
 | `src/operator_communication_provider.py` | Presentation-only structured communication request boundary. |
 | `src/operator_communication_prompt.py` | Executive communication instructions. |
 | `src/presentation.py` | Executive comparison and Salesforce presentation projections. |
 | `app.py` | Executive information architecture and component ownership. |
-| `src/evaluation/` | Historical proposition-family evaluation implementation pending reconstruction. |
-| `evaluation/corpus/successor_corpus.json` | Historical proposition-family ground truth; unchanged and not true-north authority. |
-| `tests/test_contracts.py` and semantic-focused tests | Current boundary verification authority. |
+| `src/evaluation/` | Current evaluation contracts, execution, comparison, and reporting. |
+| `evaluation/corpus/successor_corpus.json` | Repository-authored True North operational evaluation ground truth. |
+| `tests/` | Permanent deterministic behavioral verification authority. |
 | `tools/repo_governance/` | Supporting repository governance and SITREC generation tooling. |
 
 ## N. SOURCE OF TRUTH RULE
@@ -113,13 +110,12 @@ Repository state is authoritative. If this SITREC conflicts with code, contracts
 ## O. REHYDRATION INSTRUCTIONS
 
 1. Read `README.md`, `docs/architecture.md`, this SITREC, `docs/local_governance.md`, `docs/opord_004_verification_authority.md`, `docs/workplace_violence_doctrine.md`, `docs/true_north_semantic_contract_specification.md`, and `docs/true_north_migration_strategy.md`.
-2. Inspect `src/contracts.py`, `src/provider_adapter.py`, `src/semantic_prompt.py`, `src/semantic_extractor.py`, `src/schema_validation.py`, `src/domain_validation.py`, `src/semantic_validation.py`, `src/semantic_derivation.py`, `src/policy.py`, `src/app_logic.py`, downstream presentation components, and focused runtime tests. Treat historical evaluation files as pending migration rather than current authority.
+2. Inspect the True North contracts, adapter, validation/derivation/policy chain, application and presentation runtime, `src/evaluation/`, and `evaluation/corpus/successor_corpus.json`.
 3. Inspect `git status --short` before mutation and preserve unrelated work.
-4. Run `python3 -m tools.repo_governance validate-all`; for baseline decisions run `python3 -m tools.repo_governance baseline-readiness`.
-5. Preserve provider operational-fact-only authority, repository bookkeeping, fact-local evidence, fail-closed validation, the sole true-north semantic boundary, and historical artifact immutability.
-6. Treat the true-north doctrine and contract as implemented authority for extraction, adaptation, schema/domain/evidence validation, repository status, deterministic derivation, and policy.
-7. Treat evaluation reconstruction, local and live-provider acceptance, baseline acceptance, deployment, and hosted acceptance as separately authorized follow-on actions.
-8. Regenerate this artifact with the governed `sitrec` command whenever current repository truth changes.
+4. Run `python3 -m tools.repo_governance validate-all`; for readiness run `python3 -m tools.repo_governance baseline-readiness` without accepting a baseline.
+5. Preserve provider operational-fact authority, repository bookkeeping, request boundaries, fail-closed validation, deterministic policy, active True North evaluation, and historical artifact immutability.
+6. Treat live-provider evaluation, baseline acceptance, deployment, and hosted acceptance as separately authorized follow-on actions.
+7. Regenerate this artifact with the governed `sitrec` command whenever repository truth changes.
 
 ## P. SITREC LIFECYCLE
 

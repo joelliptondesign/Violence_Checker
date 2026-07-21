@@ -66,19 +66,17 @@ def test_sitrec_validation_accepts_current_active_sitrec() -> None:
 
     assert findings == []
     assert "Provider authority is limited to semantic candidates" in text
-    assert "CASE_003" in text
-    assert "all eight stakeholder fixtures" in text
-    assert "390, 360, and 320 CSS pixels" in text
+    assert "all eight demonstration fixtures" in text
+    assert "24 synthetic operational cases" in text
     assert "Streamlit Community Cloud deployment remains a manual operator follow-on" in text
     assert "no hosted deployment, hosted URL, or hosted acceptance is claimed" in text
-    assert "runtime remains proposition-oriented and unchanged" in text
-    assert "workplace violence doctrine as authoritative for successor implementation" in text
-    assert "true-north semantic contract and migration strategy as approved design authority" in text
-    assert "Target runtime implementation, evaluation reconstruction, local acceptance" in text
+    assert "`TrueNorthSemanticEnvelope` is the sole current semantic authority" in text
+    assert "True North runtime is active" in text
+    assert "Historical evaluation artifacts remain immutable" in text
     assert "docs/workplace_violence_doctrine.md" in text
     assert "docs/true_north_semantic_contract_specification.md" in text
     assert "docs/true_north_migration_strategy.md" in text
-    assert "no true-north runtime contract" in text
+    assert "Live-provider evaluation, baseline acceptance, deployment, and hosted acceptance remain pending" in text
 
 
 def test_sitrec_lifecycle_selects_one_active_current_record() -> None:

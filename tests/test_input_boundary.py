@@ -55,5 +55,5 @@ def test_valid_input_binds_normalized_narrative_and_incident_id_to_envelope():
         return SemanticExtractionResult(SemanticExtractionStatus.SUCCESS, envelope(narrative=incident.narrative, incident_id=incident.incident_id))
     result = run_analysis(Incident(incident_id="CASE_001", narrative=raw), extractor=executor)
     assert isinstance(result, AnalysisResult)
-    assert result.validation_result.validated_envelope.envelope.incident_id == "CASE_001"
-    assert result.validation_result.validated_envelope.envelope.evidence_excerpts[0].text == "Patient struck the nurse."
+    assert result.validation_result.validated_envelope.incident_id == "CASE_001"
+    assert result.validation_result.validated_envelope.facts[0].evidence[0].excerpt == "Patient struck the nurse."

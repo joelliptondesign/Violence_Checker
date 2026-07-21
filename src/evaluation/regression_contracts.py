@@ -1,4 +1,4 @@
-"""Immutable contracts for accepted baselines and regression evidence."""
+"""Immutable contracts for True North baselines and operational regression evidence."""
 
 from __future__ import annotations
 

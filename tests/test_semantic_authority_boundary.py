@@ -169,7 +169,7 @@ def test_successor_boundary_contains_no_legacy_semantic_contract_classes():
     contracts = Path("src/contracts.py").read_text()
     for obsolete in (
         "ViolenceProposition", "EntityReference", "SemanticRelationship",
-        "EvidenceSupport", "PolicyCandidateView", "DerivedSemanticView",
+        "EvidenceSupport", "PolicyCandidateView",
         "ViolenceSemanticEnvelope",
     ):
         assert f"class {obsolete}" not in contracts

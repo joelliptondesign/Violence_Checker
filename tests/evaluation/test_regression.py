@@ -29,7 +29,7 @@ def test_creation_time_json_artifacts_route_to_strict_legacy_readers():
 
 
 def test_cross_schema_families_are_explicitly_incomparable():
-    result = compare_artifact_families("1.0.0", "2.0.0")
+    result = compare_artifact_families("1.0.0", "3.0.0")
     assert result.comparable is False
     assert result.reason == "schema_families_are_incomparable"
 
@@ -64,7 +64,7 @@ def test_malformed_and_unsupported_run_schemas_fail_without_fallback(monkeypatch
     malformed = runs / "malformed.json"
     malformed.write_text(json.dumps({"evaluation_schema_version": "1.0.0"}), encoding="utf-8")
     unsupported = runs / "unsupported.json"
-    unsupported.write_text(json.dumps({"evaluation_schema_version": "3.0.0"}), encoding="utf-8")
+    unsupported.write_text(json.dumps({"evaluation_schema_version": "9.0.0"}), encoding="utf-8")
 
     for path in (malformed, unsupported):
         with pytest.raises(BaselineError) as error:

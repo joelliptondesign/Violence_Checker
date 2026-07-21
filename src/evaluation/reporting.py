@@ -42,6 +42,10 @@ _RUNTIME_FAILURE_FINDINGS = {
 _COMPARISON_DIFFERENCE_FINDINGS = {
     FailurePattern.UNSUPPORTED_EVIDENCE.value,
     FailurePattern.EVIDENCE_OMISSION.value,
+    FailurePattern.OPERATIONAL_FACT_MISMATCH.value,
+    FailurePattern.PROCESSING_STATUS_MISMATCH.value,
+    FailurePattern.COMPLETENESS_STATUS_MISMATCH.value,
+    FailurePattern.DOCTRINE_MISMATCH.value,
     FailurePattern.POLICY_MISMATCH.value,
 }
 
@@ -82,8 +86,8 @@ def _finding_groups(pattern_counts: Counter[str]) -> List[tuple[str, Counter[str
     return [
         ("Runtime failures", runtime),
         ("Comparison differences", comparison),
-        ("Semantic weakness indicators", semantic),
-        ("Legacy classification artifacts", legacy),
+        ("Operational doctrine indicators", semantic),
+        ("Historical artifact observations", legacy),
     ]
 
 
@@ -153,7 +157,7 @@ def render_engineering_report(artifact: RegressionArtifact) -> str:
     summary = artifact.summary
 
     lines = [
-        "# Evaluation Engineering Report",
+        "# True North Evaluation Engineering Report",
         "",
         "## 1. Run provenance",
         "",

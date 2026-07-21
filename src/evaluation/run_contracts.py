@@ -1,4 +1,4 @@
-"""Immutable contracts for evaluation runner configuration and artifacts."""
+"""Immutable run contracts for the True North evaluation family."""
 
 from __future__ import annotations
 
@@ -8,14 +8,9 @@ from typing import Dict, Optional, Tuple
 
 from pydantic import ConfigDict, StrictBool, StrictInt, StrictStr, field_validator, model_validator
 
-from src.contracts import (
-    SEMANTIC_SCHEMA_IDENTITY,
-    SEMANTIC_SCHEMA_VERSION,
-    PipelineFailureProvenance,
-    PipelineResult,
-)
-from src.evaluation.corpus import EVALUATION_SCHEMA_VERSION
+from src.contracts import PipelineResult, PolicyOutcome, SEMANTIC_SCHEMA_IDENTITY, SEMANTIC_SCHEMA_VERSION
 from src.evaluation.contracts import CaseEvaluationResult, EvaluationContract
+from src.evaluation.corpus import EVALUATION_SCHEMA_VERSION
 
 
 class ImmutableEvaluationContract(EvaluationContract):
@@ -33,13 +28,9 @@ class RunArtifactStatus(str, Enum):
 
 
 class ObservedPipelineComparison(ImmutableEvaluationContract):
-    semantic_validation_status: StrictStr
+    regex_detected: StrictBool
+    true_north_outcome: PolicyOutcome
     classification_alignment: StrictStr
-    material_difference_detected: StrictBool
-    divergence_observations: Tuple[StrictStr, ...]
-    semantic_enrichment_observations: Tuple[StrictStr, ...]
-    display_status: StrictStr
-    observations: Tuple[StrictStr, ...]
 
 
 class ObservedCaseResult(ImmutableEvaluationContract):
@@ -47,15 +38,14 @@ class ObservedCaseResult(ImmutableEvaluationContract):
     run_id: StrictStr
     semantic_status: StrictStr
     semantic_failure_message: Optional[StrictStr] = None
-    failure_provenance: Optional[PipelineFailureProvenance] = None
     pipeline_result: PipelineResult
     pipeline_comparison: ObservedPipelineComparison
 
     @field_validator("case_id", "run_id", "semantic_status")
     @classmethod
-    def require_non_empty(cls, value: str) -> str:
+    def non_empty(cls, value: str) -> str:
         if not value.strip():
-            raise ValueError("observed case identifiers and status must not be empty")
+            raise ValueError("observed identifiers and status must not be empty")
         return value
 
 
@@ -70,27 +60,19 @@ class EvaluationRunConfiguration(ImmutableEvaluationContract):
     output_path: StrictStr
     overwrite: StrictBool = False
 
-    @field_validator(
-        "run_id",
-        "repository_commit",
-        "model_identifier",
-        "extraction_configuration_identity",
-        "output_path",
-    )
+    @field_validator("run_id", "repository_commit", "model_identifier", "extraction_configuration_identity", "output_path")
     @classmethod
-    def require_identifiers(cls, value: Optional[str]) -> Optional[str]:
+    def identifiers(cls, value: Optional[str]) -> Optional[str]:
         if value is not None and not value.strip():
-            raise ValueError("runner identifiers and output path must not be empty")
+            raise ValueError("runner identifiers must not be empty")
         return value
 
     @model_validator(mode="after")
-    def require_timestamp_and_unique_selection(self) -> "EvaluationRunConfiguration":
+    def valid_selection(self) -> "EvaluationRunConfiguration":
         if self.run_timestamp.tzinfo is None or self.run_timestamp.utcoffset() is None:
-            raise ValueError("run_timestamp must be timezone-aware")
+            raise ValueError("run timestamp must be timezone-aware")
         if len(self.requested_case_ids) != len(set(self.requested_case_ids)):
-            raise ValueError("requested case identifiers must not contain duplicates")
-        if any(not value.strip() for value in self.requested_case_ids):
-            raise ValueError("requested case identifiers must not be empty")
+            raise ValueError("requested case identifiers must be unique")
         return self
 
 
@@ -128,20 +110,15 @@ class EvaluationRunArtifact(ImmutableEvaluationContract):
     status: RunArtifactStatus
 
     @model_validator(mode="after")
-    def require_ordered_complete_artifact(self) -> "EvaluationRunArtifact":
+    def consistent(self) -> "EvaluationRunArtifact":
         if self.evaluation_schema_version != EVALUATION_SCHEMA_VERSION:
             raise ValueError("unsupported evaluation schema version")
-        if (self.semantic_schema_identity, self.semantic_schema_version) != (
-            SEMANTIC_SCHEMA_IDENTITY,
-            SEMANTIC_SCHEMA_VERSION,
-        ):
-            raise ValueError("unsupported semantic schema identity or version")
-        observed_ids = tuple(item.case_id for item in self.observed_cases)
-        evaluation_ids = tuple(item.case_id for item in self.case_evaluations)
-        if observed_ids != self.requested_case_ids or evaluation_ids != self.requested_case_ids:
-            raise ValueError("observed and evaluated case ordering must match requested case ordering")
-        if self.summary.requested_cases != len(self.requested_case_ids):
-            raise ValueError("summary requested count must match artifact cases")
-        if self.summary.executed_cases != len(self.observed_cases):
-            raise ValueError("summary executed count must match observed cases")
+        if (self.semantic_schema_identity, self.semantic_schema_version) != (SEMANTIC_SCHEMA_IDENTITY, SEMANTIC_SCHEMA_VERSION):
+            raise ValueError("unsupported semantic schema")
+        ids = tuple(item.case_id for item in self.observed_cases)
+        evaluated = tuple(item.case_id for item in self.case_evaluations)
+        if ids != self.requested_case_ids or evaluated != self.requested_case_ids:
+            raise ValueError("artifact case ordering is inconsistent")
+        if self.summary.requested_cases != len(self.requested_case_ids) or self.summary.executed_cases != len(self.observed_cases):
+            raise ValueError("artifact summary counts are inconsistent")
         return self

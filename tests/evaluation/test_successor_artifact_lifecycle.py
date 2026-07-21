@@ -5,7 +5,7 @@ import pytest
 
 from src.evaluation import baseline, regression, reporting, runner
 from src.evaluation.baseline import BaselineError, BaselineIssueCode
-from src.evaluation.corpus import load_corpus
+from src.evaluation.corpus import load_corpus, semantic_candidate_for_case
 from src.evaluation.regression import RegressionError, RegressionIssueCode
 from src.evaluation.run_contracts import EvaluationRunConfiguration, EvaluationRunnerMode
 from src.evaluation.runner import RunnerError, RunnerIssueCode
@@ -22,7 +22,7 @@ def _executor():
     def execute(incident):
         return SemanticExtractionResult(
             SemanticExtractionStatus.SUCCESS,
-            cases[incident.incident_id].ground_truth.semantic_envelope,
+            semantic_candidate_for_case(cases[incident.incident_id]),
         )
 
     return execute
@@ -53,7 +53,7 @@ def _configuration(output: Path, *, overwrite: bool = False) -> EvaluationRunCon
         execution_mode=EvaluationRunnerMode.DETERMINISTIC_TEST,
         repository_commit=COMMIT,
         run_timestamp=NOW,
-        requested_case_ids=("EVAL_001",),
+        requested_case_ids=("TN_001",),
         output_path=str(output),
         overwrite=overwrite,
     )
@@ -155,7 +155,7 @@ def test_successor_regression_and_report_are_deterministic_and_overwrite_protect
         output_path=str(report_path),
     )
     assert report == report_path.read_text(encoding="utf-8")
-    assert "Evaluation schema: `2.0.0`" in report
+    assert "Evaluation schema: `3.0.0`" in report
     assert "Unchanged: 1" in report
     with pytest.raises(RegressionError) as error:
         reporting.generate_report(

@@ -2,46 +2,39 @@ import hashlib
 import json
 from pathlib import Path
 
-from src.evaluation.contracts import DocumentationQualityTag, EvaluationCategory
-from src.evaluation.corpus import corpus_coverage, load_corpus, load_legacy_corpus_document, validate_corpus
+from src.evaluation.contracts import AdversarialCondition, DocumentationQualityTag, EvaluationCategory
+from src.evaluation.corpus import CORPUS_IDENTITY, corpus_coverage, load_corpus, load_legacy_corpus_document, validate_corpus
 
 
-def test_successor_corpus_loads_atomically_with_48_stable_cases():
+def test_true_north_corpus_loads_with_complete_required_coverage():
     corpus = load_corpus()
+    assert corpus.corpus_identity == CORPUS_IDENTITY
+    assert corpus.evaluation_schema_version == "3.0.0"
     assert not validate_corpus(corpus)
-    assert [case.case_id for case in corpus.cases] == [f"EVAL_{index:03d}" for index in range(1, 49)]
-    assert all(case.synthetic is True for case in corpus.cases)
-
-
-def test_successor_corpus_preserves_legacy_narrative_bytes_and_metadata_authority():
-    successor = load_corpus()
-    legacy = load_legacy_corpus_document()
-    legacy_by_id = {case["case_id"]: case for case in legacy["cases"]}
-    for case in successor.cases:
-        assert case.narrative.encode("utf-8") == legacy_by_id[case.case_id]["narrative"].encode("utf-8")
-        assert case.synthetic == legacy_by_id[case.case_id]["synthetic"]
-        assert case.metadata.model_dump(mode="json") == legacy_by_id[case.case_id]["metadata"]
-
-
-def test_every_category_and_documentation_tag_is_preserved():
-    coverage = corpus_coverage(load_corpus())
+    assert [case.case_id for case in corpus.cases] == [f"TN_{index:03d}" for index in range(1, 25)]
+    coverage = corpus_coverage(corpus)
     assert set(coverage.primary_categories) == {item.value for item in EvaluationCategory}
     assert set(coverage.documentation_quality_tags) == {item.value for item in DocumentationQualityTag}
-    assert set(coverage.primary_categories.values()) == {4}
-    assert coverage.compound_cases == 21
+    assert coverage.fixture_expectations == 8
 
 
-def test_ground_truth_has_explicit_entities_propositions_supports_derivation_and_policy():
-    for case in load_corpus().cases:
-        truth = case.ground_truth
-        envelope = truth.semantic_envelope
-        assert envelope.entities and envelope.propositions
-        assert envelope.evidence_excerpts and envelope.evidence_supports
-        assert truth.expected_derived.active_proposition_ids
-        assert truth.policy_decision is not None
+def test_corpus_has_eight_explicit_adversarial_repository_cases():
+    corpus = load_corpus()
+    adversaries = [case for case in corpus.cases if case.adversarial_condition is not None]
+    assert {case.adversarial_condition for case in adversaries} == set(AdversarialCondition)
+    assert len(adversaries) == 8
 
 
-def test_legacy_corpus_file_is_unchanged_creation_time_family():
-    raw = json.loads(Path("evaluation/corpus/corpus.json").read_text())
-    assert raw["corpus_identity"] == "violence-checker-synthetic-evaluation-corpus"
+def test_all_fixture_expectations_are_explicit_and_complete():
+    expectations = load_corpus().fixture_expectations
+    assert [item.fixture_id for item in expectations] == [f"CASE_{index:03d}" for index in range(1, 9)]
+    assert all(item.expected_conduct for item in expectations)
+    assert all(item.expected_processing_status.value == "successful_analysis" for item in expectations)
+
+
+def test_historical_corpus_is_read_only_creation_time_family():
+    path = Path("evaluation/corpus/corpus.json")
+    before = hashlib.sha256(path.read_bytes()).hexdigest()
+    raw = load_legacy_corpus_document()
     assert raw["evaluation_schema_version"] == "1.0.0"
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == before

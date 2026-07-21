@@ -11,10 +11,8 @@ from pathlib import Path
 from typing import Callable, List, Optional, Sequence, Tuple
 
 from src.app_logic import AnalysisResult, run_analysis
-from src.contract_adapters import pipeline_result_from_analysis
 from src.contracts import (
     InputValidationResult,
-    PipelineFailureProvenance,
     SEMANTIC_SCHEMA_IDENTITY,
     SEMANTIC_SCHEMA_VERSION,
     ValidationFailureStage,
@@ -116,13 +114,9 @@ def validate_run_configuration(
 def _observed_comparison(analysis: AnalysisResult) -> ObservedPipelineComparison:
     comparison = analysis.comparison
     return ObservedPipelineComparison(
-        semantic_validation_status=comparison.semantic_validation_status,
+        regex_detected=bool(comparison.regex_result.get("detected")),
+        true_north_outcome=comparison.true_north_outcome,
         classification_alignment=comparison.classification_alignment,
-        material_difference_detected=comparison.material_difference_detected,
-        divergence_observations=tuple(comparison.divergence_observations),
-        semantic_enrichment_observations=tuple(comparison.semantic_enrichment_observations),
-        display_status=comparison.display_status,
-        observations=tuple(comparison.observations),
     )
 
 
@@ -141,14 +135,12 @@ def _execute_case(
             RunnerIssueCode.PIPELINE_RESULT_UNAVAILABLE,
             f"governed pipeline did not produce AnalysisResult for {case.case_id}",
         )
-    pipeline = pipeline_result_from_analysis(result)
     return ObservedCaseResult(
         case_id=case.case_id,
         run_id=configuration.run_id,
         semantic_status=result.semantic_result.status.value,
         semantic_failure_message=result.semantic_result.failure_message,
-        failure_provenance=result.policy_decision.failure_provenance,
-        pipeline_result=pipeline,
+        pipeline_result=result.pipeline_result,
         pipeline_comparison=_observed_comparison(result),
     )
 
@@ -170,16 +162,7 @@ def _summary(
         outcomes_by_category[category][evaluation.status.value] = (
             outcomes_by_category[category].get(evaluation.status.value, 0) + 1
         )
-    provider_failures = sum(
-        item.failure_provenance
-        in {
-            PipelineFailureProvenance.PROVIDER_CONFIGURATION,
-            PipelineFailureProvenance.PROVIDER_REQUEST,
-            PipelineFailureProvenance.PROVIDER_STRUCTURED_RESPONSE,
-            PipelineFailureProvenance.PROVIDER_VALIDATION,
-        }
-        for item in observed
-    )
+    provider_failures = sum(item.semantic_status != "success" for item in observed)
     validation_rejections = sum(
         item.pipeline_result.validation_result.failure_stage
         in {ValidationFailureStage.SCHEMA, ValidationFailureStage.DOMAIN}

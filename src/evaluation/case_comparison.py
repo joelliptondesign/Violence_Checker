@@ -1,25 +1,27 @@
-"""Identifier-addressed deterministic successor case comparison."""
+"""Deterministic comparison of operational True North expectations and observations."""
 
 from __future__ import annotations
 
-from typing import Iterable
-
-from src.contracts import PolicyOutcome, ValidationFailureStage, ValidationIssueCode
+from src.contracts import AssertionStatus, Conduct, Intentionality, TemporalScope, ValidationFailureStage
 from src.evaluation.contracts import (
-    CaseEvaluationResult,
-    CaseEvaluationStatus,
-    DifferenceClassification,
-    DifferenceReasonCode,
-    EvaluationCase,
-    ExpectedSemanticOutcome,
-    FailurePattern,
-    FieldDifference,
-    NonComparableReason,
+    CaseEvaluationResult, CaseEvaluationStatus, DifferenceClassification,
+    DifferenceReasonCode, DoctrineCompliance, EvaluationCase, ExpectedEvidence,
+    ExpectedOperationalFact, FailurePattern, FieldDifference, NonComparableReason,
 )
 from src.evaluation.run_contracts import ObservedCaseResult
 
 
-def _difference(path: str, expected: object, observed: object) -> FieldDifference | None:
+def _json(value):
+    if hasattr(value, "model_dump"):
+        return value.model_dump(mode="json")
+    if isinstance(value, tuple):
+        return [_json(item) for item in value]
+    if hasattr(value, "value"):
+        return value.value
+    return value
+
+
+def _difference(field: str, expected, observed, reason=DifferenceReasonCode.VALUES_DIFFER):
     if expected == observed:
         return None
     if observed is None:
@@ -30,194 +32,93 @@ def _difference(path: str, expected: object, observed: object) -> FieldDifferenc
         reason = DifferenceReasonCode.UNEXPECTED_OBSERVED_VALUE
     else:
         classification = DifferenceClassification.VALUE_MISMATCH
-        reason = DifferenceReasonCode.COLLECTION_MISMATCH if isinstance(expected, (list, tuple)) else DifferenceReasonCode.SCALAR_MISMATCH
     return FieldDifference(
-        field=path,
-        expected_value=expected,
-        observed_value=observed,
-        classification=classification,
-        reason_code=reason,
+        field=field, expected_value=_json(expected), observed_value=_json(observed),
+        classification=classification, reason_code=reason,
     )
 
 
-def _subject_differences(
-    collection: str,
-    identifier_field: str,
-    expected_items: Iterable[object],
-    observed_items: Iterable[object],
-) -> list[FieldDifference]:
-    expected = {getattr(item, identifier_field): item.model_dump(mode="json") for item in expected_items}
-    observed = {getattr(item, identifier_field): item.model_dump(mode="json") for item in observed_items}
-    differences: list[FieldDifference] = []
-    for identifier in sorted(set(expected) | set(observed)):
-        expected_value = expected.get(identifier)
-        observed_value = observed.get(identifier)
-        if expected_value is None or observed_value is None:
-            item = _difference(f"{collection}[{identifier}]", expected_value, observed_value)
-            if item:
-                differences.append(item)
-            continue
-        for field in sorted(set(expected_value) | set(observed_value)):
-            item = _difference(
-                f"{collection}[{identifier}].{field}",
-                expected_value.get(field),
-                observed_value.get(field),
-            )
-            if item:
-                differences.append(item)
-    return differences
+def _operational_facts(validation) -> tuple[ExpectedOperationalFact, ...]:
+    envelope = validation.validated_envelope
+    if not validation.passed or envelope is None:
+        return ()
+    return tuple(ExpectedOperationalFact(
+        conduct=fact.conduct, direction=fact.direction,
+        intentionality=fact.intentionality, temporal_scope=fact.temporal_scope,
+        assertion_status=fact.assertion_status, resolution_status=fact.resolution_status,
+        uncertainty=tuple(fact.uncertainty),
+        evidence=tuple(ExpectedEvidence(excerpt=item.excerpt, supports=tuple(item.supports)) for item in fact.evidence),
+    ) for fact in envelope.facts)
 
 
-def _has_exact_ordered_coverage(expected_text: str, observed_texts: list[str]) -> bool:
-    """Require exact containment or gap-free ordered segmentation of expected evidence."""
-    if any(expected_text in observed for observed in observed_texts):
-        return True
-    intervals: list[tuple[int, int]] = []
-    for observed in observed_texts:
-        start = expected_text.find(observed)
-        if start >= 0:
-            intervals.append((start, start + len(observed)))
-    if not intervals:
-        return False
-    covered = 0
-    for start, end in sorted(intervals):
-        if start > covered:
-            return False
-        covered = max(covered, end)
-    return covered == len(expected_text)
+def _qualifying(validation) -> tuple[Conduct, ...]:
+    if not validation.passed or validation.validated_envelope is None or validation.derived_semantics is None:
+        return ()
+    active = set(validation.derived_semantics.active_fact_ids)
+    values = {
+        fact.conduct for fact in validation.validated_envelope.facts
+        if fact.fact_id in active and fact.conduct is not None
+        and fact.intentionality == Intentionality.INTENTIONAL
+        and fact.temporal_scope == TemporalScope.CURRENT
+        and fact.assertion_status == AssertionStatus.AFFIRMED
+    }
+    return tuple(value for value in Conduct if value in values)
 
 
 def compare_case(case: EvaluationCase, observed: ObservedCaseResult) -> CaseEvaluationResult:
-    truth = case.ground_truth
     pipeline = observed.pipeline_result
-    if observed.failure_provenance is not None and pipeline.validation_result.failure_stage == ValidationFailureStage.NOT_RUN:
+    validation = pipeline.validation_result
+    truth = case.ground_truth
+    if observed.semantic_status != "success" and validation.failure_stage == ValidationFailureStage.NOT_RUN:
         return CaseEvaluationResult(
-            result_id=f"{observed.run_id}:{case.case_id}",
-            case_id=case.case_id,
-            observed_run_id=observed.run_id,
-            status=CaseEvaluationStatus.NON_COMPARABLE,
+            result_id=f"{observed.run_id}:{case.case_id}", case_id=case.case_id,
+            observed_run_id=observed.run_id, status=CaseEvaluationStatus.NON_COMPARABLE,
             non_comparable_reason=NonComparableReason.OBSERVATION_FAILED,
             failure_patterns=[FailurePattern.PROVIDER_FAILURE],
         )
 
-    if truth.semantic_outcome == ExpectedSemanticOutcome.FAILURE:
-        differences: list[FieldDifference] = []
-        if truth.validation_failure_stage is not None:
-            item = _difference(
-                "validation.failure_stage",
-                truth.validation_failure_stage.value,
-                pipeline.validation_result.failure_stage.value,
-            )
-            if item:
-                differences.append(item)
-        if truth.failure_provenance is not None:
-            item = _difference(
-                "failure_provenance",
-                truth.failure_provenance.value,
-                pipeline.policy_decision.failure_provenance.value
-                if pipeline.policy_decision.failure_provenance
-                else None,
-            )
-            if item:
-                differences.append(item)
-        if truth.policy_decision is not None:
-            item = _difference(
-                "policy.outcome",
-                truth.policy_decision.outcome.value,
-                pipeline.policy_decision.outcome.value,
-            )
-            if item:
-                differences.append(item)
-        return CaseEvaluationResult(
-            result_id=f"{observed.run_id}:{case.case_id}",
-            case_id=case.case_id,
-            observed_run_id=observed.run_id,
-            status=CaseEvaluationStatus.MATCH if not differences else CaseEvaluationStatus.PARTIAL_MISMATCH,
-            field_differences=differences,
-            failure_patterns=([] if not differences else [FailurePattern.VALIDATION_FAILURE]),
-        )
-
-    if pipeline.validation_result.failure_stage != ValidationFailureStage.NONE:
-        patterns = [FailurePattern.VALIDATION_FAILURE]
-        issues = (
-            pipeline.validation_result.domain_validation.issues
-            if pipeline.validation_result.failure_stage == ValidationFailureStage.DOMAIN
-            else pipeline.validation_result.schema_validation.issues
-        )
-        if any(issue.code == ValidationIssueCode.EVIDENCE_NOT_CONTAINED for issue in issues):
-            patterns.append(FailurePattern.UNSUPPORTED_EVIDENCE)
-        return CaseEvaluationResult(
-            result_id=f"{observed.run_id}:{case.case_id}",
-            case_id=case.case_id,
-            observed_run_id=observed.run_id,
-            status=CaseEvaluationStatus.FAILURE,
-            failure_patterns=patterns,
-        )
-
-    expected = truth.semantic_envelope
-    actual = pipeline.semantic_envelope
-    expected_derived = truth.expected_derived
-    actual_derived = pipeline.derived_semantics
-    if expected is None or expected_derived is None or actual is None or actual_derived is None:
-        return CaseEvaluationResult(
-            result_id=f"{observed.run_id}:{case.case_id}",
-            case_id=case.case_id,
-            observed_run_id=observed.run_id,
-            status=CaseEvaluationStatus.FAILURE,
-            failure_patterns=[FailurePattern.MISSING_OBSERVATION],
-        )
-
-    differences: list[FieldDifference] = []
-    for path, expected_value, observed_value in (
-        ("semantic.schema_identity", expected.schema_identity, actual.schema_identity),
-        ("semantic.schema_version", expected.schema_version, actual.schema_version),
-        ("semantic.incident_id", expected.incident_id, actual.incident_id),
-    ):
-        item = _difference(path, expected_value, observed_value)
-        if item:
-            differences.append(item)
-    for collection, identifier in (
-        ("entities", "entity_id"),
-        ("propositions", "proposition_id"),
-        ("relationships", "relationship_id"),
-        ("uncertainties", "uncertainty_id"),
-        ("evidence_excerpts", "evidence_id"),
-        ("evidence_supports", "support_id"),
-    ):
-        differences.extend(_subject_differences(collection, identifier, getattr(expected, collection), getattr(actual, collection)))
-    differences.extend(_subject_differences("derived.propositions", "proposition_id", expected_derived.propositions, actual_derived.propositions))
-    item = _difference("derived.active_proposition_ids", expected_derived.active_proposition_ids, actual_derived.active_proposition_ids)
-    if item:
-        differences.append(item)
-    if truth.policy_decision is not None:
-        item = _difference("policy.outcome", truth.policy_decision.outcome.value, pipeline.policy_decision.outcome.value)
-        if item:
-            differences.append(item)
-        item = _difference(
-            "policy.reason_codes",
-            [value.value for value in truth.policy_decision.reason_codes],
-            [value.value for value in pipeline.policy_decision.reason_codes],
-        )
-        if item:
-            differences.append(item)
-
+    actual_facts = _operational_facts(validation)
+    expected_facts = tuple(fact.model_copy(update={"correction_of_fact": None, "contradiction_group": None}) for fact in truth.operational_facts)
+    issue_codes = tuple(item.code for item in validation.schema_validation.issues + validation.domain_validation.issues)
+    direction = validation.derived_semantics.incident_direction if validation.derived_semantics else truth.incident_direction
+    doctrine = (
+        DoctrineCompliance.REJECTED_VIOLATION
+        if case.adversarial_condition is not None and not validation.passed
+        else DoctrineCompliance.BOUNDED_NOT_PROVABLE
+        if case.adversarial_condition is not None
+        else DoctrineCompliance.COMPLIANT
+    )
+    comparisons = (
+        ("deterministic_outcome", truth.deterministic_outcome, pipeline.policy_decision.outcome, DifferenceReasonCode.POLICY_OUTCOME_MISMATCH),
+        ("processing_status", truth.processing_status, validation.processing_status, DifferenceReasonCode.PROCESSING_STATUS_MISMATCH),
+        ("completeness_status", truth.completeness_status, validation.completeness_status, DifferenceReasonCode.COMPLETENESS_STATUS_MISMATCH),
+        ("validation_failure_stage", truth.validation_failure_stage, validation.failure_stage, DifferenceReasonCode.VALUES_DIFFER),
+        ("validation_issue_codes", truth.validation_issue_codes, issue_codes, DifferenceReasonCode.COLLECTION_MISMATCH),
+        ("qualifying_conduct", truth.qualifying_conduct, _qualifying(validation), DifferenceReasonCode.COLLECTION_MISMATCH),
+        ("incident_direction", truth.incident_direction, direction, DifferenceReasonCode.SCALAR_MISMATCH),
+        ("operational_facts", expected_facts if validation.passed else (), actual_facts, DifferenceReasonCode.COLLECTION_MISMATCH),
+        ("doctrine_compliance", truth.doctrine_compliance, doctrine, DifferenceReasonCode.DOCTRINE_COMPLIANCE_MISMATCH),
+    )
+    differences = [item for field, expected, actual, reason in comparisons if (item := _difference(field, expected, actual, reason))]
     patterns: list[FailurePattern] = []
-    if any(item.field.startswith(("entities", "propositions", "relationships", "uncertainties", "evidence", "derived")) for item in differences):
-        patterns.append(FailurePattern.SEMANTIC_FIELD_MISMATCH)
-    observed_evidence_texts = [item.text for item in actual.evidence_excerpts]
-    if any(
-        not _has_exact_ordered_coverage(item.text, observed_evidence_texts)
-        for item in expected.evidence_excerpts
-    ):
-        patterns.append(FailurePattern.EVIDENCE_OMISSION)
-    if any(item.field.startswith("policy") for item in differences):
+    fields = {item.field for item in differences}
+    if "operational_facts" in fields:
+        patterns.append(FailurePattern.OPERATIONAL_FACT_MISMATCH)
+        expected_evidence = {e.excerpt for fact in expected_facts for e in fact.evidence}
+        actual_evidence = {e.excerpt for fact in actual_facts for e in fact.evidence}
+        if expected_evidence - actual_evidence:
+            patterns.append(FailurePattern.EVIDENCE_OMISSION)
+    if "deterministic_outcome" in fields:
         patterns.append(FailurePattern.POLICY_MISMATCH)
-    status = CaseEvaluationStatus.MATCH if not differences else CaseEvaluationStatus.PARTIAL_MISMATCH
+    if "processing_status" in fields:
+        patterns.append(FailurePattern.PROCESSING_STATUS_MISMATCH)
+    if "completeness_status" in fields:
+        patterns.append(FailurePattern.COMPLETENESS_STATUS_MISMATCH)
+    if "doctrine_compliance" in fields:
+        patterns.append(FailurePattern.DOCTRINE_MISMATCH)
     return CaseEvaluationResult(
-        result_id=f"{observed.run_id}:{case.case_id}",
-        case_id=case.case_id,
+        result_id=f"{observed.run_id}:{case.case_id}", case_id=case.case_id,
         observed_run_id=observed.run_id,
-        status=status,
-        field_differences=differences,
-        failure_patterns=patterns,
+        status=CaseEvaluationStatus.MATCH if not differences else CaseEvaluationStatus.PARTIAL_MISMATCH,
+        field_differences=differences, failure_patterns=patterns,
     )
