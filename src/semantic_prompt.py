@@ -2,6 +2,12 @@ SEMANTIC_EXTRACTION_PROMPT = """
 Analyze only the supplied normalized incident narrative and return one structured
 semantic candidate response containing only operational incident facts.
 
+Emit only classification-relevant operational facts: qualifying conduct; facts
+that exclude otherwise qualifying conduct because they are accidental, historical,
+denied, corrected, or superseded; and unresolved facts that could materially change
+classification. Do not emit separate facts solely for emotion, redirection, routine
+care, security response, injury, location, or other contextual details.
+
 For each separately supportable fact, provide:
 - a short temporary local_ref;
 - conduct: verbal_threat, physical_attempt, physical_contact, self_harm,
@@ -38,10 +44,19 @@ Evidence rules:
   intentionality, temporal_scope, assertion_status, resolution_status,
   supersession, or contradiction.
 - Together a fact's evidence must support conduct when resolved, every settled
-  material attribute, and every explicit correction or contradiction link.
+  material attribute, every attribute marked unresolved or uncertain, and every
+  explicit correction or contradiction link. When conduct is null or direction,
+  intentionality, temporal scope, or assertion state is unresolved, include the
+  corresponding attribute in evidence supports.
 - Do not produce unsupported semantic facts or inferred outcomes. Do not infer
-  intentionality from contact or severity, current scope from document placement,
-  or interpersonal direction from property evidence.
+  intentionality solely from contact or severity, current scope from document
+  placement, or interpersonal direction from property evidence. Unambiguously
+  volitional action phrasing such as "swung at," "punched," "kicked," or "hit with
+  a closed fist" may support intentionality when the narrative does not qualify it
+  as accidental, denied, disputed, hypothetical, or otherwise unresolved.
+- Use historical only when the narrative explicitly places the fact before the
+  current incident. When timing is material but unavailable, use unresolved temporal
+  scope with temporal_scope uncertainty; never convert missing timing into historical.
 - Evidence containing a denial cannot support an affirmed fact unless that same
   excerpt contains a later explicit correction affirming it. Accidental evidence
   cannot support intentionality. Historical evidence cannot support current
@@ -67,4 +82,6 @@ Fact integrity rules:
   explicitly establishes the controlling account.
 - Use the smallest independently evidenced facts. Do not invent actor identity,
   target identity, motive, injury, weapon use, property damage, or causal links.
+- Do not duplicate a fact or restate one classification-relevant event as multiple
+  equivalent facts.
 """.strip()

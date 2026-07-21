@@ -41,3 +41,13 @@ def test_prompt_encodes_fact_level_evidence_and_integrity_adversaries():
     assert "historical evidence" in prompt
     assert "no-contact evidence" in prompt
     assert "unresolved materially conflicting active facts" in prompt
+
+
+def test_prompt_limits_facts_and_closes_observed_evidence_and_timing_gaps():
+    prompt = SEMANTIC_EXTRACTION_PROMPT.casefold()
+    assert "emit only classification-relevant operational facts" in prompt
+    assert "do not emit separate facts solely for emotion" in prompt
+    assert "every attribute marked unresolved or uncertain" in prompt
+    assert "volitional action phrasing" in prompt
+    assert "never convert missing timing into historical" in prompt
+    assert "do not duplicate a fact" in prompt

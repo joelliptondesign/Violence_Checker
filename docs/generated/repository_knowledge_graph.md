@@ -83,7 +83,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_fixtures.py` | deterministic test | none | 3 |
 | `tests/test_input_boundary.py` | deterministic test | none | 6 |
 | `tests/test_models.py` | deterministic test | none | 3 |
-| `tests/test_operator_communication.py` | deterministic test | none | 6 |
+| `tests/test_operator_communication.py` | deterministic test | none | 7 |
 | `tests/test_operator_communication_provider.py` | deterministic test | `FakeClient`, `FakeResponses` | 7 |
 | `tests/test_policy.py` | deterministic test | none | 17 |
 | `tests/test_presentation.py` | deterministic test | none | 4 |
@@ -92,8 +92,8 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_salesforce_preview.py` | deterministic test | none | 3 |
 | `tests/test_semantic_authority_boundary.py` | deterministic test | none | 8 |
 | `tests/test_semantic_extractor.py` | deterministic test | `FakeClient`, `FakeResponses` | 9 |
-| `tests/test_semantic_prompt.py` | deterministic test | none | 4 |
-| `tests/test_semantic_validation.py` | deterministic test | none | 17 |
+| `tests/test_semantic_prompt.py` | deterministic test | none | 5 |
+| `tests/test_semantic_validation.py` | deterministic test | none | 19 |
 | `tests/test_sitrec_lifecycle.py` | deterministic test | none | 18 |
 | `tests/test_streamlit_empty_state.py` | deterministic test | none | 5 |
 | `tests/test_successor_downstream_authority.py` | deterministic test | none | 5 |
@@ -166,7 +166,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_fixtures.py` | `src.fixtures` |
 | `tests/test_input_boundary.py` | `pytest`, `src.app_logic`, `src.contracts`, `src.fixtures`, `src.input_validation`, `src.models`, `src.narrative_normalizer`, `src.semantic_extractor`, `tests.successor_helpers` |
 | `tests/test_models.py` | `pydantic`, `pytest`, `src.models` |
-| `tests/test_operator_communication.py` | `pathlib`, `pydantic`, `pytest`, `src.app_logic`, `src.contracts`, `src.models`, `src.operator_communication`, `src.semantic_extractor`, `tests.test_app_logic` |
+| `tests/test_operator_communication.py` | `pathlib`, `pydantic`, `pytest`, `src.app_logic`, `src.contracts`, `src.models`, `src.operator_communication`, `src.operator_communication_provider`, `src.semantic_extractor`, `tests.test_app_logic` |
 | `tests/test_operator_communication_provider.py` | `json`, `pytest`, `src.app_logic`, `src.config`, `src.contracts`, `src.models`, `src.operator_communication`, `src.operator_communication_provider`, `tests.test_app_logic` |
 | `tests/test_policy.py` | `inspect`, `pytest`, `src.contracts`, `src.models`, `src.policy`, `src.provider_adapter`, `src.semantic_validation` |
 | `tests/test_presentation.py` | `src.app_logic`, `src.contracts`, `src.models`, `src.presentation`, `tests.test_app_logic` |

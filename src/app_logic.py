@@ -135,7 +135,11 @@ def run_analysis(
         communication_input = construct_communication_input(validation_result, policy_decision)
         try:
             generated = communicator(communication_input)
-            if generated.succeeded and generated.communication is not None:
+            if (
+                generated.succeeded
+                and generated.communication is not None
+                and generated.communication == communication
+            ):
                 communication = generated.communication
         except Exception:
             pass  # Presentation generation cannot change deterministic authority.

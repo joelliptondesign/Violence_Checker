@@ -59,7 +59,13 @@ def _contains_denial(text: str) -> bool:
 
 
 def _contains_later_affirmation(text: str) -> bool:
-    return bool(re.search(r"\b(later (confirmed|corrected)|actually|correction.{0,30}(did|occurred|happened))\b", text))
+    marker_and_action = re.search(
+        r"\b(?:later\s+(?:confirmed|corrected)|correction|actually)\b.{0,120}"
+        r"(?<!did not )(?<!didn't )(?:intentionally\s+)?"
+        r"(?:hit|punched|struck|shoved|kicked|smashed|damaged|broke|threatened|swung at)\b",
+        text,
+    )
+    return bool(marker_and_action)
 
 
 def validate_semantic_domain(

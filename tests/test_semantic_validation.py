@@ -242,6 +242,37 @@ def test_supported_correction_requires_later_reference_evidence_and_resolution_s
     assert ValidationIssueCode.INVALID_CORRECTION_REFERENCE in {issue.code for issue in result.domain_validation.issues}
 
 
+def test_correction_can_affirm_property_conduct_while_denying_interpersonal_contact():
+    earlier_text = "The initial note said the patient struck a nurse."
+    later_text = "A later supported correction states the patient intentionally struck a door and did not touch staff."
+    narrative = f"{earlier_text} {later_text}"
+    earlier = fact(
+        earlier_text,
+        local_ref="earlier",
+        resolution_status=ResolutionStatus.SUPERSEDED,
+    )
+    later = fact(
+        later_text,
+        local_ref="later",
+        conduct=Conduct.PROPERTY_VIOLENCE,
+        direction=FactDirection.OBJECT_DIRECTED,
+        supersedes_local_ref="earlier",
+        evidence=[ProviderFactEvidenceCandidate(
+            excerpt=later_text,
+            supports=BASE_SUPPORTS + [MaterialAttribute.SUPERSESSION],
+        )],
+    )
+    assert validate(adapt(narrative, [earlier, later]), narrative).passed
+
+
+def test_denial_only_correction_cannot_support_an_affirmed_fact():
+    narrative = "Correction: the patient did not strike the nurse."
+    result = validate(adapt(narrative, [fact(narrative)]), narrative)
+    assert ValidationIssueCode.INVALID_EVIDENCE_SUPPORT in {
+        issue.code for issue in result.domain_validation.issues
+    }
+
+
 def test_unresolved_contradiction_requires_two_active_disputed_supported_members():
     first_text = "Witness A said he intentionally punched the coworker today."
     second_text = "Witness B said he did not intentionally punch the coworker today."

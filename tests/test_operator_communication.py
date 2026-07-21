@@ -10,6 +10,7 @@ from src.contracts import (
 )
 from src.models import Incident
 from src.operator_communication import construct_communication_input
+from src.operator_communication_provider import OperatorCommunicationResult, OperatorCommunicationStatus
 from src.semantic_extractor import SemanticExtractionResult, SemanticExtractionStatus
 from tests.test_app_logic import candidate_for, extraction_for
 
@@ -72,3 +73,28 @@ def test_contract_rejects_extra_empty_and_implementation_language():
 def test_communication_module_has_no_provider_semantic_or_network_authority():
     source = Path("src/operator_communication.py").read_text(encoding="utf-8").lower()
     assert not any(term in source for term in ("semantic_extractor", "openai", "requests", "responses.parse", "evaluate_policy", "build_salesforce_preview"))
+
+
+def test_provider_prose_cannot_replace_bounded_deterministic_communication():
+    narrative = "Patient intentionally harmed themself today."
+    invented = OperatorCommunication(
+        incident_summary="The self-harm is current and ongoing.",
+        key_findings=("Ongoing harm confirmed",),
+        why_this_result="The unresolved incident remains ongoing.",
+    )
+    result = run_analysis(
+        Incident(incident_id="CASE_001", narrative=narrative),
+        extractor=extraction_for(candidate_for(
+            narrative,
+            conduct=Conduct.SELF_HARM,
+            direction=FactDirection.SELF_DIRECTED,
+        )),
+        communicator=lambda _: OperatorCommunicationResult(
+            status=OperatorCommunicationStatus.SUCCESS,
+            communication=invented,
+        ),
+    )
+    assert result.communication != invented
+    assert result.communication.incident_summary == (
+        "Intentional self-directed violence was reported during the current incident."
+    )

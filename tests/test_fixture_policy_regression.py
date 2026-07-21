@@ -23,5 +23,7 @@ def test_fixture_expectations_cover_detection_negative_and_directional_behavior(
     assert values["CASE_001"].expected_outcome.value == "Violence Detected"
     assert values["CASE_003"].expected_outcome.value == "No Violence Detected"
     assert values["CASE_004"].expected_outcome.value == "No Violence Detected"
+    assert values["CASE_006"].expected_conduct[0].value == "property_violence"
+    assert values["CASE_006"].expected_direction.value == "object_directed"
     assert values["CASE_007"].expected_direction.value == "object_directed"
     assert values["CASE_008"].expected_conduct[0].value == "physical_attempt"
