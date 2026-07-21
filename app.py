@@ -15,12 +15,18 @@ from src.models import Incident
 from src.operator_communication_provider import generate_operator_communication
 from src.presentation import (
     operational_fact_rows,
-    policy_explanation,
     policy_outcome_label,
     policy_reason_explanations,
     salesforce_operator_rows,
     salesforce_payload_rows,
     validated_evidence_excerpts,
+)
+
+
+DECISION_LOGIC_EXPLANATION = (
+    "The application reviewed supported operational facts, including conduct, direction, "
+    "intent, timing, assertion state, corrections, and unresolved information. It then applied "
+    "the workplace violence criteria deterministically."
 )
 
 
@@ -123,7 +129,6 @@ def _display_ai_operator_view(result) -> None:
         "Reviews supported incident facts as a whole and applies the workplace violence criteria deterministically."
     )
     st.subheader(policy_outcome_label(result.policy_decision))
-    st.caption(policy_explanation(result.policy_decision))
     if result.policy_decision.outcome == PolicyOutcome.UNABLE_TO_DETERMINE:
         st.error(policy_reason_explanations(result.policy_decision)[0])
     _display_operator_communication(result.communication)
@@ -148,24 +153,26 @@ def _display_ai_technical_details(result) -> None:
             st.write("No validated supporting evidence is available.")
 
         st.markdown("**Decision Logic**")
-        st.write(result.communication.why_this_result)
+        st.write(DECISION_LOGIC_EXPLANATION)
         validated = result.validation_result.validated_envelope
         derived = result.validation_result.derived_semantics
-        summary_lines = ["operator_facts:"]
+        summary_lines = ["incident_facts:"]
         if validated is None or derived is None:
-            summary_lines.append("  incident_information_available: false")
+            summary_lines.append("  operational_facts_available: false")
         else:
-            for row in rows:
-                summary_lines.append(f"  - what_happened: {row['What Happened']}")
-                if row["Who Was Involved"] != "—":
-                    summary_lines.append(f"    who_was_involved: {row['Who Was Involved']}")
-                if row["What Was Targeted"] != "—":
-                    summary_lines.append(f"    what_was_targeted: {row['What Was Targeted']}")
-                summary_lines.append(f"    intent: {row['Intent']}")
-                summary_lines.append(f"    when: {row['When']}")
-            summary_lines.append(
-                "  unresolved_information: "
-                f"{str(bool(derived.contradiction_groups) or any(fact.uncertainty for fact in validated.facts)).lower()}"
+            active_ids = set(derived.active_fact_ids)
+            active_facts = [fact for fact in validated.facts if fact.fact_id in active_ids]
+            values = lambda attribute: sorted({getattr(fact, attribute).value for fact in active_facts})
+            summary_lines.extend(
+                (
+                    f"  conduct: {[fact.conduct.value if fact.conduct else 'unresolved' for fact in active_facts]}",
+                    f"  incident_direction: {derived.incident_direction.value}",
+                    f"  intentionality: {values('intentionality')}",
+                    f"  temporal_scope: {values('temporal_scope')}",
+                    f"  assertion_status: {values('assertion_status')}",
+                    f"  resolution_status: {values('resolution_status')}",
+                    f"  unresolved_content: {str(bool(derived.contradiction_groups) or any(fact.uncertainty for fact in active_facts)).lower()}",
+                )
             )
         summary_lines.extend(
             (

@@ -19,11 +19,7 @@ from src.contracts import (
 from src.input_validation import validate_incident
 from src.models import Incident
 from src.narrative_normalizer import normalize_incident
-from src.operator_communication import (
-    communication_is_supported,
-    create_operator_communication,
-    construct_communication_input,
-)
+from src.operator_communication import build_failure_communication, create_operator_communication, construct_communication_input
 from src.operator_communication_provider import OperatorCommunicationResult
 from src.policy import evaluate_policy
 from src.regex_baseline import detect_violence_terms
@@ -142,7 +138,7 @@ def run_analysis(
             if (
                 generated.succeeded
                 and generated.communication is not None
-                and communication_is_supported(generated.communication, communication_input)
+                and generated.communication == communication
             ):
                 communication = generated.communication
         except Exception:

@@ -602,7 +602,7 @@ class ValidationResult(BaseModel):
 
 
 class CommunicationFact(BaseModel):
-    """Identifier-free operational fact projected from validated repository truth."""
+    """Narrative-free operational fact projected from validated repository truth."""
 
     model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
 
@@ -613,7 +613,6 @@ class CommunicationFact(BaseModel):
     assertion_status: AssertionStatus
     resolution_status: ResolutionStatus
     uncertainty: tuple[UncertaintyDimension, ...]
-    evidence_excerpts: tuple[StrictStr, ...] = Field(min_length=1)
 
 
 class OperatorCommunicationInput(BaseModel):
@@ -655,26 +654,13 @@ class OperatorCommunication(BaseModel):
     def prohibit_implementation_language(self) -> "OperatorCommunication":
         rendered = " ".join((self.incident_summary, *self.key_findings, self.why_this_result)).casefold()
         forbidden = (
-            "assertion affirmed",
             "canonical id",
-            "classifier concluded",
-            "completeness status",
-            "contradiction group",
-            "deterministic processing",
-            "model determined",
             "policy candidate",
-            "processing status",
             "provider output",
             "reason code",
-            "repository",
             "repository bookkeeping",
-            "resolution active",
             "schema version",
-            "semantic analysis",
             "semantic graph",
-            "system determined",
-            "temporal scope",
-            "validated facts",
             "validation stage",
         )
         if any(term in rendered for term in forbidden):

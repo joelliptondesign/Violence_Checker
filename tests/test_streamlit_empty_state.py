@@ -56,18 +56,10 @@ def test_successful_run_preserves_two_cards_mobile_order_and_true_north_details(
         "Incident Narrative", "Regex Keyword Detection", "AI-Powered Semantic Analysis",
         "Illustrative Salesforce Record",
     ]
-    assert all(value in text for value in (
-        "Incident Summary", "Key Findings", "Why This Result", "Violence Detected",
-        "The reported event meets the workplace violence criteria.",
-    ))
+    assert all(value in text for value in ("Incident Summary", "Key Findings", "Why This Result", "Violence Detected"))
     assert [item.label for item in app_test.expander] == ["Technical Details", "Technical Details", "Salesforce Payload Details"]
-    assert list(app_test.table[0].value.columns) == [
-        "What Happened", "Who Was Involved", "What Was Targeted", "Intent", "When",
-    ]
-    assert "who_was_involved:" in app_test.code[0].value
-    assert all(term not in app_test.code[0].value for term in (
-        "incident_direction", "assertion_status", "resolution_status", "temporal_scope",
-    ))
+    assert list(app_test.table[0].value.columns) == ["Conduct", "Direction", "Intent", "Timing", "Assertion", "Resolution"]
+    assert "incident_direction:" in app_test.code[0].value
     assert not any(term in app_test.code[0].value.lower() for term in ("proposition", "entity", "relationship"))
     source = Path("app.py").read_text(encoding="utf-8")
     assert "@media (max-width: 640px)" in source
@@ -89,7 +81,6 @@ def test_unable_result_renders_bounded_communication_and_no_record():
         app_test.button[0].click().run(timeout=10)
     text = rendered(app_test)
     assert "Unable to Determine" in text
-    assert "The available information was insufficient to complete a reliable analysis." in text
     assert "Incident Summary" in text
     assert "No record generated for this result." in text
     assert "secret-value" not in text

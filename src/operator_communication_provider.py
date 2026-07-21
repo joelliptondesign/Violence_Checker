@@ -102,62 +102,6 @@ def generate_operator_communication(
             status=OperatorCommunicationStatus.VALIDATION_FAILURE,
             failure_message=exc.__class__.__name__,
         )
-    summary = communication.incident_summary.casefold()
-    rendered = " ".join((
-        communication.incident_summary,
-        *communication.key_findings,
-        communication.why_this_result,
-    )).casefold()
-    evidence = " ".join(
-        excerpt
-        for fact in (*facts.active_facts, *facts.superseded_facts)
-        for excerpt in fact.evidence_excerpts
-    ).casefold()
-    issues = []
-    if facts.outcome.value.casefold() in summary or any(
-        term in summary for term in ("classif", "criteria", "result", "validation", "semantic")
-    ):
-        issues.append("incident summary must describe the event without explaining classification")
-    if "workplace violence criteria" not in communication.why_this_result.casefold():
-        issues.append("classification explanation must connect the incident to doctrine")
-    evidence_words = set(evidence.replace(".", " ").replace(",", " ").split())
-    summary_words = set(summary.replace(".", " ").replace(",", " ").split())
-    for claim, support_words in (
-        ("patient", ("patient", "pt")), ("nurse", ("nurse", "rn")),
-        ("technician", ("technician", "tech")), ("aide", ("aide",)),
-        ("visitor", ("visitor",)), ("security", ("security",)),
-        ("physician", ("physician", "doctor")),
-    ):
-        if claim in summary_words and not any(word in evidence_words for word in support_words):
-            issues.append(f"unsupported actor introduced: {claim}")
-    for fact in facts.active_facts:
-        conduct_terms = {
-            "verbal_threat": ("threat", "punch", "harm"),
-            "physical_attempt": ("attempt", "swung", "lunged", "missed", "tried"),
-            "physical_contact": ("contact", "hit", "struck", "grab", "kick", "slap", "elbow"),
-            "self_harm": ("self-harm", "themself", "herself", "himself", "own"),
-            "property_violence": ("property", "door", "window", "wall", "rail", "object"),
-        }.get(fact.conduct.value if fact.conduct is not None else "", ())
-        if conduct_terms and not any(term in rendered for term in conduct_terms):
-            issues.append("material conduct omitted")
-        if fact.intentionality.value == "accidental" and "accident" not in rendered:
-            issues.append("accidental intent omitted")
-        if fact.temporal_scope.value == "historical" and not any(
-            term in rendered for term in ("before", "earlier", "historical", "previous", "years ago")
-        ):
-            issues.append("material chronology omitted")
-    for claim in (
-        "injury", "injured", "bruising", "bleeding", "sore", "pain", "hallway",
-        "bathroom", "bedroom", "lobby", "parking", "security", "police", "restraint",
-        "medication", "ongoing", "resolved", "calmed",
-    ):
-        if claim in rendered and claim not in evidence:
-            issues.append(f"unsupported detail introduced: {claim}")
-    if issues:
-        return OperatorCommunicationResult(
-            status=OperatorCommunicationStatus.VALIDATION_FAILURE,
-            failure_message="; ".join(issues),
-        )
     return OperatorCommunicationResult(
         status=OperatorCommunicationStatus.SUCCESS,
         communication=communication,

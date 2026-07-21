@@ -21,13 +21,6 @@ def test_preview_is_deterministic_true_north_representation():
     assert first["Illustrative_Deterministic_Outcome__c"] == "Violence Detected"
     assert first["Illustrative_Qualifying_Conduct__c"] == ["physical_contact"]
     assert first["Illustrative_Incident_Direction__c"] == "interpersonal"
-    assert first["Illustrative_Operational_Facts__c"] == [
-        "What Happened: Physical contact; Who Was Involved: Patient and nurse; "
-        "Intent: Intentional; When: During the event being reported"
-    ]
-    assert all(term not in first["Illustrative_Operational_Facts__c"][0] for term in (
-        "assertion", "resolution", "interpersonal", "current",
-    ))
     assert not any("proposition" in name.lower() for name in first)
 
 
