@@ -87,6 +87,7 @@ def test_sitrec_validation_accepts_current_active_sitrec() -> None:
     assert "docs/operator_communication_tone_guidelines.md" in text
     assert "Governing presentation policy for every operator-facing communication surface" in text
     assert "The first 24-case live-provider evaluation is complete" in text
+    assert "corrections are implemented but have not been live re-evaluated" in text
     assert "No True North baseline has been accepted" in text
 
 

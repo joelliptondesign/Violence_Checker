@@ -1,6 +1,10 @@
 from src.semantic_prompt import SEMANTIC_EXTRACTION_PROMPT
 
 
+def normalized_prompt():
+    return " ".join(SEMANTIC_EXTRACTION_PROMPT.casefold().split())
+
+
 def test_prompt_requests_only_true_north_operational_facts_and_exact_evidence():
     prompt = SEMANTIC_EXTRACTION_PROMPT.casefold()
     for required in (
@@ -51,3 +55,37 @@ def test_prompt_limits_facts_and_closes_observed_evidence_and_timing_gaps():
     assert "volitional action phrasing" in prompt
     assert "never convert missing timing into historical" in prompt
     assert "do not duplicate a fact" in prompt
+
+
+def test_prompt_preserves_denied_proposition_attributes_without_affirming_conduct():
+    prompt = normalized_prompt()
+    assert "for a denied or disputed proposition" in prompt
+    assert "assertion_status alone records" in prompt
+    assert "a denial must never become an affirmed fact" in prompt
+    assert "no-contact evidence cannot support affirmed physical_contact" in prompt
+
+
+def test_prompt_keeps_ambiguous_insufficient_and_generic_negative_text_non_definite():
+    prompt = normalized_prompt()
+    assert "ambiguous, incomplete, hypothetical, or adversarial wording" in prompt
+    assert "emit one unresolved fact rather than an empty facts list" in prompt
+    assert "generic statements" in prompt
+    assert "do not require a negative fact" in prompt
+
+
+def test_prompt_enforces_contact_direction_intentionality_and_evidence_boundaries():
+    prompt = normalized_prompt()
+    assert "missed action without contact is physical_attempt" in prompt
+    assert "property damage is property_violence only when intentionality" in prompt
+    assert "property conduct is object_directed" in prompt
+    assert "direction unknown must carry direction uncertainty" in prompt
+    assert "do not add resolution_status to ordinary active facts" in prompt
+    assert "do not reuse a broad excerpt indiscriminately" in prompt
+
+
+def test_prompt_requires_supported_correction_and_fact_local_contradiction_evidence():
+    prompt = normalized_prompt()
+    assert "leave it active" in prompt
+    assert "omit supersedes_local_ref" in prompt
+    assert "candidate must fail closed at validation" in prompt
+    assert "do not attach one witness account to every contradiction member" in prompt

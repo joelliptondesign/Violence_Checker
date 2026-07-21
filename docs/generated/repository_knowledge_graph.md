@@ -36,7 +36,7 @@ This graph records deterministic repository relationships discoverable from file
 | `src/config.py` | provider-facing | `AppConfig` | 3 |
 | `src/contract_adapters.py` | deterministic | none | 2 |
 | `src/contracts.py` | deterministic | `AssertionStatus`, `CommunicationFact`, `CompletenessStatus`, `Conduct`, `DerivedContradictionGroup`, `DerivedSemanticView`, `DomainValidationResult`, `DomainValidationStatus`, `FactDirection`, `FactEvidence`, `IncidentDirection`, `IncidentFact`, `InputFailureCode`, `InputValidationIssue`, `InputValidationResult`, `InputValidationStatus`, `Intentionality`, `MaterialAttribute`, `NormalizationOperation`, `NormalizedIncident`, `OperatorCommunication`, `OperatorCommunicationInput`, `PipelineResult`, `PolicyDecision`, `PolicyOutcome`, `PolicyReasonCode`, `ProcessingStatus`, `ProviderFactCandidate`, `ProviderFactEvidenceCandidate`, `ProviderStructuredResponse`, `RegexResult`, `ResolutionStatus`, `SchemaValidationResult`, `SchemaValidationStatus`, `TemporalScope`, `TrueNorthSemanticEnvelope`, `UncertaintyDimension`, `ValidationFailureStage`, `ValidationIssue`, `ValidationIssueCode`, `ValidationResult` | 21 |
-| `src/domain_validation.py` | deterministic | none | 7 |
+| `src/domain_validation.py` | deterministic | none | 8 |
 | `src/evaluation/__init__.py` | deterministic | none | 0 |
 | `src/evaluation/artifact_cli.py` | deterministic | none | 3 |
 | `src/evaluation/baseline.py` | deterministic | `BaselineError`, `BaselineIssueCode` | 7 |
@@ -92,8 +92,8 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_salesforce_preview.py` | deterministic test | none | 3 |
 | `tests/test_semantic_authority_boundary.py` | deterministic test | none | 8 |
 | `tests/test_semantic_extractor.py` | deterministic test | `FakeClient`, `FakeResponses` | 9 |
-| `tests/test_semantic_prompt.py` | deterministic test | none | 5 |
-| `tests/test_semantic_validation.py` | deterministic test | none | 19 |
+| `tests/test_semantic_prompt.py` | deterministic test | none | 10 |
+| `tests/test_semantic_validation.py` | deterministic test | none | 23 |
 | `tests/test_sitrec_lifecycle.py` | deterministic test | none | 18 |
 | `tests/test_streamlit_empty_state.py` | deterministic test | none | 5 |
 | `tests/test_successor_downstream_authority.py` | deterministic test | none | 5 |

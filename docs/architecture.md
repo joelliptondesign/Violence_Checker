@@ -4,7 +4,7 @@
 
 The true-north semantic, deterministic-policy, and downstream application runtime are implemented. They use `TrueNorthSemanticEnvelope`, schema identity `violence-checker.true-north-incident-facts`, version `1.0.0`, repository-owned analysis status, deterministic semantic views, and direct policy evaluation over validated facts.
 
-Application orchestration, regex comparison, illustrative Salesforce projection, bounded operator communication, presentation, Streamlit, and the evaluation framework consume the true-north fact contract. The active evaluation schema is `3.0.0` and its 24-case operational corpus includes all required doctrine categories, eight adversarial integrity cases, and explicit expectations for all eight demonstration fixtures. Baseline acceptance, live-provider evaluation, deployment, and hosted acceptance remain pending. No compatibility wrapper, proposition policy candidate, or dual semantic authority is present.
+Application orchestration, regex comparison, illustrative Salesforce projection, bounded operator communication, presentation, Streamlit, and the evaluation framework consume the true-north fact contract. The active evaluation schema is `3.0.0` and its 24-case operational corpus includes all required doctrine categories, eight adversarial integrity cases, and explicit expectations for all eight demonstration fixtures. The first live-provider evaluation is immutable historical evidence with readiness conclusion `NOT_READY_SEMANTIC_FAILURES`. Provider-boundary semantic corrections are implemented but have not been live re-evaluated; baseline acceptance, deployment, and hosted acceptance remain pending. No compatibility wrapper, proposition policy candidate, or dual semantic authority is present.
 
 ## Semantic authority
 
@@ -42,7 +42,7 @@ The provider response contains only candidate facts, exact evidence excerpts, at
 
 Evidence is fact-oriented. Every evidence record belongs to one fact, preserves an exact non-empty narrative excerpt, has repository-owned identity, may carry exact offsets, and names the material attributes it supports. There is no subject-oriented evidence graph.
 
-Schema validation enforces strict shape, exact identities and versions, bounded enumerations, canonical identifiers and ordering, and reference integrity. Domain validation enforces exact containment and offsets, material-attribute coverage, uncertainty correspondence, doctrinal combinations, denial/accident/historical/no-contact safeguards, correction order and acyclicity, and contradiction-group integrity.
+Schema validation enforces strict shape, exact identities and versions, bounded enumerations, canonical identifiers and ordering, and reference integrity. Domain validation enforces exact containment and offsets, material-attribute coverage, uncertainty correspondence, doctrinal combinations, denial/accident/historical/no-contact safeguards, correction order and acyclicity, explicit correction-marker linkage, contradiction-group integrity, and rejection of unsupported resolution-status evidence on ordinary active facts. Denied propositions may retain their explicitly supported conduct attributes without becoming affirmed facts.
 
 Validation is deterministic and fail-closed. It does not repair candidates, apply silent semantic defaults, or attempt unrestricted natural-language entailment.
 
@@ -71,7 +71,7 @@ Successful validation exposes the envelope, repository processing/completeness s
 
 ## Preserved boundaries
 
-Input validation, narrative normalization, and regex result contracts remain available. The application makes one semantic request for a valid explicit analysis, disables provider retries, and makes no request for invalid input. This integration made no live evaluation run, corpus or baseline regeneration, deployment, push, or external write.
+Input validation, narrative normalization, and regex result contracts remain available. The application makes one semantic request for a valid explicit analysis, disables provider retries, and makes no request for invalid input. The provider-boundary correction operation made no provider request, live evaluation run, corpus or baseline regeneration, deployment, or external write. The recorded live-evaluation artifacts remain unchanged.
 
 Historical evaluation artifacts retain their creation-time schema families and were not rewritten or promoted. They remain readable but non-authoritative and incomparable with the active True North evaluation family.
 
@@ -83,4 +83,4 @@ The repository remains a synthetic demonstration. It does not provide clinical, 
 
 The approved [Workplace Violence Doctrine](workplace_violence_doctrine.md), [True North Semantic Contract Specification](true_north_semantic_contract_specification.md), and [True North Migration Strategy](true_north_migration_strategy.md) govern the semantic and policy boundary. The [Operator Communication Tone Guidelines](operator_communication_tone_guidelines.md) govern every operator-facing presentation surface, including provider-generated and fallback communication, Streamlit labels and prose, operational facts, decision logic, technical details, and the illustrative Salesforce preview. This communication authority changes presentation policy only; it cannot alter supported facts, validation, classification, or runtime behavior.
 
-Later packages must implement and evaluate operator-facing wording against that communication authority while completing live-provider evaluation, baseline acceptance, deployment, and hosted acceptance without restoring dual semantic authority.
+Later packages must evaluate the provider-boundary corrections through a separately authorized live-provider run and implement operator-facing wording against the communication authority before baseline acceptance, deployment, or hosted acceptance, without restoring dual semantic authority.

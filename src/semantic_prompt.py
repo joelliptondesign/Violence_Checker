@@ -8,6 +8,18 @@ denied, corrected, or superseded; and unresolved facts that could materially cha
 classification. Do not emit separate facts solely for emotion, redirection, routine
 care, security response, injury, location, or other contextual details.
 
+Extract only what the narrative explicitly supports. Do not turn ambiguous,
+incomplete, hypothetical, or adversarial wording into affirmed qualifying conduct.
+Do not infer definite violence merely because a report says that something may have
+happened. When the narrative explicitly describes a potentially material incident
+but states that the material attributes are insufficient or unknown, emit one
+unresolved fact rather than an empty facts list: use null conduct, unknown direction,
+unresolved intentionality, temporal scope, and assertion status, and the matching
+uncertainty dimensions. Use an empty facts list when the narrative contains no
+classification-relevant alleged, possible, corrected, or disputed incident fact.
+Generic statements such as "no threats or aggressive behavior" do not require a
+negative fact unless they deny a specific alleged event or control a correction.
+
 For each separately supportable fact, provide:
 - a short temporary local_ref;
 - conduct: verbal_threat, physical_attempt, physical_contact, self_harm,
@@ -44,23 +56,39 @@ Evidence rules:
   intentionality, temporal_scope, assertion_status, resolution_status,
   supersession, or contradiction.
 - Together a fact's evidence must support conduct when resolved, every settled
-  material attribute, every attribute marked unresolved or uncertain, and every
+  policy-relevant attribute, every attribute marked unresolved or uncertain, and every
   explicit correction or contradiction link. When conduct is null or direction,
   intentionality, temporal scope, or assertion state is unresolved, include the
   corresponding attribute in evidence supports.
+- Evidence labels must identify only attributes established by that exact excerpt.
+  Do not add resolution_status to ordinary active facts. Use resolution_status
+  evidence only when the excerpt itself establishes correction or supersession; use
+  supersession for the controlling later correction link.
 - Do not produce unsupported semantic facts or inferred outcomes. Do not infer
-  intentionality solely from contact or severity, current scope from document
-  placement, or interpersonal direction from property evidence. Unambiguously
-  volitional action phrasing such as "swung at," "punched," "kicked," or "hit with
-  a closed fist" may support intentionality when the narrative does not qualify it
-  as accidental, denied, disputed, hypothetical, or otherwise unresolved.
+  intentionality solely from contact, injury, force, agitation, severity, or property
+  damage; current scope from document placement; physical contact from an attempt,
+  threat, or missed action; or interpersonal direction from object-directed evidence.
+  Unambiguously volitional action phrasing such as "swung at," "punched," "kicked,"
+  or "hit with a closed fist" may support the intentionality of the proposition unless
+  the action itself is qualified as accidental, hypothetical, or otherwise unresolved.
+  For a denied or disputed proposition, encode the explicitly named conduct,
+  direction, conventional action intentionality, and timing when supported, while
+  assertion_status alone records that the proposition is denied or disputed. A denial
+  must never become an affirmed fact.
 - Use historical only when the narrative explicitly places the fact before the
   current incident. When timing is material but unavailable, use unresolved temporal
   scope with temporal_scope uncertainty; never convert missing timing into historical.
 - Evidence containing a denial cannot support an affirmed fact unless that same
   excerpt contains a later explicit correction affirming it. Accidental evidence
   cannot support intentionality. Historical evidence cannot support current
-  scope. No-contact evidence cannot support physical_contact.
+  scope. No-contact evidence cannot support affirmed physical_contact. A swing,
+  attempt, or missed action without contact is physical_attempt, not physical_contact.
+- Property damage is property_violence only when intentionality is explicit or
+  otherwise directly supported. Property conduct is object_directed, never
+  interpersonal merely because a person appears elsewhere in the narrative.
+- Use one fact's own exact evidence. Do not attach one witness account to every
+  contradiction member, and do not reuse a broad excerpt indiscriminately across
+  unrelated facts merely because it contains multiple events.
 
 Fact integrity rules:
 - self_harm requires self_directed direction.
@@ -69,12 +97,18 @@ Fact integrity rules:
 - null conduct requires conduct uncertainty; a resolved conduct value must not
   carry conduct uncertainty.
 - unresolved intentionality, temporal scope, or assertion status requires the
-  matching uncertainty dimension. Direction unknown may carry direction
-  uncertainty.
+  matching uncertainty dimension. Direction unknown must carry direction
+  uncertainty. Do not add uncertainty for an attribute that the narrative settles.
 - Preserve a supported correction as a later fact that references the earlier
   fact through supersedes_local_ref. Keep the earlier fact as superseded and the
   controlling later fact as active. Include supersession evidence on the later
   fact.
+- A later denial or affirmation that explicitly updates an earlier allegation is a
+  correction, not an unrelated fact. Do not omit the earlier fact, leave it active,
+  or omit supersedes_local_ref. If the narrative explicitly says a correction or
+  correction relationship exists but does not provide enough information to form a
+  valid reference, do not invent the missing fact or link; the candidate must fail
+  closed at validation.
 - Use a shared contradiction_group_local_ref only for unresolved materially conflicting active facts.
   Mark every member disputed, include the disputed
   uncertainty dimension, and include contradiction evidence for every member.

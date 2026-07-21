@@ -273,6 +273,53 @@ def test_denial_only_correction_cannot_support_an_affirmed_fact():
     }
 
 
+def test_denied_specific_contact_can_preserve_proposition_attributes_without_becoming_affirmed():
+    narrative = "The employee denied hitting the nurse today."
+    denied = fact(
+        narrative,
+        assertion_status=AssertionStatus.DENIED,
+    )
+    result = validate(adapt(narrative, [denied]), narrative)
+    assert result.passed
+    assert result.validated_envelope.facts[0].assertion_status == AssertionStatus.DENIED
+
+
+def test_explicit_omitted_correction_relationship_fails_closed():
+    narrative = "An earlier report alleged a shove, but the correction relationship was omitted."
+    result = validate(adapt(narrative, [fact(narrative)]), narrative)
+    assert ValidationIssueCode.INVALID_CORRECTION_REFERENCE in {
+        issue.code for issue in result.domain_validation.issues
+    }
+
+
+def test_ordinary_active_fact_rejects_unsupported_resolution_status_evidence_label():
+    narrative = "The employee intentionally punched the nurse today."
+    labeled = fact(
+        narrative,
+        evidence=[ProviderFactEvidenceCandidate(
+            excerpt=narrative,
+            supports=BASE_SUPPORTS + [MaterialAttribute.RESOLUTION_STATUS],
+        )],
+    )
+    result = validate(adapt(narrative, [labeled]), narrative)
+    assert ValidationIssueCode.INVALID_EVIDENCE_SUPPORT in {
+        issue.code for issue in result.domain_validation.issues
+    }
+
+
+def test_unknown_direction_preserves_supported_qualifying_conduct():
+    narrative = "An intentional punch occurred today, but the target is unknown."
+    unknown_direction = fact(
+        narrative,
+        direction=FactDirection.UNKNOWN,
+        uncertainty=[UncertaintyDimension.DIRECTION],
+    )
+    result = validate(adapt(narrative, [unknown_direction]), narrative)
+    assert result.passed
+    assert result.validated_envelope.facts[0].conduct == Conduct.PHYSICAL_CONTACT
+    assert result.derived_semantics.incident_direction == IncidentDirection.UNKNOWN
+
+
 def test_unresolved_contradiction_requires_two_active_disputed_supported_members():
     first_text = "Witness A said he intentionally punched the coworker today."
     second_text = "Witness B said he did not intentionally punch the coworker today."

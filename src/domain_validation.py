@@ -68,6 +68,13 @@ def _contains_later_affirmation(text: str) -> bool:
     return bool(marker_and_action)
 
 
+def _contains_correction_marker(text: str) -> bool:
+    return bool(re.search(
+        r"\b(?:correction|corrected|updated\s+(?:note|report)|later\s+(?:confirmed|corrected))\b",
+        text.casefold(),
+    ))
+
+
 def validate_semantic_domain(
     envelope: TrueNorthSemanticEnvelope,
     *,
@@ -138,7 +145,11 @@ def validate_semantic_domain(
         if fact.temporal_scope == TemporalScope.CURRENT and re.search(r"\b(historical|previously|prior|last year|years? ago|yrs? ago)\b", temporal_text):
             issues.append(_issue(ValidationIssueCode.INVALID_EVIDENCE_SUPPORT, f"{field}.temporal_scope", "Historical-only evidence cannot support current scope."))
         conduct_text = _support_text(fact, MaterialAttribute.CONDUCT)
-        if fact.conduct == Conduct.PHYSICAL_CONTACT and re.search(r"\b(no|without|did not|didn't)\s+(physical\s+)?(contact|hit|strike|struck|shove|shoved|touch)\b", conduct_text):
+        if (
+            fact.conduct == Conduct.PHYSICAL_CONTACT
+            and fact.assertion_status == AssertionStatus.AFFIRMED
+            and re.search(r"\b(no|without|did not|didn't)\s+(physical\s+)?(contact|hit|strike|struck|shove|shoved|touch)\b", conduct_text)
+        ):
             issues.append(_issue(ValidationIssueCode.INVALID_EVIDENCE_SUPPORT, f"{field}.conduct", "No-contact evidence cannot support physical contact."))
         if fact.conduct == Conduct.PHYSICAL_ATTEMPT:
             completed = re.search(r"\b(hit|punched|struck|shoved|made contact|contact occurred)\b", conduct_text)
@@ -182,11 +193,30 @@ def validate_semantic_domain(
         if count > 1:
             issues.append(_issue(ValidationIssueCode.INVALID_CORRECTION_REFERENCE, target, "A fact cannot have multiple controlling corrections."))
     target_set = set(correction_targets)
+    if (
+        _contains_correction_marker(normalized_narrative)
+        and not correction_edges
+        and all(fact.resolution_status == ResolutionStatus.ACTIVE for fact in envelope.facts)
+    ):
+        issues.append(_issue(
+            ValidationIssueCode.INVALID_CORRECTION_REFERENCE,
+            "facts.supersedes_fact_id",
+            "An explicit correction marker requires a supported correction reference.",
+        ))
     for fact in envelope.facts:
         if fact.fact_id in target_set and fact.resolution_status != ResolutionStatus.SUPERSEDED:
             issues.append(_issue(ValidationIssueCode.INVALID_CORRECTION_REFERENCE, fact.fact_id, "A corrected fact must be superseded."))
         if fact.resolution_status == ResolutionStatus.SUPERSEDED and fact.fact_id not in target_set:
             issues.append(_issue(ValidationIssueCode.INVALID_CORRECTION_REFERENCE, fact.fact_id, "A superseded fact requires a later correction reference."))
+        participates_in_correction = fact.fact_id in target_set or fact.supersedes_fact_id is not None
+        if not participates_in_correction:
+            for evidence in fact.evidence:
+                if MaterialAttribute.RESOLUTION_STATUS in evidence.supports:
+                    issues.append(_issue(
+                        ValidationIssueCode.INVALID_EVIDENCE_SUPPORT,
+                        f"{fact.fact_id}.evidence",
+                        "Ordinary active facts cannot claim resolution-status evidence.",
+                    ))
 
     for group_id, members in sorted(groups.items()):
         if len(members) < 2:
