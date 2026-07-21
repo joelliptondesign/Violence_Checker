@@ -1,0 +1,3917 @@
+{
+  "aggregate_summary": {
+    "acceptable_variations": 2,
+    "corpus_status_counts": {
+      "ACCEPTABLE_VARIATION": 2,
+      "PASS": 14,
+      "PROVIDER_TIMEOUT": 2,
+      "SEMANTIC_MISMATCH": 2,
+      "VALIDATION_FAILURE": 4
+    },
+    "exact_corpus_passes": 14,
+    "fixture_status_counts": {
+      "PASS": 2,
+      "PROVIDER_FAILURE": 1,
+      "SEMANTIC_MISMATCH": 2,
+      "VALIDATION_FAILURE": 3
+    },
+    "operational_fact_accuracy_completed_corpus_responses": {
+      "matches": 14,
+      "percent": 63.64,
+      "total": 22
+    },
+    "outcome_accuracy_completed_corpus_responses": {
+      "matches": 17,
+      "percent": 77.27,
+      "total": 22
+    },
+    "provider_failures_all_live_cases": 1,
+    "provider_timeouts_all_live_cases": 2,
+    "severity_counts_all_live_cases": {
+      "1": 7,
+      "2": 4,
+      "3": 0
+    },
+    "total_corpus_cases": 24,
+    "total_fixtures": 8
+  },
+  "artifact_identity": "violence-checker.true-north-live-comparison",
+  "artifact_version": "2.0.0",
+  "baseline_accepted": false,
+  "case_results": [
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_001",
+      "case_status": "PASS",
+      "completeness_status": "complete_admissible_analysis",
+      "derived_incident_direction": "interpersonal",
+      "deterministic_outcome": "Violence Detected",
+      "deterministic_reason": {
+        "explanation": "At least one active fact affirms intentional current qualifying conduct.",
+        "reason_codes": [
+          "qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "explicit_threat",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "verbal_threat",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient explicitly threatened to punch the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [],
+      "malformed_candidate_expectation": null,
+      "narrative": "The patient explicitly threatened to punch the nurse today.",
+      "narrative_sha256": "e72fcce1796171975af65585061b9275ebd4830bd70a1e1b9a93c8a190f69d52",
+      "observed_evidence_excerpts": [
+        "The patient explicitly threatened to punch the nurse today."
+      ],
+      "observed_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "verbal_threat",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient explicitly threatened to punch the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 8.956,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T12:58:10.244735Z",
+      "request_started_at": "2026-07-21T12:58:01.288877Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_002",
+      "case_status": "SEMANTIC_MISMATCH",
+      "completeness_status": "unresolved_semantic_content",
+      "derived_incident_direction": "interpersonal",
+      "deterministic_outcome": "Uncertain",
+      "deterministic_reason": {
+        "explanation": "Admissible active facts preserve unresolved semantic content that can change classification.",
+        "reason_codes": [
+          "material_semantic_uncertainty"
+        ]
+      },
+      "doctrine_category": "physical_attempt",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "Observed extraction did not satisfy doctrine-authored semantic expectations.",
+      "earliest_failing_stage": "EVALUATION_COMPARISON",
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_attempt",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "pt swung at rn and missed",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [
+        {
+          "expected": "complete_admissible_analysis",
+          "field": "completeness_status",
+          "observed": "unresolved_semantic_content"
+        },
+        {
+          "expected": "Violence Detected",
+          "field": "deterministic_outcome",
+          "observed": "Uncertain"
+        },
+        {
+          "expected": "current",
+          "field": "operational_facts[0].temporal_scope",
+          "observed": "unresolved"
+        },
+        {
+          "expected": 0,
+          "field": "operational_facts[0].uncertainty.length",
+          "observed": 1
+        }
+      ],
+      "malformed_candidate_expectation": null,
+      "narrative": "pt swung at rn and missed",
+      "narrative_sha256": "465208b589d409b86c2c7f7bddbcbe5d1f795b3e985e7e508a019fa57a5776ff",
+      "observed_evidence_excerpts": [
+        "pt swung at rn and missed"
+      ],
+      "observed_truth": {
+        "completeness_status": "unresolved_semantic_content",
+        "deterministic_outcome": "Uncertain",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_attempt",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "pt swung at rn and missed",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "unresolved",
+            "uncertainty": [
+              "temporal_scope"
+            ]
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 15.4,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T12:58:26.098993Z",
+      "request_started_at": "2026-07-21T12:58:10.698951Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": 1,
+      "stakeholder_impact": "Blocks semantic baseline review.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_003",
+      "case_status": "PASS",
+      "completeness_status": "complete_admissible_analysis",
+      "derived_incident_direction": "interpersonal",
+      "deterministic_outcome": "Violence Detected",
+      "deterministic_reason": {
+        "explanation": "At least one active fact affirms intentional current qualifying conduct.",
+        "reason_codes": [
+          "qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "completed_physical_contact",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient intentionally punched the nurse during medication administration.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [],
+      "malformed_candidate_expectation": null,
+      "narrative": "The patient intentionally punched the nurse during medication administration.",
+      "narrative_sha256": "69121ad751bc69df7227f70785a348572d0fce7b0c27f3a2ebb511d00bc4aa4c",
+      "observed_evidence_excerpts": [
+        "The patient intentionally punched the nurse during medication administration."
+      ],
+      "observed_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient intentionally punched the nurse during medication administration.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 11.596,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T12:58:38.124894Z",
+      "request_started_at": "2026-07-21T12:58:26.528774Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_004",
+      "case_status": "PASS",
+      "completeness_status": "complete_admissible_analysis",
+      "derived_incident_direction": "self_directed",
+      "deterministic_outcome": "Violence Detected",
+      "deterministic_reason": {
+        "explanation": "At least one active fact affirms intentional current qualifying conduct.",
+        "reason_codes": [
+          "qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "self_harm",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "self_directed",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "self_harm",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "self_directed",
+            "evidence": [
+              {
+                "excerpt": "The patient intentionally cut themself during the incident.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [],
+      "malformed_candidate_expectation": null,
+      "narrative": "The patient intentionally cut themself during the incident.",
+      "narrative_sha256": "c06d441558156923ecc0c1cfe7f9e9635f8e32a5b6d854b56f46ab8e1465dd6c",
+      "observed_evidence_excerpts": [
+        "The patient intentionally cut themself during the incident."
+      ],
+      "observed_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "self_directed",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "self_harm",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "self_directed",
+            "evidence": [
+              {
+                "excerpt": "The patient intentionally cut themself during the incident.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 11.92,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T12:58:50.473287Z",
+      "request_started_at": "2026-07-21T12:58:38.553006Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_005",
+      "case_status": "PASS",
+      "completeness_status": "complete_admissible_analysis",
+      "derived_incident_direction": "object_directed",
+      "deterministic_outcome": "Violence Detected",
+      "deterministic_reason": {
+        "explanation": "At least one active fact affirms intentional current qualifying conduct.",
+        "reason_codes": [
+          "qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "intentional_property_violence",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "object_directed",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "property_violence",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "object_directed",
+            "evidence": [
+              {
+                "excerpt": "The patient intentionally smashed the window today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [],
+      "malformed_candidate_expectation": null,
+      "narrative": "The patient intentionally smashed the window today.",
+      "narrative_sha256": "2c4cf584c80fb40b75fcd140695614430c41a2617a14c873054c9c8dc31c66f3",
+      "observed_evidence_excerpts": [
+        "The patient intentionally smashed the window today."
+      ],
+      "observed_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "object_directed",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "property_violence",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "object_directed",
+            "evidence": [
+              {
+                "excerpt": "The patient intentionally smashed the window today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 12.982,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T12:59:03.881804Z",
+      "request_started_at": "2026-07-21T12:58:50.899600Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_006",
+      "case_status": "PASS",
+      "completeness_status": "complete_admissible_analysis",
+      "derived_incident_direction": "interpersonal",
+      "deterministic_outcome": "No Violence Detected",
+      "deterministic_reason": {
+        "explanation": "Complete admissible analysis contains no active affirmed intentional current qualifying conduct.",
+        "reason_codes": [
+          "no_qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "accidental_contact",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient accidentally bumped the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "accidental",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [],
+      "malformed_candidate_expectation": null,
+      "narrative": "The patient accidentally bumped the nurse today.",
+      "narrative_sha256": "9fa46c6e0c773c1f9af32b4f4fa15d8697fc19d17cb3c12b5417185c0014e701",
+      "observed_evidence_excerpts": [
+        "The patient accidentally bumped the nurse today."
+      ],
+      "observed_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient accidentally bumped the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "accidental",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 10.103,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T12:59:14.424462Z",
+      "request_started_at": "2026-07-21T12:59:04.321193Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_007",
+      "case_status": "PROVIDER_TIMEOUT",
+      "completeness_status": "incomplete_analysis",
+      "derived_incident_direction": null,
+      "deterministic_outcome": "Unable to Determine",
+      "deterministic_reason": {
+        "explanation": "Repository processing did not produce admissible semantic facts for deterministic classification.",
+        "reason_codes": [
+          "provider_failure"
+        ]
+      },
+      "doctrine_category": "historical_only_conduct",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "not_run"
+      },
+      "downstream_consequence": "Provider availability prevented semantic comparison.",
+      "earliest_failing_stage": "PROVIDER_REQUEST",
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient struck a nurse years ago.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "historical",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "provider_timeout",
+      "field_level_differences": [
+        {
+          "expected": "complete_admissible_analysis",
+          "field": "completeness_status",
+          "observed": "incomplete_analysis"
+        },
+        {
+          "expected": "No Violence Detected",
+          "field": "deterministic_outcome",
+          "observed": "Unable to Determine"
+        },
+        {
+          "expected": "interpersonal",
+          "field": "incident_direction",
+          "observed": null
+        },
+        {
+          "expected": 1,
+          "field": "operational_facts.length",
+          "observed": 0
+        },
+        {
+          "expected": "successful_analysis",
+          "field": "processing_status",
+          "observed": "pipeline_failure"
+        },
+        {
+          "expected": "none",
+          "field": "validation_failure_stage",
+          "observed": "not_run"
+        }
+      ],
+      "malformed_candidate_expectation": null,
+      "narrative": "The patient struck a nurse years ago.",
+      "narrative_sha256": "14f6c16c50c0998ee0fd6d3d9b1a3f52df3b1312d5126b803e750e00e41994dc",
+      "observed_evidence_excerpts": [],
+      "observed_truth": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": null,
+        "operational_facts": [],
+        "processing_status": "pipeline_failure",
+        "validation_failure_stage": "not_run",
+        "validation_issue_codes": []
+      },
+      "processing_status": "pipeline_failure",
+      "provider_duration_seconds": 120.004,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:01:14.860488Z",
+      "request_started_at": "2026-07-21T12:59:14.856038Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "not_run"
+      },
+      "severity": null,
+      "stakeholder_impact": "Availability gap; semantic correctness was not assessed.",
+      "timeout_or_failure_provenance": "provider request exceeded 120 seconds"
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_008",
+      "case_status": "VALIDATION_FAILURE",
+      "completeness_status": "incomplete_analysis",
+      "derived_incident_direction": null,
+      "deterministic_outcome": "Unable to Determine",
+      "deterministic_reason": {
+        "explanation": "Repository processing did not produce admissible semantic facts for deterministic classification.",
+        "reason_codes": [
+          "validation_failure"
+        ]
+      },
+      "doctrine_category": "corrected_allegation",
+      "domain_evidence_integrity_validation": {
+        "issues": [
+          {
+            "code": "missing_evidence_support",
+            "field": "facts.0.evidence",
+            "message": "Fact evidence does not cover temporal_scope."
+          },
+          {
+            "code": "invalid_uncertainty",
+            "field": "facts.0.uncertainty",
+            "message": "temporal_scope uncertainty must exactly match unresolved semantic state."
+          },
+          {
+            "code": "missing_evidence_support",
+            "field": "facts.1.evidence",
+            "message": "Fact evidence does not cover temporal_scope."
+          },
+          {
+            "code": "invalid_uncertainty",
+            "field": "facts.1.uncertainty",
+            "message": "temporal_scope uncertainty must exactly match unresolved semantic state."
+          }
+        ],
+        "status": "failed"
+      },
+      "downstream_consequence": "Observed extraction did not satisfy doctrine-authored semantic expectations.",
+      "earliest_failing_stage": "EVIDENCE_INTEGRITY_VALIDATION",
+      "expected_truth": {
+        "completeness_status": "unresolved_semantic_content",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "unknown",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Initial report said the patient struck the nurse.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "superseded",
+            "temporal_scope": "current",
+            "uncertainty": []
+          },
+          {
+            "assertion_status": "denied",
+            "conduct": null,
+            "contradiction_group": null,
+            "correction_of_fact": 0,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Correction: the patient did not strike the nurse.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status",
+                  "supersession"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": [
+              "conduct"
+            ]
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [
+        {
+          "expected": "unresolved_semantic_content",
+          "field": "completeness_status",
+          "observed": "incomplete_analysis"
+        },
+        {
+          "expected": "No Violence Detected",
+          "field": "deterministic_outcome",
+          "observed": "Unable to Determine"
+        },
+        {
+          "expected": "unknown",
+          "field": "incident_direction",
+          "observed": null
+        },
+        {
+          "expected": 5,
+          "field": "operational_facts[0].evidence[0].supports.length",
+          "observed": 4
+        },
+        {
+          "expected": "temporal_scope",
+          "field": "operational_facts[0].evidence[0].supports[3]",
+          "observed": "assertion_status"
+        },
+        {
+          "expected": "current",
+          "field": "operational_facts[0].temporal_scope",
+          "observed": "unresolved"
+        },
+        {
+          "expected": null,
+          "field": "operational_facts[1].conduct",
+          "observed": "physical_contact"
+        },
+        {
+          "expected": 6,
+          "field": "operational_facts[1].evidence[0].supports.length",
+          "observed": 5
+        },
+        {
+          "expected": "temporal_scope",
+          "field": "operational_facts[1].evidence[0].supports[3]",
+          "observed": "assertion_status"
+        },
+        {
+          "expected": "assertion_status",
+          "field": "operational_facts[1].evidence[0].supports[4]",
+          "observed": "supersession"
+        },
+        {
+          "expected": "current",
+          "field": "operational_facts[1].temporal_scope",
+          "observed": "unresolved"
+        },
+        {
+          "expected": 1,
+          "field": "operational_facts[1].uncertainty.length",
+          "observed": 0
+        },
+        {
+          "expected": "successful_analysis",
+          "field": "processing_status",
+          "observed": "validation_failure"
+        },
+        {
+          "expected": "none",
+          "field": "validation_failure_stage",
+          "observed": "domain"
+        },
+        {
+          "expected": 0,
+          "field": "validation_issue_codes.length",
+          "observed": 4
+        }
+      ],
+      "malformed_candidate_expectation": null,
+      "narrative": "Initial report said the patient struck the nurse. Correction: the patient did not strike the nurse.",
+      "narrative_sha256": "fb38058adda5facdbc360739d3ebba9d8a2d1f5f72338ea2338639db8d1780a0",
+      "observed_evidence_excerpts": [
+        "Initial report said the patient struck the nurse.",
+        "Correction: the patient did not strike the nurse."
+      ],
+      "observed_truth": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": null,
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Initial report said the patient struck the nurse.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "superseded",
+            "temporal_scope": "unresolved",
+            "uncertainty": []
+          },
+          {
+            "assertion_status": "denied",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": 0,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Correction: the patient did not strike the nurse.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "assertion_status",
+                  "supersession"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "unresolved",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "missing_evidence_support",
+          "invalid_uncertainty",
+          "missing_evidence_support",
+          "invalid_uncertainty"
+        ]
+      },
+      "processing_status": "validation_failure",
+      "provider_duration_seconds": 32.25,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:01:47.579802Z",
+      "request_started_at": "2026-07-21T13:01:15.329670Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": 1,
+      "stakeholder_impact": "Blocks semantic baseline review.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_009",
+      "case_status": "PASS",
+      "completeness_status": "complete_admissible_analysis",
+      "derived_incident_direction": "interpersonal",
+      "deterministic_outcome": "No Violence Detected",
+      "deterministic_reason": {
+        "explanation": "Complete admissible analysis contains no active affirmed intentional current qualifying conduct.",
+        "reason_codes": [
+          "no_qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "denial",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "denied",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient denied hitting the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [],
+      "malformed_candidate_expectation": null,
+      "narrative": "The patient denied hitting the nurse today.",
+      "narrative_sha256": "9967489f6970f05b5213d866c77865fa60dc754c1f3da00c22f9349fbe0bcbbf",
+      "observed_evidence_excerpts": [
+        "The patient denied hitting the nurse today."
+      ],
+      "observed_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "denied",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient denied hitting the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 13.956,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:02:01.961118Z",
+      "request_started_at": "2026-07-21T13:01:48.005403Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_010",
+      "case_status": "ACCEPTABLE_VARIATION",
+      "completeness_status": "complete_admissible_analysis",
+      "derived_incident_direction": "interpersonal",
+      "deterministic_outcome": "Violence Detected",
+      "deterministic_reason": {
+        "explanation": "At least one active fact affirms intentional current qualifying conduct.",
+        "reason_codes": [
+          "qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "denial_followed_by_correction",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "denied",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient initially denied hitting the nurse.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "superseded",
+            "temporal_scope": "current",
+            "uncertainty": []
+          },
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": 0,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Later confirmed he actually struck the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status",
+                  "supersession"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [
+        {
+          "expected": 1,
+          "field": "operational_facts[0].evidence.length",
+          "observed": 2
+        },
+        {
+          "expected": 5,
+          "field": "operational_facts[0].evidence[0].supports.length",
+          "observed": 4
+        },
+        {
+          "expected": "temporal_scope",
+          "field": "operational_facts[0].evidence[0].supports[3]",
+          "observed": "assertion_status"
+        }
+      ],
+      "malformed_candidate_expectation": null,
+      "narrative": "The patient initially denied hitting the nurse. Later confirmed he actually struck the nurse today.",
+      "narrative_sha256": "8f8901457daedca354ba7b8e2da439ec08666e55db5f1b6a02b501374da3aca1",
+      "observed_evidence_excerpts": [
+        "The patient initially denied hitting the nurse.",
+        "Later confirmed he actually struck the nurse today.",
+        "Later confirmed he actually struck the nurse today."
+      ],
+      "observed_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "denied",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient initially denied hitting the nurse.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "assertion_status"
+                ]
+              },
+              {
+                "excerpt": "Later confirmed he actually struck the nurse today.",
+                "supports": [
+                  "temporal_scope",
+                  "resolution_status",
+                  "supersession"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "superseded",
+            "temporal_scope": "current",
+            "uncertainty": []
+          },
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": 0,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Later confirmed he actually struck the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status",
+                  "supersession"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 47.142,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:02:49.531541Z",
+      "request_started_at": "2026-07-21T13:02:02.389552Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_011",
+      "case_status": "VALIDATION_FAILURE",
+      "completeness_status": "incomplete_analysis",
+      "derived_incident_direction": null,
+      "deterministic_outcome": "Unable to Determine",
+      "deterministic_reason": {
+        "explanation": "Repository processing did not produce admissible semantic facts for deterministic classification.",
+        "reason_codes": [
+          "validation_failure"
+        ]
+      },
+      "doctrine_category": "copied_forward_correction",
+      "domain_evidence_integrity_validation": {
+        "issues": [
+          {
+            "code": "missing_evidence_support",
+            "field": "facts.0.evidence",
+            "message": "Fact evidence does not cover temporal_scope."
+          }
+        ],
+        "status": "failed"
+      },
+      "downstream_consequence": "Observed extraction did not satisfy doctrine-authored semantic expectations.",
+      "earliest_failing_stage": "EVIDENCE_INTEGRITY_VALIDATION",
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Copied note alleged a punch.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "superseded",
+            "temporal_scope": "current",
+            "uncertainty": []
+          },
+          {
+            "assertion_status": "denied",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": 0,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Updated note states the patient did not punch anyone today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status",
+                  "supersession"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [
+        {
+          "expected": "complete_admissible_analysis",
+          "field": "completeness_status",
+          "observed": "incomplete_analysis"
+        },
+        {
+          "expected": "No Violence Detected",
+          "field": "deterministic_outcome",
+          "observed": "Unable to Determine"
+        },
+        {
+          "expected": "interpersonal",
+          "field": "incident_direction",
+          "observed": null
+        },
+        {
+          "expected": 5,
+          "field": "operational_facts[0].evidence[0].supports.length",
+          "observed": 4
+        },
+        {
+          "expected": "temporal_scope",
+          "field": "operational_facts[0].evidence[0].supports[3]",
+          "observed": "assertion_status"
+        },
+        {
+          "expected": "current",
+          "field": "operational_facts[0].temporal_scope",
+          "observed": "unresolved"
+        },
+        {
+          "expected": 0,
+          "field": "operational_facts[0].uncertainty.length",
+          "observed": 1
+        },
+        {
+          "expected": "successful_analysis",
+          "field": "processing_status",
+          "observed": "validation_failure"
+        },
+        {
+          "expected": "none",
+          "field": "validation_failure_stage",
+          "observed": "domain"
+        },
+        {
+          "expected": 0,
+          "field": "validation_issue_codes.length",
+          "observed": 1
+        }
+      ],
+      "malformed_candidate_expectation": null,
+      "narrative": "Copied note alleged a punch. Updated note states the patient did not punch anyone today.",
+      "narrative_sha256": "7849476f07de14b2bcd4e7c5bde2fc39c9ff6c66dccdb8351147ee1ce15e0d95",
+      "observed_evidence_excerpts": [
+        "Copied note alleged a punch.",
+        "Updated note states the patient did not punch anyone today."
+      ],
+      "observed_truth": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": null,
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Copied note alleged a punch.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "superseded",
+            "temporal_scope": "unresolved",
+            "uncertainty": [
+              "temporal_scope"
+            ]
+          },
+          {
+            "assertion_status": "denied",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": 0,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Updated note states the patient did not punch anyone today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status",
+                  "supersession"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "missing_evidence_support"
+        ]
+      },
+      "processing_status": "validation_failure",
+      "provider_duration_seconds": 30.539,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:03:20.504686Z",
+      "request_started_at": "2026-07-21T13:02:49.965323Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": 1,
+      "stakeholder_impact": "Blocks semantic baseline review.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_012",
+      "case_status": "VALIDATION_FAILURE",
+      "completeness_status": "incomplete_analysis",
+      "derived_incident_direction": null,
+      "deterministic_outcome": "Unable to Determine",
+      "deterministic_reason": {
+        "explanation": "Repository processing did not produce admissible semantic facts for deterministic classification.",
+        "reason_codes": [
+          "validation_failure"
+        ]
+      },
+      "doctrine_category": "unresolved_contradictory_witnesses",
+      "domain_evidence_integrity_validation": {
+        "issues": [
+          {
+            "code": "missing_evidence_support",
+            "field": "facts.0.evidence",
+            "message": "Fact evidence does not cover intentionality."
+          },
+          {
+            "code": "missing_evidence_support",
+            "field": "facts.1.evidence",
+            "message": "Fact evidence does not cover intentionality."
+          }
+        ],
+        "status": "failed"
+      },
+      "downstream_consequence": "Observed extraction did not satisfy doctrine-authored semantic expectations.",
+      "earliest_failing_stage": "EVIDENCE_INTEGRITY_VALIDATION",
+      "expected_truth": {
+        "completeness_status": "unresolved_semantic_content",
+        "deterministic_outcome": "Uncertain",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "disputed",
+            "conduct": "physical_contact",
+            "contradiction_group": "group_1",
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Witness A disputed that a punch occurred.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status",
+                  "contradiction"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": [
+              "assertion_status"
+            ]
+          },
+          {
+            "assertion_status": "disputed",
+            "conduct": "physical_contact",
+            "contradiction_group": "group_1",
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Witness B disputed the account and reported a punch.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status",
+                  "contradiction"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": [
+              "assertion_status"
+            ]
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [
+        {
+          "expected": "unresolved_semantic_content",
+          "field": "completeness_status",
+          "observed": "incomplete_analysis"
+        },
+        {
+          "expected": "Uncertain",
+          "field": "deterministic_outcome",
+          "observed": "Unable to Determine"
+        },
+        {
+          "expected": "interpersonal",
+          "field": "incident_direction",
+          "observed": null
+        },
+        {
+          "expected": 6,
+          "field": "operational_facts[0].evidence[0].supports.length",
+          "observed": 5
+        },
+        {
+          "expected": "intentionality",
+          "field": "operational_facts[0].evidence[0].supports[2]",
+          "observed": "temporal_scope"
+        },
+        {
+          "expected": "temporal_scope",
+          "field": "operational_facts[0].evidence[0].supports[3]",
+          "observed": "assertion_status"
+        },
+        {
+          "expected": "assertion_status",
+          "field": "operational_facts[0].evidence[0].supports[4]",
+          "observed": "contradiction"
+        },
+        {
+          "expected": "intentional",
+          "field": "operational_facts[0].intentionality",
+          "observed": "unresolved"
+        },
+        {
+          "expected": "current",
+          "field": "operational_facts[0].temporal_scope",
+          "observed": "unresolved"
+        },
+        {
+          "expected": 1,
+          "field": "operational_facts[0].uncertainty.length",
+          "observed": 3
+        },
+        {
+          "expected": "assertion_status",
+          "field": "operational_facts[0].uncertainty[0]",
+          "observed": "intentionality"
+        },
+        {
+          "expected": 6,
+          "field": "operational_facts[1].evidence[0].supports.length",
+          "observed": 5
+        },
+        {
+          "expected": "intentionality",
+          "field": "operational_facts[1].evidence[0].supports[2]",
+          "observed": "temporal_scope"
+        },
+        {
+          "expected": "temporal_scope",
+          "field": "operational_facts[1].evidence[0].supports[3]",
+          "observed": "assertion_status"
+        },
+        {
+          "expected": "assertion_status",
+          "field": "operational_facts[1].evidence[0].supports[4]",
+          "observed": "contradiction"
+        },
+        {
+          "expected": "intentional",
+          "field": "operational_facts[1].intentionality",
+          "observed": "unresolved"
+        },
+        {
+          "expected": "current",
+          "field": "operational_facts[1].temporal_scope",
+          "observed": "unresolved"
+        },
+        {
+          "expected": 1,
+          "field": "operational_facts[1].uncertainty.length",
+          "observed": 3
+        },
+        {
+          "expected": "assertion_status",
+          "field": "operational_facts[1].uncertainty[0]",
+          "observed": "intentionality"
+        },
+        {
+          "expected": "successful_analysis",
+          "field": "processing_status",
+          "observed": "validation_failure"
+        },
+        {
+          "expected": "none",
+          "field": "validation_failure_stage",
+          "observed": "domain"
+        },
+        {
+          "expected": 0,
+          "field": "validation_issue_codes.length",
+          "observed": 2
+        }
+      ],
+      "malformed_candidate_expectation": null,
+      "narrative": "Witness A disputed that a punch occurred. Witness B disputed the account and reported a punch.",
+      "narrative_sha256": "de81c50b66a9b0edecdd6b8777843ebdd8352e80d4bba008f696beafe1b57ce3",
+      "observed_evidence_excerpts": [
+        "Witness A disputed that a punch occurred.",
+        "Witness B disputed the account and reported a punch."
+      ],
+      "observed_truth": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": null,
+        "operational_facts": [
+          {
+            "assertion_status": "disputed",
+            "conduct": "physical_contact",
+            "contradiction_group": "group_1",
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Witness A disputed that a punch occurred.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "temporal_scope",
+                  "assertion_status",
+                  "contradiction"
+                ]
+              }
+            ],
+            "intentionality": "unresolved",
+            "resolution_status": "active",
+            "temporal_scope": "unresolved",
+            "uncertainty": [
+              "intentionality",
+              "temporal_scope",
+              "assertion_status"
+            ]
+          },
+          {
+            "assertion_status": "disputed",
+            "conduct": "physical_contact",
+            "contradiction_group": "group_1",
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "Witness B disputed the account and reported a punch.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "temporal_scope",
+                  "assertion_status",
+                  "contradiction"
+                ]
+              }
+            ],
+            "intentionality": "unresolved",
+            "resolution_status": "active",
+            "temporal_scope": "unresolved",
+            "uncertainty": [
+              "intentionality",
+              "temporal_scope",
+              "assertion_status"
+            ]
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "missing_evidence_support",
+          "missing_evidence_support"
+        ]
+      },
+      "processing_status": "validation_failure",
+      "provider_duration_seconds": 117.801,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:05:18.740794Z",
+      "request_started_at": "2026-07-21T13:03:20.940145Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": 2,
+      "stakeholder_impact": "Blocks semantic baseline review.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_013",
+      "case_status": "VALIDATION_FAILURE",
+      "completeness_status": "incomplete_analysis",
+      "derived_incident_direction": null,
+      "deterministic_outcome": "Unable to Determine",
+      "deterministic_reason": {
+        "explanation": "Repository processing did not produce admissible semantic facts for deterministic classification.",
+        "reason_codes": [
+          "validation_failure"
+        ]
+      },
+      "doctrine_category": "profanity_without_physical_threat",
+      "domain_evidence_integrity_validation": {
+        "issues": [
+          {
+            "code": "missing_evidence_support",
+            "field": "facts.0.evidence",
+            "message": "Fact evidence does not cover direction."
+          },
+          {
+            "code": "missing_evidence_support",
+            "field": "facts.0.evidence",
+            "message": "Fact evidence does not cover intentionality."
+          },
+          {
+            "code": "missing_evidence_support",
+            "field": "facts.0.evidence",
+            "message": "Fact evidence does not cover temporal_scope."
+          }
+        ],
+        "status": "failed"
+      },
+      "downstream_consequence": "Observed extraction did not satisfy doctrine-authored semantic expectations.",
+      "earliest_failing_stage": "EVIDENCE_INTEGRITY_VALIDATION",
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "unknown",
+        "operational_facts": [],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [
+        {
+          "expected": "complete_admissible_analysis",
+          "field": "completeness_status",
+          "observed": "incomplete_analysis"
+        },
+        {
+          "expected": "No Violence Detected",
+          "field": "deterministic_outcome",
+          "observed": "Unable to Determine"
+        },
+        {
+          "expected": "unknown",
+          "field": "incident_direction",
+          "observed": null
+        },
+        {
+          "expected": 0,
+          "field": "operational_facts.length",
+          "observed": 1
+        },
+        {
+          "expected": "successful_analysis",
+          "field": "processing_status",
+          "observed": "validation_failure"
+        },
+        {
+          "expected": "none",
+          "field": "validation_failure_stage",
+          "observed": "domain"
+        },
+        {
+          "expected": 0,
+          "field": "validation_issue_codes.length",
+          "observed": 3
+        }
+      ],
+      "malformed_candidate_expectation": null,
+      "narrative": "The patient used profanity about the wait time but made no physical threat.",
+      "narrative_sha256": "051804023a4f471d823a29da1aa3e3f17ba5dfc13f3619425529514a104c2b4c",
+      "observed_evidence_excerpts": [
+        "The patient used profanity about the wait time but made no physical threat."
+      ],
+      "observed_truth": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": null,
+        "operational_facts": [
+          {
+            "assertion_status": "denied",
+            "conduct": "verbal_threat",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "unknown",
+            "evidence": [
+              {
+                "excerpt": "The patient used profanity about the wait time but made no physical threat.",
+                "supports": [
+                  "conduct",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "unresolved",
+            "resolution_status": "active",
+            "temporal_scope": "unresolved",
+            "uncertainty": [
+              "direction",
+              "intentionality",
+              "temporal_scope"
+            ]
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "missing_evidence_support",
+          "missing_evidence_support",
+          "missing_evidence_support"
+        ]
+      },
+      "processing_status": "validation_failure",
+      "provider_duration_seconds": 31.654,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:05:50.833038Z",
+      "request_started_at": "2026-07-21T13:05:19.179276Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": 2,
+      "stakeholder_impact": "Blocks semantic baseline review.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_014",
+      "case_status": "PASS",
+      "completeness_status": "unresolved_semantic_content",
+      "derived_incident_direction": "unknown",
+      "deterministic_outcome": "Uncertain",
+      "deterministic_reason": {
+        "explanation": "Admissible active facts preserve unresolved semantic content that can change classification.",
+        "reason_codes": [
+          "material_semantic_uncertainty"
+        ]
+      },
+      "doctrine_category": "insufficient_information",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "unresolved_semantic_content",
+        "deterministic_outcome": "Uncertain",
+        "incident_direction": "unknown",
+        "operational_facts": [
+          {
+            "assertion_status": "unresolved",
+            "conduct": null,
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "unknown",
+            "evidence": [
+              {
+                "excerpt": "Something may have happened, but the report contains insufficient information.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "unresolved",
+            "resolution_status": "active",
+            "temporal_scope": "unresolved",
+            "uncertainty": [
+              "conduct",
+              "direction",
+              "intentionality",
+              "temporal_scope",
+              "assertion_status"
+            ]
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [],
+      "malformed_candidate_expectation": null,
+      "narrative": "Something may have happened, but the report contains insufficient information.",
+      "narrative_sha256": "255a3b9883b0292ef8ae395f6540d9176f45a7220c51cb74277748d108579e22",
+      "observed_evidence_excerpts": [
+        "Something may have happened, but the report contains insufficient information."
+      ],
+      "observed_truth": {
+        "completeness_status": "unresolved_semantic_content",
+        "deterministic_outcome": "Uncertain",
+        "incident_direction": "unknown",
+        "operational_facts": [
+          {
+            "assertion_status": "unresolved",
+            "conduct": null,
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "unknown",
+            "evidence": [
+              {
+                "excerpt": "Something may have happened, but the report contains insufficient information.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "unresolved",
+            "resolution_status": "active",
+            "temporal_scope": "unresolved",
+            "uncertainty": [
+              "conduct",
+              "direction",
+              "intentionality",
+              "temporal_scope",
+              "assertion_status"
+            ]
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 9.602,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:06:00.866550Z",
+      "request_started_at": "2026-07-21T13:05:51.264225Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_015",
+      "case_status": "PASS",
+      "completeness_status": "complete_admissible_analysis",
+      "derived_incident_direction": "unknown",
+      "deterministic_outcome": "Violence Detected",
+      "deterministic_reason": {
+        "explanation": "At least one active fact affirms intentional current qualifying conduct.",
+        "reason_codes": [
+          "qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "qualifying_violence_unknown_direction",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "unknown",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "unknown",
+            "evidence": [
+              {
+                "excerpt": "An intentional punch occurred today, but the target direction is unknown.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": [
+              "direction"
+            ]
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [],
+      "malformed_candidate_expectation": null,
+      "narrative": "An intentional punch occurred today, but the target direction is unknown.",
+      "narrative_sha256": "582223b5edead862420405000a4ae4df54bd175e853f4ae42702b088c59c9aef",
+      "observed_evidence_excerpts": [
+        "An intentional punch occurred today, but the target direction is unknown."
+      ],
+      "observed_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "unknown",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "unknown",
+            "evidence": [
+              {
+                "excerpt": "An intentional punch occurred today, but the target direction is unknown.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": [
+              "direction"
+            ]
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 10.184,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:06:11.484464Z",
+      "request_started_at": "2026-07-21T13:06:01.300772Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": null,
+      "case_id": "TN_016",
+      "case_status": "ACCEPTABLE_VARIATION",
+      "completeness_status": "complete_admissible_analysis",
+      "derived_incident_direction": "multiple",
+      "deterministic_outcome": "Violence Detected",
+      "deterministic_reason": {
+        "explanation": "At least one active fact affirms intentional current qualifying conduct.",
+        "reason_codes": [
+          "qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "mixed_direction_incident",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "multiple",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient intentionally struck the nurse",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          },
+          {
+            "assertion_status": "affirmed",
+            "conduct": "self_harm",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "self_directed",
+            "evidence": [
+              {
+                "excerpt": "intentionally harmed themself today",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [
+        {
+          "expected": 1,
+          "field": "operational_facts[0].evidence.length",
+          "observed": 2
+        },
+        {
+          "expected": 5,
+          "field": "operational_facts[0].evidence[0].supports.length",
+          "observed": 4
+        },
+        {
+          "expected": "temporal_scope",
+          "field": "operational_facts[0].evidence[0].supports[3]",
+          "observed": "assertion_status"
+        },
+        {
+          "expected": "intentionally harmed themself today",
+          "field": "operational_facts[1].evidence[0].excerpt",
+          "observed": "intentionally harmed themself today."
+        }
+      ],
+      "malformed_candidate_expectation": null,
+      "narrative": "The patient intentionally struck the nurse and then intentionally harmed themself today.",
+      "narrative_sha256": "8ef85bd7b7084e433ece48ed98938d97fa7db6127a63f23b232f47beebf4a81c",
+      "observed_evidence_excerpts": [
+        "The patient intentionally struck the nurse",
+        "today.",
+        "intentionally harmed themself today."
+      ],
+      "observed_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "multiple",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient intentionally struck the nurse",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "assertion_status"
+                ]
+              },
+              {
+                "excerpt": "today.",
+                "supports": [
+                  "temporal_scope"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          },
+          {
+            "assertion_status": "affirmed",
+            "conduct": "self_harm",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "self_directed",
+            "evidence": [
+              {
+                "excerpt": "intentionally harmed themself today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 32.358,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:06:44.282064Z",
+      "request_started_at": "2026-07-21T13:06:11.924286Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": "denial_as_affirmed",
+      "case_id": "TN_017",
+      "case_status": "PASS",
+      "completeness_status": "complete_admissible_analysis",
+      "derived_incident_direction": "interpersonal",
+      "deterministic_outcome": "No Violence Detected",
+      "deterministic_reason": {
+        "explanation": "Complete admissible analysis contains no active affirmed intentional current qualifying conduct.",
+        "reason_codes": [
+          "no_qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "adversarial_denial_as_affirmed",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "denied",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient denied hitting the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [],
+      "malformed_candidate_expectation": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient denied hitting the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "invalid_evidence_support"
+        ]
+      },
+      "narrative": "The patient denied hitting the nurse today.",
+      "narrative_sha256": "9967489f6970f05b5213d866c77865fa60dc754c1f3da00c22f9349fbe0bcbbf",
+      "observed_evidence_excerpts": [
+        "The patient denied hitting the nurse today."
+      ],
+      "observed_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "denied",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient denied hitting the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 16.716,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:07:01.425428Z",
+      "request_started_at": "2026-07-21T13:06:44.709903Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": "accidental_as_intentional",
+      "case_id": "TN_018",
+      "case_status": "PASS",
+      "completeness_status": "complete_admissible_analysis",
+      "derived_incident_direction": "interpersonal",
+      "deterministic_outcome": "No Violence Detected",
+      "deterministic_reason": {
+        "explanation": "Complete admissible analysis contains no active affirmed intentional current qualifying conduct.",
+        "reason_codes": [
+          "no_qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "adversarial_accidental_as_intentional",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient accidentally bumped the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "accidental",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [],
+      "malformed_candidate_expectation": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient accidentally bumped the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "invalid_evidence_support"
+        ]
+      },
+      "narrative": "The patient accidentally bumped the nurse today.",
+      "narrative_sha256": "9fa46c6e0c773c1f9af32b4f4fa15d8697fc19d17cb3c12b5417185c0014e701",
+      "observed_evidence_excerpts": [
+        "The patient accidentally bumped the nurse today."
+      ],
+      "observed_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient accidentally bumped the nurse today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "accidental",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 9.443,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:07:11.299439Z",
+      "request_started_at": "2026-07-21T13:07:01.856467Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": "historical_as_current",
+      "case_id": "TN_019",
+      "case_status": "PASS",
+      "completeness_status": "complete_admissible_analysis",
+      "derived_incident_direction": "interpersonal",
+      "deterministic_outcome": "No Violence Detected",
+      "deterministic_reason": {
+        "explanation": "Complete admissible analysis contains no active affirmed intentional current qualifying conduct.",
+        "reason_codes": [
+          "no_qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "adversarial_historical_as_current",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient struck a nurse years ago.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "historical",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [],
+      "malformed_candidate_expectation": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient struck a nurse years ago.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "invalid_evidence_support"
+        ]
+      },
+      "narrative": "The patient struck a nurse years ago.",
+      "narrative_sha256": "14f6c16c50c0998ee0fd6d3d9b1a3f52df3b1312d5126b803e750e00e41994dc",
+      "observed_evidence_excerpts": [
+        "The patient struck a nurse years ago."
+      ],
+      "observed_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "No Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient struck a nurse years ago.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "historical",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 20.369,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:07:32.105146Z",
+      "request_started_at": "2026-07-21T13:07:11.736382Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": "no_contact_as_contact",
+      "case_id": "TN_020",
+      "case_status": "PASS",
+      "completeness_status": "complete_admissible_analysis",
+      "derived_incident_direction": "interpersonal",
+      "deterministic_outcome": "Violence Detected",
+      "deterministic_reason": {
+        "explanation": "At least one active fact affirms intentional current qualifying conduct.",
+        "reason_codes": [
+          "qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "adversarial_no_contact_as_contact",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_attempt",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient swung at the nurse without contact today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [],
+      "malformed_candidate_expectation": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient swung at the nurse without contact today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "invalid_evidence_support"
+        ]
+      },
+      "narrative": "The patient swung at the nurse without contact today.",
+      "narrative_sha256": "6efec66dd934d0c98a45f04fa9de04eb4092e97314778cefa927a6180008ce64",
+      "observed_evidence_excerpts": [
+        "The patient swung at the nurse without contact today."
+      ],
+      "observed_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_attempt",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient swung at the nurse without contact today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 11.443,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:07:43.985234Z",
+      "request_started_at": "2026-07-21T13:07:32.542436Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": "object_as_interpersonal",
+      "case_id": "TN_021",
+      "case_status": "PROVIDER_TIMEOUT",
+      "completeness_status": "incomplete_analysis",
+      "derived_incident_direction": null,
+      "deterministic_outcome": "Unable to Determine",
+      "deterministic_reason": {
+        "explanation": "Repository processing did not produce admissible semantic facts for deterministic classification.",
+        "reason_codes": [
+          "provider_failure"
+        ]
+      },
+      "doctrine_category": "adversarial_object_as_interpersonal",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "not_run"
+      },
+      "downstream_consequence": "Provider availability prevented semantic comparison.",
+      "earliest_failing_stage": "PROVIDER_REQUEST",
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "object_directed",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "property_violence",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "object_directed",
+            "evidence": [
+              {
+                "excerpt": "The patient intentionally smashed the wall today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "provider_timeout",
+      "field_level_differences": [
+        {
+          "expected": "complete_admissible_analysis",
+          "field": "completeness_status",
+          "observed": "incomplete_analysis"
+        },
+        {
+          "expected": "Violence Detected",
+          "field": "deterministic_outcome",
+          "observed": "Unable to Determine"
+        },
+        {
+          "expected": "object_directed",
+          "field": "incident_direction",
+          "observed": null
+        },
+        {
+          "expected": 1,
+          "field": "operational_facts.length",
+          "observed": 0
+        },
+        {
+          "expected": "successful_analysis",
+          "field": "processing_status",
+          "observed": "pipeline_failure"
+        },
+        {
+          "expected": "none",
+          "field": "validation_failure_stage",
+          "observed": "not_run"
+        }
+      ],
+      "malformed_candidate_expectation": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "property_violence",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The patient intentionally smashed the wall today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "invalid_fact_combination"
+        ]
+      },
+      "narrative": "The patient intentionally smashed the wall today.",
+      "narrative_sha256": "b3cd4d7d20d8e8e389f2c694a2d798aca848b2c3b1694b4d1a03b1c128ab1120",
+      "observed_evidence_excerpts": [],
+      "observed_truth": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": null,
+        "operational_facts": [],
+        "processing_status": "pipeline_failure",
+        "validation_failure_stage": "not_run",
+        "validation_issue_codes": []
+      },
+      "processing_status": "pipeline_failure",
+      "provider_duration_seconds": 264.479,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:12:08.903988Z",
+      "request_started_at": "2026-07-21T13:07:44.424638Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "not_run"
+      },
+      "severity": null,
+      "stakeholder_impact": "Availability gap; semantic correctness was not assessed.",
+      "timeout_or_failure_provenance": "provider request exceeded 120 seconds"
+    },
+    {
+      "adversarial_condition": "omitted_correction",
+      "case_id": "TN_022",
+      "case_status": "PASS",
+      "completeness_status": "incomplete_analysis",
+      "derived_incident_direction": null,
+      "deterministic_outcome": "Unable to Determine",
+      "deterministic_reason": {
+        "explanation": "Repository processing did not produce admissible semantic facts for deterministic classification.",
+        "reason_codes": [
+          "validation_failure"
+        ]
+      },
+      "doctrine_category": "adversarial_omitted_correction",
+      "domain_evidence_integrity_validation": {
+        "issues": [
+          {
+            "code": "invalid_correction_reference",
+            "field": "facts.supersedes_fact_id",
+            "message": "An explicit correction marker requires a supported correction reference."
+          }
+        ],
+        "status": "failed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "An earlier report alleged a punch, but the correction relationship was omitted.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "superseded",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "invalid_correction_reference"
+        ]
+      },
+      "extraction_status": "success",
+      "field_level_differences": [
+        {
+          "expected": "interpersonal",
+          "field": "incident_direction",
+          "observed": null
+        },
+        {
+          "expected": "affirmed",
+          "field": "operational_facts[0].assertion_status",
+          "observed": "unresolved"
+        },
+        {
+          "expected": "physical_contact",
+          "field": "operational_facts[0].conduct",
+          "observed": null
+        },
+        {
+          "expected": "interpersonal",
+          "field": "operational_facts[0].direction",
+          "observed": "unknown"
+        },
+        {
+          "expected": "intentional",
+          "field": "operational_facts[0].intentionality",
+          "observed": "unresolved"
+        },
+        {
+          "expected": "superseded",
+          "field": "operational_facts[0].resolution_status",
+          "observed": "active"
+        },
+        {
+          "expected": "current",
+          "field": "operational_facts[0].temporal_scope",
+          "observed": "unresolved"
+        },
+        {
+          "expected": 0,
+          "field": "operational_facts[0].uncertainty.length",
+          "observed": 5
+        }
+      ],
+      "malformed_candidate_expectation": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "An earlier report alleged a punch, but the correction relationship was omitted.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "superseded",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "invalid_correction_reference"
+        ]
+      },
+      "narrative": "An earlier report alleged a punch, but the correction relationship was omitted.",
+      "narrative_sha256": "3ffa0e1b207fd9978043f3d7d55dee384df2f57c23b31a35de33e160429f886a",
+      "observed_evidence_excerpts": [
+        "An earlier report alleged a punch, but the correction relationship was omitted."
+      ],
+      "observed_truth": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": null,
+        "operational_facts": [
+          {
+            "assertion_status": "unresolved",
+            "conduct": null,
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "unknown",
+            "evidence": [
+              {
+                "excerpt": "An earlier report alleged a punch, but the correction relationship was omitted.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "unresolved",
+            "resolution_status": "active",
+            "temporal_scope": "unresolved",
+            "uncertainty": [
+              "conduct",
+              "direction",
+              "intentionality",
+              "temporal_scope",
+              "assertion_status"
+            ]
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "invalid_correction_reference"
+        ]
+      },
+      "processing_status": "validation_failure",
+      "provider_duration_seconds": 27.42,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:12:36.946976Z",
+      "request_started_at": "2026-07-21T13:12:09.526907Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": "omitted_contradiction",
+      "case_id": "TN_023",
+      "case_status": "PASS",
+      "completeness_status": "incomplete_analysis",
+      "derived_incident_direction": null,
+      "deterministic_outcome": "Unable to Determine",
+      "deterministic_reason": {
+        "explanation": "Repository processing did not produce admissible semantic facts for deterministic classification.",
+        "reason_codes": [
+          "validation_failure"
+        ]
+      },
+      "doctrine_category": "adversarial_omitted_contradiction",
+      "domain_evidence_integrity_validation": {
+        "issues": [
+          {
+            "code": "invalid_uncertainty",
+            "field": "facts.0.uncertainty",
+            "message": "assertion_status uncertainty must exactly match unresolved semantic state."
+          },
+          {
+            "code": "invalid_contradiction_group",
+            "field": "FACT-0001",
+            "message": "A disputed fact requires a contradiction group."
+          }
+        ],
+        "status": "failed"
+      },
+      "downstream_consequence": "None.",
+      "earliest_failing_stage": null,
+      "expected_truth": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "disputed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "A witness disputed the reported punch, but no competing account was linked.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": [
+              "assertion_status"
+            ]
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "invalid_contradiction_group"
+        ]
+      },
+      "extraction_status": "success",
+      "field_level_differences": [
+        {
+          "expected": "interpersonal",
+          "field": "incident_direction",
+          "observed": null
+        },
+        {
+          "expected": "current",
+          "field": "operational_facts[0].temporal_scope",
+          "observed": "unresolved"
+        },
+        {
+          "expected": "assertion_status",
+          "field": "operational_facts[0].uncertainty[0]",
+          "observed": "temporal_scope"
+        },
+        {
+          "expected": 1,
+          "field": "validation_issue_codes.length",
+          "observed": 2
+        },
+        {
+          "expected": "invalid_contradiction_group",
+          "field": "validation_issue_codes[0]",
+          "observed": "invalid_uncertainty"
+        }
+      ],
+      "malformed_candidate_expectation": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "disputed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "A witness disputed the reported punch, but no competing account was linked.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": [
+              "assertion_status"
+            ]
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "invalid_contradiction_group"
+        ]
+      },
+      "narrative": "A witness disputed the reported punch, but no competing account was linked.",
+      "narrative_sha256": "c96c0799cf3db553c2b2630a6cbc6b866fdbedcb74d133148e5fd61b534f8d40",
+      "observed_evidence_excerpts": [
+        "A witness disputed the reported punch, but no competing account was linked."
+      ],
+      "observed_truth": {
+        "completeness_status": "incomplete_analysis",
+        "deterministic_outcome": "Unable to Determine",
+        "incident_direction": null,
+        "operational_facts": [
+          {
+            "assertion_status": "disputed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "A witness disputed the reported punch, but no competing account was linked.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "unresolved",
+            "uncertainty": [
+              "temporal_scope"
+            ]
+          }
+        ],
+        "processing_status": "validation_failure",
+        "validation_failure_stage": "domain",
+        "validation_issue_codes": [
+          "invalid_uncertainty",
+          "invalid_contradiction_group"
+        ]
+      },
+      "processing_status": "validation_failure",
+      "provider_duration_seconds": 21.277,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:12:58.603939Z",
+      "request_started_at": "2026-07-21T13:12:37.326744Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": null,
+      "stakeholder_impact": "No semantic impact.",
+      "timeout_or_failure_provenance": null
+    },
+    {
+      "adversarial_condition": "broad_evidence_reuse",
+      "case_id": "TN_024",
+      "case_status": "SEMANTIC_MISMATCH",
+      "completeness_status": "unresolved_semantic_content",
+      "derived_incident_direction": "interpersonal",
+      "deterministic_outcome": "Violence Detected",
+      "deterministic_reason": {
+        "explanation": "At least one active fact affirms intentional current qualifying conduct.",
+        "reason_codes": [
+          "qualifying_current_violence"
+        ]
+      },
+      "doctrine_category": "adversarial_broad_evidence_reuse",
+      "domain_evidence_integrity_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "downstream_consequence": "Observed extraction did not satisfy doctrine-authored semantic expectations.",
+      "earliest_failing_stage": "EVALUATION_COMPARISON",
+      "expected_truth": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "multiple",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The report broadly states that the patient struck a nurse and damaged a door today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          },
+          {
+            "assertion_status": "affirmed",
+            "conduct": "property_violence",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "object_directed",
+            "evidence": [
+              {
+                "excerpt": "The report broadly states that the patient struck a nurse and damaged a door today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "extraction_status": "success",
+      "field_level_differences": [
+        {
+          "expected": "complete_admissible_analysis",
+          "field": "completeness_status",
+          "observed": "unresolved_semantic_content"
+        },
+        {
+          "expected": "multiple",
+          "field": "incident_direction",
+          "observed": "interpersonal"
+        },
+        {
+          "expected": "physical_contact",
+          "field": "operational_facts[0].conduct",
+          "observed": null
+        },
+        {
+          "expected": "interpersonal",
+          "field": "operational_facts[0].direction",
+          "observed": "object_directed"
+        },
+        {
+          "expected": "intentional",
+          "field": "operational_facts[0].intentionality",
+          "observed": "unresolved"
+        },
+        {
+          "expected": 0,
+          "field": "operational_facts[0].uncertainty.length",
+          "observed": 2
+        },
+        {
+          "expected": "property_violence",
+          "field": "operational_facts[1].conduct",
+          "observed": "physical_contact"
+        },
+        {
+          "expected": "object_directed",
+          "field": "operational_facts[1].direction",
+          "observed": "interpersonal"
+        }
+      ],
+      "malformed_candidate_expectation": {
+        "completeness_status": "complete_admissible_analysis",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "multiple",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The report broadly states that the patient struck a nurse and damaged a door today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          },
+          {
+            "assertion_status": "affirmed",
+            "conduct": "property_violence",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "object_directed",
+            "evidence": [
+              {
+                "excerpt": "The report broadly states that the patient struck a nurse and damaged a door today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "narrative": "The report broadly states that the patient struck a nurse and damaged a door today.",
+      "narrative_sha256": "99067cb86186ca4364f4c5a39c5472a439664163409ab0f6b8a11cd5a56e0652",
+      "observed_evidence_excerpts": [
+        "The report broadly states that the patient struck a nurse and damaged a door today.",
+        "The report broadly states that the patient struck a nurse and damaged a door today."
+      ],
+      "observed_truth": {
+        "completeness_status": "unresolved_semantic_content",
+        "deterministic_outcome": "Violence Detected",
+        "incident_direction": "interpersonal",
+        "operational_facts": [
+          {
+            "assertion_status": "affirmed",
+            "conduct": null,
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "object_directed",
+            "evidence": [
+              {
+                "excerpt": "The report broadly states that the patient struck a nurse and damaged a door today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "unresolved",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": [
+              "conduct",
+              "intentionality"
+            ]
+          },
+          {
+            "assertion_status": "affirmed",
+            "conduct": "physical_contact",
+            "contradiction_group": null,
+            "correction_of_fact": null,
+            "direction": "interpersonal",
+            "evidence": [
+              {
+                "excerpt": "The report broadly states that the patient struck a nurse and damaged a door today.",
+                "supports": [
+                  "conduct",
+                  "direction",
+                  "intentionality",
+                  "temporal_scope",
+                  "assertion_status"
+                ]
+              }
+            ],
+            "intentionality": "intentional",
+            "resolution_status": "active",
+            "temporal_scope": "current",
+            "uncertainty": []
+          }
+        ],
+        "processing_status": "successful_analysis",
+        "validation_failure_stage": "none",
+        "validation_issue_codes": []
+      },
+      "processing_status": "successful_analysis",
+      "provider_duration_seconds": 48.748,
+      "provider_request_count": 1,
+      "request_finished_at": "2026-07-21T13:13:47.729169Z",
+      "request_started_at": "2026-07-21T13:12:58.981280Z",
+      "request_timeout_seconds": 120,
+      "retry_count": 0,
+      "schema_validation": {
+        "issues": [],
+        "status": "passed"
+      },
+      "severity": 1,
+      "stakeholder_impact": "Blocks semantic baseline review.",
+      "timeout_or_failure_provenance": null
+    }
+  ],
+  "compared_run_id": "TRUE_NORTH_LIVE_EVALUATION_001",
+  "comparison_id": "TRUE_NORTH_LIVE_COMPARISON_002",
+  "corpus_identity": "violence-checker-true-north-operational-evaluation",
+  "corpus_sha256": "79f696ab0acd19ca6f648a12ce52f9bbbf1a1f26f990b35ee8a4e26b0087c836",
+  "corpus_version": "3.0.0",
+  "evaluation_schema_version": "3.0.0",
+  "execution": {
+    "attempted_corpus_cases": 24,
+    "attempted_fixtures": 8,
+    "finished_at": "2026-07-21T13:22:30.399409Z",
+    "mode": "live_provider",
+    "provider_request_count": 32,
+    "repository_commit": "73b5112d29b941c5afb58767748231d2ee351558",
+    "requested_corpus_cases": 24,
+    "requested_fixtures": 8,
+    "retry_count": 0,
+    "started_at": "2026-07-21T12:58:01.288877Z",
+    "status": "complete_with_failures"
+  },
+  "fixture_artifact": "evaluation/reports/true-north-live-fixtures-002.json",
+  "provider_availability_conclusion": "PROVIDER_AVAILABILITY_NOT_ACCEPTABLE",
+  "provider_configuration": {
+    "external_case_timeout_seconds": 120,
+    "model": "gpt-5-mini",
+    "provider": "OpenAI configured repository client",
+    "sdk_max_retries": 0
+  },
+  "run_id": "TRUE_NORTH_LIVE_EVALUATION_002",
+  "run_to_run_comparison": {
+    "availability_change": "Corpus timeouts decreased from 3 to 2; fixture live execution added one provider request failure.",
+    "change": {
+      "exact_passes": 12,
+      "operational_fact_accuracy_percentage_points": 50.0,
+      "outcome_accuracy_percentage_points": 24.89,
+      "provider_timeouts": -1,
+      "severity_1": 1,
+      "severity_2": -8,
+      "validation_failures": -2
+    },
+    "corrected_failure_mechanisms": [
+      "denial represented without invented affirmed conduct",
+      "denial-followed-by-correction represented with linked supersession",
+      "insufficient-information represented as unresolved",
+      "no-contact attempt represented as physical_attempt",
+      "historical conduct represented as historical"
+    ],
+    "new_regressions": [
+      "TN_002"
+    ],
+    "run_001": {
+      "exact_passes": 2,
+      "operational_fact_accuracy_all_attempted": {
+        "matches": 2,
+        "percent": 8.33,
+        "total": 24
+      },
+      "outcome_accuracy_completed": {
+        "matches": 11,
+        "percent": 52.38,
+        "total": 21
+      },
+      "provider_timeouts": 3,
+      "severity_1": 3,
+      "severity_2": 10,
+      "validation_failures": 6
+    },
+    "run_002": {
+      "exact_passes": 14,
+      "operational_fact_accuracy_all_attempted": {
+        "matches": 14,
+        "percent": 58.33,
+        "total": 24
+      },
+      "outcome_accuracy_completed": {
+        "matches": 17,
+        "percent": 77.27,
+        "total": 22
+      },
+      "provider_timeouts": 2,
+      "severity_1": 4,
+      "severity_2": 2,
+      "validation_failures": 4
+    },
+    "unchanged_failures": [
+      "TN_008",
+      "TN_011",
+      "TN_012",
+      "TN_013",
+      "TN_024"
+    ]
+  },
+  "semantic_readiness_conclusion": "NOT_READY_SEMANTIC_FAILURES",
+  "semantic_schema_identity": "violence-checker.true-north-incident-facts",
+  "semantic_schema_version": "1.0.0"
+}

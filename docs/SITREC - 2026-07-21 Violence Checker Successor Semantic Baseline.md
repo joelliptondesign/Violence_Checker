@@ -11,7 +11,7 @@ Repository: `Violence_Checker`. This is a non-production local Python and Stream
 
 ## B. CURRENT STATE
 
-Current repository facts: `TrueNorthSemanticEnvelope` is the sole current semantic authority. The True North runtime is active across extraction, repository adaptation, schema and domain validation, deterministic derivation and policy, application orchestration, comparison, illustrative Salesforce projection, bounded Operator Communication, presentation, and Streamlit. The repository-authored `violence-checker-true-north-operational-evaluation` contains 24 synthetic operational cases under evaluation schema `3.0.0`, explicit expectations for all eight demonstration fixtures, and adversarial evidence-integrity coverage. The first 24-case live-provider evaluation is complete with 2 passes, 6 evidence-integrity validation failures, 13 semantic mismatches, and 3 provider timeouts; its assessment is `NOT_READY_SEMANTIC_FAILURES`. Bounded provider-prompt and evidence-integrity corrections are implemented but have not been live re-evaluated. Historical evaluation artifacts remain immutable, readable through their creation-time family, and non-authoritative. No True North baseline has been accepted; deployment and hosted acceptance remain pending.
+Current repository facts: `TrueNorthSemanticEnvelope` is the sole current semantic authority. The True North runtime is active across extraction, repository adaptation, schema and domain validation, deterministic derivation and policy, application orchestration, comparison, illustrative Salesforce projection, bounded Operator Communication, presentation, and Streamlit. The repository-authored `violence-checker-true-north-operational-evaluation` contains 24 synthetic operational cases under evaluation schema `3.0.0`, explicit expectations for all eight demonstration fixtures, and adversarial evidence-integrity coverage. The first 24-case live-provider evaluation is complete and remains immutable. The second live re-evaluation recorded 14 exact passes, 2 acceptable variations, 4 evidence-integrity validation failures, 2 semantic mismatches, and 2 provider timeouts; its semantic assessment is `NOT_READY_SEMANTIC_FAILURES` and its independent availability assessment is `PROVIDER_AVAILABILITY_NOT_ACCEPTABLE`. The prior state that corrections are implemented but have not been live re-evaluated is superseded by this observed run. All eight fixtures were also attempted live, with 1 provider request failure. Historical evaluation artifacts remain immutable, readable through their creation-time family, and non-authoritative. No True North baseline has been accepted; deployment and hosted acceptance remain pending.
 
 ## C. CORE INVARIANTS
 
@@ -60,7 +60,7 @@ The app accepts fixtures and bounded free-form narratives, applies total determi
 
 ## I. KNOWN LIMITATIONS
 
-The lexical baseline is intentionally shallow. Provider quality is not guaranteed, and deterministic validation cannot prove unrestricted natural-language entailment. The completed live-provider evaluation is non-deterministic even though its surrounding contracts are deterministic; it recorded 3 provider timeouts and the readiness assessment `NOT_READY_SEMANTIC_FAILURES`. Subsequent provider-boundary corrections have deterministic regression coverage but require a separately authorized live re-evaluation before any accuracy or availability claim. No True North evaluation baseline has been accepted. Deployment and hosted acceptance have not occurred. Historical and True North artifact families remain intentionally incomparable.
+The lexical baseline is intentionally shallow. Provider quality is not guaranteed, and deterministic validation cannot prove unrestricted natural-language entailment. The second live-provider evaluation is non-deterministic even though its surrounding contracts are deterministic; it recorded 2 corpus timeouts, 1 fixture provider failure, semantic readiness `NOT_READY_SEMANTIC_FAILURES`, and availability `PROVIDER_AVAILABILITY_NOT_ACCEPTABLE`. Observed semantic failures still block baseline review, and observed availability failures independently block hosted-readiness confidence. No True North evaluation baseline has been accepted. Deployment and hosted acceptance have not occurred. Historical and True North artifact families remain intentionally incomparable.
 
 ## J. INTERACTION MODEL
 
@@ -102,9 +102,10 @@ The repository does not guarantee model accuracy, exhaustive violence ontology c
 | `app.py` | Executive information architecture and component ownership. |
 | `src/evaluation/` | Current evaluation contracts, execution, comparison, and reporting. |
 | `evaluation/corpus/successor_corpus.json` | Repository-authored True North operational evaluation ground truth. |
-| `evaluation/runs/true-north-live-evaluation-001.json` | Observed 24-case live-provider execution evidence; not ground truth or an accepted baseline. |
-| `evaluation/reports/true-north-live-comparison-001.json` | Machine-readable doctrine comparison, failure attribution, and readiness assessment. |
-| `evaluation/reports/true-north-live-evaluation-001.md` | Evidence-only operational report for the completed live-provider evaluation. |
+| `evaluation/runs/true-north-live-evaluation-002.json` | Observed 24-case live-provider execution evidence; not ground truth or an accepted baseline. |
+| `evaluation/reports/true-north-live-comparison-002.json` | Machine-readable doctrine comparison, failure attribution, and readiness assessment. |
+| `evaluation/reports/true-north-live-evaluation-002.md` | Evidence-only operational report for the completed live-provider evaluation. |
+| `evaluation/reports/true-north-live-fixtures-002.json` | Observed eight-fixture live-provider evidence; not ground truth or an accepted baseline. |
 | `tests/` | Permanent deterministic behavioral verification authority. |
 | `tools/repo_governance/` | Supporting repository governance and SITREC generation tooling. |
 
@@ -115,11 +116,11 @@ Repository state is authoritative. If this SITREC conflicts with code, contracts
 ## O. REHYDRATION INSTRUCTIONS
 
 1. Read `README.md`, `docs/architecture.md`, this SITREC, `docs/local_governance.md`, `docs/opord_004_verification_authority.md`, `docs/operator_communication_tone_guidelines.md`, `docs/workplace_violence_doctrine.md`, `docs/true_north_semantic_contract_specification.md`, and `docs/true_north_migration_strategy.md`.
-2. Inspect the True North contracts, adapter, validation/derivation/policy chain, application and presentation runtime, `src/evaluation/`, `evaluation/corpus/successor_corpus.json`, and the three `true-north-live-*-001` evaluation artifacts.
+2. Inspect the True North contracts, adapter, validation/derivation/policy chain, application and presentation runtime, `src/evaluation/`, `evaluation/corpus/successor_corpus.json`, immutable run `001`, and the four `true-north-live-*-002` evaluation artifacts.
 3. Inspect `git status --short` before mutation and preserve unrelated work.
 4. Run `python3 -m tools.repo_governance validate-all`; for readiness run `python3 -m tools.repo_governance baseline-readiness` without accepting a baseline.
 5. Preserve provider operational-fact authority, repository bookkeeping, request boundaries, fail-closed validation, deterministic policy, active True North evaluation, operator communication authority, and historical artifact immutability.
-6. Treat baseline acceptance, deployment, and hosted acceptance as separately authorized follow-on actions; the completed live evaluation accepted no baseline.
+6. Treat baseline acceptance, deployment, and hosted acceptance as separately authorized follow-on actions; the completed live re-evaluation accepted no baseline.
 7. Regenerate this artifact with the governed `sitrec` command whenever repository truth changes.
 
 ## P. SITREC LIFECYCLE
