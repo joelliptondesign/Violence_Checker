@@ -36,7 +36,7 @@ This graph records deterministic repository relationships discoverable from file
 | `src/config.py` | provider-facing | `AppConfig` | 3 |
 | `src/contract_adapters.py` | deterministic | none | 2 |
 | `src/contracts.py` | deterministic | `AssertionStatus`, `CommunicationFact`, `CompletenessStatus`, `Conduct`, `DerivedContradictionGroup`, `DerivedSemanticView`, `DomainValidationResult`, `DomainValidationStatus`, `FactDirection`, `FactEvidence`, `IncidentDirection`, `IncidentFact`, `InputFailureCode`, `InputValidationIssue`, `InputValidationResult`, `InputValidationStatus`, `Intentionality`, `MaterialAttribute`, `NormalizationOperation`, `NormalizedIncident`, `OperatorCommunication`, `OperatorCommunicationInput`, `PipelineResult`, `PolicyDecision`, `PolicyOutcome`, `PolicyReasonCode`, `ProcessingStatus`, `ProviderFactCandidate`, `ProviderFactEvidenceCandidate`, `ProviderMaterialAttribute`, `ProviderStructuredResponse`, `RegexResult`, `ResolutionStatus`, `SchemaValidationResult`, `SchemaValidationStatus`, `TemporalScope`, `TrueNorthSemanticEnvelope`, `UncertaintyDimension`, `ValidationFailureStage`, `ValidationIssue`, `ValidationIssueCode`, `ValidationResult` | 21 |
-| `src/domain_validation.py` | deterministic | none | 8 |
+| `src/domain_validation.py` | deterministic | none | 11 |
 | `src/evaluation/__init__.py` | deterministic | none | 0 |
 | `src/evaluation/artifact_cli.py` | deterministic | none | 3 |
 | `src/evaluation/baseline.py` | deterministic | `BaselineError`, `BaselineIssueCode` | 7 |
@@ -79,7 +79,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_comparison.py` | deterministic test | none | 3 |
 | `tests/test_config_and_app.py` | deterministic test | none | 11 |
 | `tests/test_contracts.py` | deterministic test | none | 6 |
-| `tests/test_fixture_policy_regression.py` | deterministic test | none | 2 |
+| `tests/test_fixture_policy_regression.py` | deterministic test | none | 3 |
 | `tests/test_fixtures.py` | deterministic test | none | 3 |
 | `tests/test_input_boundary.py` | deterministic test | none | 6 |
 | `tests/test_models.py` | deterministic test | none | 3 |
@@ -93,7 +93,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_semantic_authority_boundary.py` | deterministic test | none | 9 |
 | `tests/test_semantic_extractor.py` | deterministic test | `FakeClient`, `FakeResponses` | 9 |
 | `tests/test_semantic_prompt.py` | deterministic test | none | 10 |
-| `tests/test_semantic_validation.py` | deterministic test | none | 22 |
+| `tests/test_semantic_validation.py` | deterministic test | none | 27 |
 | `tests/test_sitrec_lifecycle.py` | deterministic test | none | 18 |
 | `tests/test_streamlit_empty_state.py` | deterministic test | none | 5 |
 | `tests/test_successor_downstream_authority.py` | deterministic test | none | 5 |
@@ -162,7 +162,7 @@ This graph records deterministic repository relationships discoverable from file
 | `tests/test_comparison.py` | `src.app_logic`, `src.contracts`, `src.models`, `src.presentation`, `tests.test_app_logic` |
 | `tests/test_config_and_app.py` | `importlib` |
 | `tests/test_contracts.py` | `pydantic`, `pytest`, `src.contracts` |
-| `tests/test_fixture_policy_regression.py` | `src.contracts`, `src.evaluation.corpus`, `src.fixtures` |
+| `tests/test_fixture_policy_regression.py` | `src.contracts`, `src.evaluation.corpus`, `src.fixtures`, `src.models`, `src.policy`, `src.provider_adapter`, `src.semantic_validation` |
 | `tests/test_fixtures.py` | `src.fixtures` |
 | `tests/test_input_boundary.py` | `pytest`, `src.app_logic`, `src.contracts`, `src.fixtures`, `src.input_validation`, `src.models`, `src.narrative_normalizer`, `src.semantic_extractor`, `tests.successor_helpers` |
 | `tests/test_models.py` | `pydantic`, `pytest`, `src.models` |
